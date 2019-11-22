@@ -35,6 +35,14 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -56,8 +64,16 @@ public class IterativeDrive extends OpMode
 {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor leftDrive = null;
-    private DcMotor rightDrive = null;
+
+    private DcMotor fl_Drive = null;
+    private DcMotor fr_Drive = null;
+    private DcMotor bl_Drive = null;
+    private DcMotor br_Drive = null;
+    private Servo hooks    = null;
+    private Boolean hooksState = false;
+
+    private DigitalChannel leftBumper = null;
+    private DigitalChannel rightBumper = null;
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -66,19 +82,32 @@ public class IterativeDrive extends OpMode
     public void init() {
         telemetry.addData("Status", "Initialized");
 
-        // Initialize the hardware variables. Note that the strings used here as parameters
-        // to 'get' must correspond to the names assigned during the robot configuration
-        // step (using the FTC Robot Controller app on the phone).
-        leftDrive  = hardwareMap.get(DcMotor.class, "left_drive");
-        rightDrive = hardwareMap.get(DcMotor.class, "right_drive");
+        fl_Drive = hardwareMap.get(DcMotor.class, "fl_drive");
+        fr_Drive = hardwareMap.get(DcMotor.class, "fr_drive");
+        bl_Drive = hardwareMap.get(DcMotor.class, "bl_drive");
+        br_Drive = hardwareMap.get(DcMotor.class, "br_drive");
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
-        leftDrive.setDirection(DcMotor.Direction.FORWARD);
-        rightDrive.setDirection(DcMotor.Direction.REVERSE);
+        fl_Drive.setDirection(DcMotor.Direction.REVERSE);
+        fr_Drive.setDirection(DcMotor.Direction.FORWARD);
+        bl_Drive.setDirection(DcMotor.Direction.REVERSE);
+        br_Drive.setDirection(DcMotor.Direction.FORWARD);
 
-        // Tell the driver that initialization is complete.
-        telemetry.addData("Status", "Initialized");
+        fl_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        fr_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        bl_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        br_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        hooks = hardwareMap.get(Servo.class, "hooks");
+        hooks.setPosition(0);
+
+        // get a reference to our digitalTouch object.
+        leftBumper  = hardwareMap.get(DigitalChannel.class, "left_bumper");
+        rightBumper = hardwareMap.get(DigitalChannel.class, "right_bumper");
+
+        leftBumper.setMode(DigitalChannel.Mode.INPUT); // set the digital channel to input.
+        rightBumper.setMode(DigitalChannel.Mode.INPUT); // set the digita
     }
 
     /*
@@ -101,32 +130,61 @@ public class IterativeDrive extends OpMode
      */
     @Override
     public void loop() {
-        // Setup a variable for each drive wheel to save power level for telemetry
-        double leftPower;
-        double rightPower;
-
         // Choose to drive using either Tank Mode, or POV Mode
         // Comment out the method that's not used.  The default below is POV.
 
         // POV Mode uses left stick to go forward, and right stick to turn.
         // - This uses basic math to combine motions and is easier to drive straight.
-        double drive = -gamepad1.left_stick_y;
-        double turn  =  gamepad1.right_stick_x;
-        leftPower    = Range.clip(drive + turn, -1.0, 1.0) ;
-        rightPower   = Range.clip(drive - turn, -1.0, 1.0) ;
+        double straight     = -gamepad1.right_stick_y;
+        double side         =  gamepad1.right_stick_x;
+        double turn         =  gamepad1.left_stick_x * 0.7;
+        double speedTrigger =  gamepad1.right_trigger;
+        boolean hookBtn     =  gamepad1.right_bumper;
 
-        // Tank Mode uses one stick to control each wheel.
-        // - This requires no math, but it is hard to drive forward slowly and keep straight.
-        // leftPower  = -gamepad1.left_stick_y ;
-        // rightPower = -gamepad1.right_stick_y ;
+        if(hookBtn) {
+            hooksState = !hooksState;
+            if(hooksState)
+                hooks.setPosition(1);
+            else
+                hooks.setPosition(0);
+
+        }
+
+        double speedBoost = speedTrigger * 0.5 + 0.5;
+
+        double fl_power = (straight + turn + side) * speedBoost;
+        double fr_power = (straight - turn - side) * speedBoost;
+        double bl_power = (straight + turn - side) * speedBoost;
+        double br_power = (straight - turn + side) * speedBoost;
+
+        double m = Math.max(Math.max(fl_power,fr_power), Math.max(bl_power,br_power));
+        if (m > 1) {
+            fl_power /= m;
+            fr_power /= m;
+            bl_power /= m;
+            br_power /= m;
+        }
+
+        if (leftBumper.getState() == false){
+            fl_power = Math.max(0,fl_power);
+            bl_power = Math.max(0,bl_power);
+        }
+
+        if (rightBumper.getState() == false){
+            fr_power = Math.max(0,fr_power);
+            br_power = Math.max(0,br_power);
+        }
 
         // Send calculated power to wheels
-        leftDrive.setPower(leftPower);
-        rightDrive.setPower(rightPower);
+        fl_Drive.setPower(fl_power);
+        fr_Drive.setPower(fr_power);
+        bl_Drive.setPower(bl_power);
+        br_Drive.setPower(br_power);
 
         // Show the elapsed game time and wheel power.
         telemetry.addData("Status", "Run Time: " + runtime.toString());
-        telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
+        telemetry.addData("Motors", "left (%.2f), right (%.2f)", fl_power, fr_power);
+        telemetry.update();
     }
 
     /*
@@ -134,6 +192,15 @@ public class IterativeDrive extends OpMode
      */
     @Override
     public void stop() {
+        fl_Drive.setPower(0);
+        fr_Drive.setPower(0);
+        bl_Drive.setPower(0);
+        br_Drive.setPower(0);
+        fl_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        fr_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        bl_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        br_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
     }
 
 }
