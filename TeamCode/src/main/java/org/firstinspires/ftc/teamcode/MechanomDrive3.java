@@ -1,53 +1,17 @@
-package org.firstinspires.ftc.teamcode;/* Copyright (c) 2017 FIRST. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted (subject to the limitations in the disclaimer below) provided that
- * the following conditions are met:
- *
- * Redistributions of source code must retain the above copyright notice, this list
- * of conditions and the following disclaimer.
- *
- * Redistributions in binary form must reproduce the above copyright notice, this
- * list of conditions and the following disclaimer in the documentation and/or
- * other materials provided with the distribution.
- *
- * Neither the name of FIRST nor the names of its contributors may be used to endorse or
- * promote products derived from this software without specific prior written permission.
- *
- * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS
- * LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
-
 
 /**
- * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
- * the autonomous or the teleop period of an FTC match. The names of OpModes appear on the menu
- * of the FTC Driver Station. When an selection is made from the menu, the corresponding OpMode
- * class is instantiated on the Robot Controller and executed.
- *
- * This particular OpMode just executes a basic Tank Drive Teleop for a two wheeled robot
- * It includes all the skeletal structure that all linear OpModes contain.
- *
- * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
+    FTC - SCI-Fighter
+    Mechanom Drive 3
+
+    Drive with left right bumpers stops and Hooks.
  */
 
 @TeleOp(name="MechanomDrive_3", group="Linear Opmode")
@@ -61,8 +25,10 @@ public class MechanomDrive3 extends LinearOpMode {
     private DcMotor fr_Drive = null;
     private DcMotor bl_Drive = null;
     private DcMotor br_Drive = null;
-    private Servo hooks    = null;
-    private Boolean hooksState = false;
+    private Toggle boostState = new Toggle();
+
+    private Servo   hooks    = null;
+    private Toggle hooksState = new Toggle();
 
     private DigitalChannel leftBumper = null;
     private DigitalChannel rightBumper = null;
@@ -116,25 +82,27 @@ public class MechanomDrive3 extends LinearOpMode {
             // - This uses basic math to combine motions and is easier to drive straight.
             double straight     = -gamepad1.right_stick_y;
             double side         =  gamepad1.right_stick_x;
-            double turn         =  gamepad1.left_stick_x * 0.7;
+            double turn         =  gamepad1.left_stick_x;
             double speedTrigger =  gamepad1.right_trigger;
+            double turneTrigger =  gamepad1.left_trigger;
+
             boolean hookBtn     =  gamepad1.right_bumper;
 
-            if(hookBtn) {
-                hooksState = !hooksState;
-                if(hooksState)
+            hooksState.update(hookBtn);
+            if(hooksState.isPressed()) {
+                if(hooksState.getState())
                     hooks.setPosition(1);
                 else
                     hooks.setPosition(0);
-                sleep(300);
             }
             
             double speedBoost = speedTrigger * 0.5 + 0.5;
+            double turnBoost = turneTrigger * 0.5 + 0.5;
 
-            double fl_power = (straight + turn + side) * speedBoost;
-            double fr_power = (straight - turn - side) * speedBoost;
-            double bl_power = (straight + turn - side) * speedBoost;
-            double br_power = (straight - turn + side) * speedBoost;
+            double fl_power = (straight + turn * turnBoost + side) * speedBoost;
+            double fr_power = (straight - turn * turnBoost - side) * speedBoost;
+            double bl_power = (straight + turn * turnBoost - side) * speedBoost;
+            double br_power = (straight - turn * turnBoost + side) * speedBoost;
 
             double m = Math.max(Math.max(fl_power,fr_power), Math.max(bl_power,br_power));
             if (m > 1) {
@@ -144,14 +112,31 @@ public class MechanomDrive3 extends LinearOpMode {
                 br_power /= m;
             }
 
-            if (leftBumper.getState() == false){
-                fl_power = Math.max(0,fl_power);
-                bl_power = Math.max(0,bl_power);
+            boostState.update(speedTrigger>0.7);
+            if (boostState.isChanged()) {
+                if (boostState.getState()) {
+                    fl_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    fr_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    bl_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    br_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                } else {
+                    fl_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    fr_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    bl_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    br_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                }
             }
 
-            if (rightBumper.getState() == false){
-                fr_power = Math.max(0,fr_power);
-                br_power = Math.max(0,br_power);
+            if (boostState.getState()) {
+                if (leftBumper.getState() == false) {
+                    fl_power = Math.max(0, fl_power);
+                    bl_power = Math.max(0, bl_power);
+                }
+
+                if (rightBumper.getState() == false) {
+                    fr_power = Math.max(0, fr_power);
+                    br_power = Math.max(0, br_power);
+                }
             }
 
             // Send calculated power to wheels
@@ -163,6 +148,8 @@ public class MechanomDrive3 extends LinearOpMode {
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Motors", "left (%.2f), right (%.2f)", fl_power, fr_power);
+            telemetry.addData("Bumper", "left (%b), right (%b)", leftBumper.getState(), rightBumper.getState());
+            if (hooksState.getState()) telemetry.addData("Hooks", "ON");
             telemetry.update();
         }
     }
