@@ -58,7 +58,7 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Basic: Iterative OpMode", group="Iterative Opmode")
+@TeleOp(name="Iterative Drive", group="Iterative Opmode")
 //@Disabled
 public class IterativeDrive extends OpMode
 {
@@ -69,6 +69,13 @@ public class IterativeDrive extends OpMode
     private DcMotor fr_Drive = null;
     private DcMotor bl_Drive = null;
     private DcMotor br_Drive = null;
+
+    private DcMotor l_roller = null;
+    private DcMotor r_roller = null;
+
+    private Servo l_roller_servo    = null;
+    private Servo r_roller_servo    = null;
+
     private Servo hooks    = null;
     private Boolean hooksState = false;
 
@@ -86,6 +93,8 @@ public class IterativeDrive extends OpMode
         fr_Drive = hardwareMap.get(DcMotor.class, "fr_drive");
         bl_Drive = hardwareMap.get(DcMotor.class, "bl_drive");
         br_Drive = hardwareMap.get(DcMotor.class, "br_drive");
+        l_roller = hardwareMap.get(DcMotor.class, "left_roller");
+        r_roller = hardwareMap.get(DcMotor.class, "right_roller");
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
@@ -93,11 +102,19 @@ public class IterativeDrive extends OpMode
         fr_Drive.setDirection(DcMotor.Direction.FORWARD);
         bl_Drive.setDirection(DcMotor.Direction.REVERSE);
         br_Drive.setDirection(DcMotor.Direction.FORWARD);
+        l_roller.setDirection(DcMotor.Direction.REVERSE);
+        r_roller.setDirection(DcMotor.Direction.FORWARD);
+
 
         fl_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         fr_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         bl_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         br_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        l_roller.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        l_roller.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        l_roller_servo = hardwareMap.get(Servo.class, "left_roller_servo");
+        r_roller_servo = hardwareMap.get(Servo.class, "right_roller_servo");
 
         hooks = hardwareMap.get(Servo.class, "hooks");
         hooks.setPosition(0);
@@ -140,6 +157,7 @@ public class IterativeDrive extends OpMode
         double turn         =  gamepad1.left_stick_x * 0.7;
         double speedTrigger =  gamepad1.right_trigger;
         boolean hookBtn     =  gamepad1.right_bumper;
+        boolean rollerBtn   =  gamepad1.left_bumper;
 
         if(hookBtn) {
             hooksState = !hooksState;
@@ -149,6 +167,31 @@ public class IterativeDrive extends OpMode
                 hooks.setPosition(0);
 
         }
+
+        int power=1;
+
+        if (rollerBtn)
+        {
+            r_roller.setPower(power);
+            l_roller.setPower(power);
+
+            r_roller_servo.setPosition(0);
+            l_roller_servo.setPosition(1);
+        }
+
+        else
+
+        {
+            r_roller.setPower(0);
+            l_roller.setPower(0);
+
+            r_roller_servo.setPosition(1);
+            l_roller_servo.setPosition(0);
+
+        }
+
+
+
 
         double speedBoost = speedTrigger * 0.5 + 0.5;
 
