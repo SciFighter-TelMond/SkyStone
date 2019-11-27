@@ -198,13 +198,12 @@ public class Auto_1 extends LinearOpMode {
         bl_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         br_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        while((fl_Drive.isBusy() || bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy()) && opModeIsActive() ) {
+        while((fl_Drive.isBusy() /*|| bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy()*/) && opModeIsActive() ) {
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Motor Runs to target: %2.2g", target_meter);
             telemetry.addData("Motors", "left (%d), right (%d)", fl_Drive.getCurrentPosition(), fr_Drive.getCurrentPosition());
             telemetry.update();
         }
-
     }
 
     void stopMove(){
