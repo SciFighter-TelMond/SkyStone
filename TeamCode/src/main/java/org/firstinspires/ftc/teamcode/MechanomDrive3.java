@@ -33,6 +33,8 @@ public class MechanomDrive3 extends LinearOpMode {
     private DigitalChannel leftBumper = null;
     private DigitalChannel rightBumper = null;
 
+    private ArmClassTest armDrive = new ArmClassTest();
+
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -68,9 +70,13 @@ public class MechanomDrive3 extends LinearOpMode {
         leftBumper.setMode(DigitalChannel.Mode.INPUT); // set the digital channel to input.
         rightBumper.setMode(DigitalChannel.Mode.INPUT); // set the digital channel to input.
 
+        armDrive.init(hardwareMap);
+
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
+
+        armDrive.begine();
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
@@ -86,9 +92,11 @@ public class MechanomDrive3 extends LinearOpMode {
             double speedTrigger =  gamepad1.right_trigger;
             double turneTrigger =  gamepad1.left_trigger;
 
-            boolean hookBtn     =  gamepad1.right_bumper;
+            armDrive.moveArm0(-gamepad2.right_stick_y);
+            armDrive.moveArm1(-gamepad2.left_stick_y);
 
-            hooksState.update(hookBtn);
+            hooksState.update(gamepad1.right_bumper);
+
             if(hooksState.isPressed()) {
                 if(hooksState.getState())
                     hooks.setPosition(1);

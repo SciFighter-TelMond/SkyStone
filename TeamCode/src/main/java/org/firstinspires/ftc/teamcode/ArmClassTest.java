@@ -11,14 +11,18 @@ public class ArmClassTest extends Thread {
     private DigitalChannel zeroSwitch0 = null;
     private DigitalChannel zeroSwitch1 = null;
 
-    public enum Commands { MANUAL, SEARCH_0, GOTO_0, TACK_BLOCK, BUILD_BLOCK_0, BUILD_BLOCK_1, BUILD_BLOCK_2, BUILD_BLOCK_3, BUILD_BLOCK_4 };
+    public enum Commands { IDLE, MANUAL, SEARCH_0, GOTO_0, TACK_BLOCK, BUILD_BLOCK_0, BUILD_BLOCK_1, BUILD_BLOCK_2, BUILD_BLOCK_3, BUILD_BLOCK_4 };
     private Commands currentCommand = Commands.MANUAL;
 
+    private double power = 0.7;
+
+    // ====================================================================================
     public void setCommand( Commands command ) {
         this.currentCommand = command;
         start();
     }
 
+    // ====================================================================================
     public void init(HardwareMap hardwareMap) {
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
@@ -39,41 +43,37 @@ public class ArmClassTest extends Thread {
         arm1.setPower(0);
     }
 
-    public void begine() {
+    // ====================================================================================
+    public void setPower(double power) {
+        this.power = power;
+        if (currentCommand != Commands.IDLE) {
+            arm0.setPower(power);
+            arm1.setPower(power);
+        }
+    }
+
+    // ====================================================================================
+    public void reset() {
+        this.interrupt();
         arm0.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         arm1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         arm0.setTargetPosition(0);
         arm1.setTargetPosition(0);
-        arm0.setPower(1);
-        arm1.setPower(1);
+        arm0.setPower(power);
+        arm1.setPower(power);
         arm0.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         arm1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+
+    // ====================================================================================
+    public void begine() {
+        reset();
         // TODO: if not zero switch touched - search for the zero position.
+        currentCommand = Commands.MANUAL;
     }
 
-    public void end() {
-        this.interrupt();
-        arm0.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        arm1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        arm0.setPower(0);
-        arm1.setPower(0);
-    }
-
-    public void moveSteps( int steps0, int steps1 ) {
-        if (currentCommand != Commands.MANUAL) {
-            interrupt();
-        }
-        int pos0 = arm0.getCurrentPosition() + steps0;
-        arm0.setTargetPosition(pos0);
-
-        int pos1 = arm1.getCurrentPosition() + steps1;
-        arm1.setTargetPosition(pos1);
-
-        checkZeroSwitch();
-    }
-
-    private void checkZeroSwitch() {
-
+    // ====================================================================================
+    private void checkSwitch() {
         if (zeroSwitch0.getState() == false) {
             arm0.setTargetPosition(arm0.getCurrentPosition());
         }
@@ -83,23 +83,44 @@ public class ArmClassTest extends Thread {
         }
     }
 
+    // ====================================================================================
+    public void moveArm0(float speed) {
+        if (zeroSwitch0.getState() == false) {
+            speed = Math.max(0, speed);
+        }
+        if (speed != 0) {
+            int tiks = arm0.getCurrentPosition() + (int) (10 * speed);
+            arm0.setTargetPosition(tiks);
+        }
+    }
+
+    // ====================================================================================
+    public void moveArm1(float speed) {
+        if (zeroSwitch1.getState() == false) {
+            speed = Math.max(0, speed);
+        }
+        if (speed != 0) {
+            int tiks = arm1.getCurrentPosition() + (int) (10 * speed);
+            arm1.setTargetPosition(tiks);
+        }
+    }
+
+    // ====================================================================================
     private void goToPosition(int pos0, int pos1) throws InterruptedException {
         arm0.setTargetPosition(pos0);
         arm1.setTargetPosition(pos1);
 
-        arm0.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        arm1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
         while ( arm0.isBusy() ) {
             sleep(10);
-            checkZeroSwitch();
+            checkSwitch();
         }
         while ( arm1.isBusy() ) {
             sleep(10);
-            checkZeroSwitch();
+            checkSwitch();
         }
     }
 
+    // ====================================================================================
     @Override
     public void run() {
         try {
@@ -117,5 +138,14 @@ public class ArmClassTest extends Thread {
         } catch (InterruptedException e) { }
 
         currentCommand = Commands.MANUAL;
+    }
+
+    // ====================================================================================
+    public void end() {
+        this.interrupt();
+        arm0.setPower(0);
+        arm1.setPower(0);
+        arm0.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        arm1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 }
