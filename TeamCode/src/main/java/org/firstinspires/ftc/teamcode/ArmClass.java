@@ -27,12 +27,37 @@ public class ArmClass extends Thread {
         arm1.setDirection(DcMotor.Direction.FORWARD);
         zeroArm0.setMode(DigitalChannel.Mode.INPUT);
         zeroArm1.setMode(DigitalChannel.Mode.INPUT);
-
     }
 
+    public void begin() {
+        arm0.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        arm1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
+        arm0.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        arm1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        double power = 0.6;
+        arm0.setPower(power);
+        arm1.setPower(power);
+    }
+
+    public void gooto(int pos0,int pos1) throws InterruptedException {
+        arm0.setTargetPosition(pos0);
+        arm1.setTargetPosition(pos1);
+        while(arm0.isBusy()){
+            sleep(10);
+        }
+        while(arm1.isBusy()){
+            sleep(10);
+        }
+    }
 
     public void run() {
 
+    }
+    public void end(){
+        double power = 0.0;
+        arm0.setPower(power);
+        arm1.setPower(power);
     }
 }
