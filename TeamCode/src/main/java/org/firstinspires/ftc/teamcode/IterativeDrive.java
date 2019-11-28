@@ -77,10 +77,12 @@ public class IterativeDrive extends OpMode
     private Servo r_roller_servo    = null;
 
     private Servo   hooks      = null;
-    private Boolean hooksState = false;
+    private Toggle  hooksState = new Toggle();
+    private Toggle  speedState = new Toggle();
 
     private DigitalChannel leftBumper = null;
     private DigitalChannel rightBumper = null;
+
 
     // Code to run ONCE when the driver hits INIT
     @Override
@@ -108,6 +110,7 @@ public class IterativeDrive extends OpMode
         fr_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         bl_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         br_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         l_roller.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         l_roller.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -143,12 +146,15 @@ public class IterativeDrive extends OpMode
         double side         =  gamepad1.right_stick_x;
         double turn         =  gamepad1.left_stick_x * 0.7;
         double speedTrigger =  gamepad1.right_trigger;
-        boolean hookBtn     =  gamepad1.right_bumper;
         boolean rollerBtn   =  gamepad1.left_bumper;
+        boolean rollerBtn2  =  gamepad1.b;
 
-        if(hookBtn) {
-            hooksState = !hooksState;
-            if(hooksState)
+        hooksState.update(gamepad1.right_bumper);
+
+        speedState.update(speedTrigger > 0.7);
+
+        if(hooksState.isPressed()) {
+            if(hooksState.getState())
                 hooks.setPosition(1);
             else
                 hooks.setPosition(0);
@@ -156,24 +162,54 @@ public class IterativeDrive extends OpMode
 
         int power=1;
 
-        if (rollerBtn)
-        {
+        if (rollerBtn) {
+            l_roller.setDirection(DcMotor.Direction.REVERSE);
+            r_roller.setDirection(DcMotor.Direction.FORWARD);
+
             r_roller.setPower(power);
             l_roller.setPower(power);
 
             r_roller_servo.setPosition(0);
             l_roller_servo.setPosition(1);
+        } else {
+            r_roller.setPower(0);
+            l_roller.setPower(0);
+
+            r_roller_servo.setPosition(1);
+            l_roller_servo.setPosition(0);
         }
 
-        else
+        if (rollerBtn2) {
+            l_roller.setDirection(DcMotor.Direction.FORWARD);
+            r_roller.setDirection(DcMotor.Direction.REVERSE);
 
-        {
+            r_roller.setPower(power);
+            l_roller.setPower(power);
+
+            r_roller_servo.setPosition(0);
+            l_roller_servo.setPosition(1);
+        } else {
+
             r_roller.setPower(0);
             l_roller.setPower(0);
 
             r_roller_servo.setPosition(1);
             l_roller_servo.setPosition(0);
 
+        }
+        if (speedState.isChanged()) {
+            if (speedState.isPressed()) {
+
+                fl_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                fr_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                bl_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                br_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            } else {
+                fl_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                fr_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                bl_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                br_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            }
         }
 
 
