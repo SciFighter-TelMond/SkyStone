@@ -91,8 +91,8 @@ public class Arm1 extends OpMode {
             speed1 = Math.min(0, speed1);
         }
 
-        int tiks0 = arm0.getCurrentPosition() + (int) (100 * speed0);
-        int tiks1 = arm1.getCurrentPosition() + (int) (100 * speed1);
+        int tiks0 = arm0.getCurrentPosition() + (int) (10 * speed0);
+        int tiks1 = arm1.getCurrentPosition() + (int) (10 * speed1);
 
         if (speed0 != 0) {
             arm0.setTargetPosition(tiks0);

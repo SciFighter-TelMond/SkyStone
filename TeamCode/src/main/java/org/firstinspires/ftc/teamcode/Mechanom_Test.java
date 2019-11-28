@@ -8,15 +8,15 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
-    FTC - SCI-Fighter
-    Mechanom Drive 3
+ FTC - SCI-Fighter
+ Mechanom Drive 3
 
-    Drive with left right bumpers stops and Hooks.
+ Drive with left right bumpers stops and Hooks.
  */
 
-@TeleOp(name="MechanomDrive_3", group="Linear Opmode")
+@TeleOp(name="Mechanom Test", group="Linear Opmode")
 //@Disabled
-public class MechanomDrive3 extends LinearOpMode {
+public class Mechanom_Test extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -32,8 +32,6 @@ public class MechanomDrive3 extends LinearOpMode {
 
     private DigitalChannel leftBumper = null;
     private DigitalChannel rightBumper = null;
-
-    private ArmClassTest armDrive = new ArmClassTest();
 
     @Override
     public void runOpMode() {
@@ -70,55 +68,30 @@ public class MechanomDrive3 extends LinearOpMode {
         leftBumper.setMode(DigitalChannel.Mode.INPUT); // set the digital channel to input.
         rightBumper.setMode(DigitalChannel.Mode.INPUT); // set the digital channel to input.
 
-        armDrive.init(hardwareMap);
-
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
 
-        armDrive.begine();
-
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
-            // Choose to drive using either Tank Mode, or POV Mode
-            // Comment out the method that's not used.  The default below is POV.
-
-            // POV Mode uses left stick to go forward, and right stick to turn.
-            // - This uses basic math to combine motions and is easier to drive straight.
-            double straight     = -gamepad1.right_stick_y;
-            double side         =  gamepad1.right_stick_x;
-            double turn         =  gamepad1.left_stick_x;
             double speedTrigger =  gamepad1.right_trigger;
             double turneTrigger =  gamepad1.left_trigger;
 
-            armDrive.moveArm0(-gamepad2.right_stick_y);
-            armDrive.moveArm1(-gamepad2.left_stick_y);
+            boolean hookBtn     =  gamepad1.right_bumper;
 
-            hooksState.update(gamepad1.right_bumper);
-
+            hooksState.update(hookBtn);
             if(hooksState.isPressed()) {
                 if(hooksState.getState())
                     hooks.setPosition(1);
                 else
                     hooks.setPosition(0);
             }
-            
-            double speedBoost = speedTrigger * 0.5 + 0.5;
-            double turnBoost = turneTrigger * 0.5 + 0.5;
 
-            double fl_power = (straight + turn * turnBoost + side) * speedBoost;
-            double fr_power = (straight - turn * turnBoost - side) * speedBoost;
-            double bl_power = (straight + turn * turnBoost - side) * speedBoost;
-            double br_power = (straight - turn * turnBoost + side) * speedBoost;
-
-            double m = Math.max(Math.max(fl_power,fr_power), Math.max(bl_power,br_power));
-            if (m > 1) {
-                fl_power /= m;
-                fr_power /= m;
-                bl_power /= m;
-                br_power /= m;
-            }
+            double fl_power =  gamepad1.left_stick_x;
+            double fr_power =  gamepad1.right_stick_x;
+            double bl_power = -gamepad1.left_stick_y;
+            double br_power = -gamepad1.right_stick_y;
 
             boostState.update(speedTrigger>0.7);
             if (boostState.isChanged()) {
@@ -132,18 +105,6 @@ public class MechanomDrive3 extends LinearOpMode {
                     fr_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                     bl_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                     br_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                }
-            }
-
-            if (boostState.getState()) {
-                if (leftBumper.getState() == false) {
-                    fl_power = Math.max(0, fl_power);
-                    bl_power = Math.max(0, bl_power);
-                }
-
-                if (rightBumper.getState() == false) {
-                    fr_power = Math.max(0, fr_power);
-                    br_power = Math.max(0, br_power);
                 }
             }
 
