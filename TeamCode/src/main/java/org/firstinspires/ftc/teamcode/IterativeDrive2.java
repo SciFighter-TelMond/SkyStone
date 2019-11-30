@@ -108,8 +108,8 @@ public class IterativeDrive2 extends OpMode {
         bl_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         br_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        l_roller.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        l_roller.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        l_roller.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        r_roller.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         l_roller_servo = hardwareMap.get(Servo.class, "left_roller_servo");
         r_roller_servo = hardwareMap.get(Servo.class, "right_roller_servo");

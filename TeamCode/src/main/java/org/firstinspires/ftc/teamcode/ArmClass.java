@@ -17,6 +17,9 @@ public class ArmClass extends Thread {
     private Servo clamps = null;
     private Servo clampsRotate = null;
 
+    private int manualPos0 = 0;
+    private int manualPos1 = 0;
+
     private double power = 0.7;
 
     public enum Mode {IDLE, MANUAL, PICK, BUILD, DORP}
@@ -147,6 +150,7 @@ public class ArmClass extends Thread {
         arm1.setPower(0);
         arm0.setTargetPosition(arm0.getCurrentPosition());
         arm1.setTargetPosition(arm1.getCurrentPosition());
+        mode = Mode.IDLE;
     }
 
     public void resumePower() {
@@ -154,6 +158,7 @@ public class ArmClass extends Thread {
         arm1.setTargetPosition(arm1.getCurrentPosition());
         arm0.setPower(power);
         arm1.setPower(power);
+        mode = Mode.MANUAL;
     }
 
     public int getArm0Pos() {
