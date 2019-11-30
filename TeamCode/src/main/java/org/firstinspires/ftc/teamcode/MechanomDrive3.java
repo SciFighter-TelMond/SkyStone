@@ -92,6 +92,12 @@ public class MechanomDrive3 extends LinearOpMode {
             double speedTrigger =  gamepad1.right_trigger;
             double turneTrigger =  gamepad1.left_trigger;
 
+            if (gamepad2.x)
+                armDrive.reset();
+
+            if (gamepad2.b)
+                armDrive.end();
+
             armDrive.moveArm0(-gamepad2.right_stick_y);
             armDrive.moveArm1(-gamepad2.left_stick_y);
 
@@ -105,7 +111,7 @@ public class MechanomDrive3 extends LinearOpMode {
             }
             
             double speedBoost = speedTrigger * 0.5 + 0.5;
-            double turnBoost = turneTrigger * 0.5 + 0.5;
+            double turnBoost  = turneTrigger * 0.5 + 0.5;
 
             double fl_power = (straight + turn * turnBoost + side) * speedBoost;
             double fr_power = (straight - turn * turnBoost - side) * speedBoost;

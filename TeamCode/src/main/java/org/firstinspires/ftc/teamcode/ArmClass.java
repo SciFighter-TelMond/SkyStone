@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -82,15 +83,33 @@ public class ArmClass extends Thread {
 
     public void run() {
         try {
-            gooto(1240, 330);
-        } catch(InterruptedException e){}
+
+            /*
+            Pos Name	Arm0	Arm1
+            Pos 1 	3100	3100
+            Pos 2 	2470	5080
+            Pos 3	4700	5960
+            Pos 4   500	    280
+
+             */
+
+            gooto(3100, 3100);
+            sleep(2000);
+            gooto(2470, 5080);
+            sleep(2000);
+            gooto(4700, 5960);
+            sleep(2000);
+            gooto(500, 280);
+
+        } catch(InterruptedException e){ }
     }
 
     public void end(){
         interrupt();
-        double power = 0.0;
-        arm0.setPower(power);
-        arm1.setPower(power);
+        arm0.setPower(0);
+        arm1.setPower(0);
+        arm0.setTargetPosition(arm0.getCurrentPosition());
+        arm1.setTargetPosition(arm1.getCurrentPosition());
     }
 
     public int arm0getPos(){

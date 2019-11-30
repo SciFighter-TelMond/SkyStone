@@ -83,6 +83,7 @@ public class IterativeDrive extends OpMode
     private DigitalChannel leftBumper = null;
     private DigitalChannel rightBumper = null;
 
+    private ArmClass arm = new ArmClass();
 
     // Code to run ONCE when the driver hits INIT
     @Override
@@ -101,6 +102,7 @@ public class IterativeDrive extends OpMode
         fr_Drive.setDirection(DcMotor.Direction.FORWARD);
         bl_Drive.setDirection(DcMotor.Direction.REVERSE);
         br_Drive.setDirection(DcMotor.Direction.FORWARD);
+
         l_roller.setDirection(DcMotor.Direction.REVERSE);
         r_roller.setDirection(DcMotor.Direction.FORWARD);
 
@@ -126,6 +128,8 @@ public class IterativeDrive extends OpMode
 
         leftBumper.setMode(DigitalChannel.Mode.INPUT); // set the digital channel to input.
         rightBumper.setMode(DigitalChannel.Mode.INPUT); // set the digital channel to input.
+
+        arm.init(hardwareMap);
     }
 
     // Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
@@ -134,7 +138,10 @@ public class IterativeDrive extends OpMode
 
     // Code to run ONCE when the driver hits PLAY
     @Override
-    public void start() { runtime.reset(); }
+    public void start() {
+        runtime.reset();
+        arm.begin();
+    }
 
     // Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
     @Override
@@ -146,12 +153,13 @@ public class IterativeDrive extends OpMode
         double side         =  gamepad1.right_stick_x;
         double turn         =  gamepad1.left_stick_x * 0.7;
         double speedTrigger =  gamepad1.right_trigger;
-        boolean rollerBtn   =  gamepad1.left_bumper;
-        boolean rollerBtn2  =  gamepad1.b;
+        boolean rollerBtnIn   =  gamepad1.left_bumper;
+        boolean rollerBtnOut  =  gamepad1.b;
 
+        // =========================================
+        // Hooks Control
+        // =========================================
         hooksState.update(gamepad1.right_bumper);
-
-        speedState.update(speedTrigger > 0.7);
 
         if(hooksState.isPressed()) {
             if(hooksState.getState())
@@ -160,43 +168,66 @@ public class IterativeDrive extends OpMode
                 hooks.setPosition(0);
         }
 
+        // =========================================
+        // Arm Control
+        // =========================================
+        arm.moveArm0(-gamepad2.left_stick_y);
+        arm.moveArm1(-gamepad2.right_stick_y);
+        if (gamepad2.b) {
+            arm.end();
+        }
+        if (gamepad2.a) {
+            arm.begin();
+        }
+        if (gamepad2.x){
+            arm.reset();
+        }
+        if (gamepad2.y){
+            arm.start();
+        }
+
+        // =========================================
+        // Rollers Control
+        // =========================================
         int power=1;
 
-        if (rollerBtn) {
-            l_roller.setDirection(DcMotor.Direction.REVERSE);
-            r_roller.setDirection(DcMotor.Direction.FORWARD);
+        if (!rollerBtnOut) {
+            if (rollerBtnIn) {
+                r_roller.setPower(power);
+                l_roller.setPower(power);
 
-            r_roller.setPower(power);
-            l_roller.setPower(power);
+                r_roller_servo.setPosition(0);
+                l_roller_servo.setPosition(1);
+            } else {
+                r_roller.setPower(0);
+                l_roller.setPower(0);
 
-            r_roller_servo.setPosition(0);
-            l_roller_servo.setPosition(1);
-        } else {
-            r_roller.setPower(0);
-            l_roller.setPower(0);
-
-            r_roller_servo.setPosition(1);
-            l_roller_servo.setPosition(0);
+                r_roller_servo.setPosition(1);
+                l_roller_servo.setPosition(0);
+            }
         }
 
-        if (rollerBtn2) {
-            l_roller.setDirection(DcMotor.Direction.FORWARD);
-            r_roller.setDirection(DcMotor.Direction.REVERSE);
+        if (!rollerBtnIn) {
+            if (rollerBtnOut) {
+                r_roller.setPower(-power);
+                l_roller.setPower(-power);
 
-            r_roller.setPower(power);
-            l_roller.setPower(power);
+                r_roller_servo.setPosition(0);
+                l_roller_servo.setPosition(1);
+            } else {
+                r_roller.setPower(0);
+                l_roller.setPower(0);
 
-            r_roller_servo.setPosition(0);
-            l_roller_servo.setPosition(1);
-        } else {
-
-            r_roller.setPower(0);
-            l_roller.setPower(0);
-
-            r_roller_servo.setPosition(1);
-            l_roller_servo.setPosition(0);
-
+                r_roller_servo.setPosition(1);
+                l_roller_servo.setPosition(0);
+            }
         }
+
+        // =========================================
+        // Mechanom Drive with Speed Boost.
+        // =========================================
+        speedState.update(speedTrigger > 0.7);
+
         if (speedState.isChanged()) {
             if (speedState.isPressed()) {
 
@@ -211,9 +242,6 @@ public class IterativeDrive extends OpMode
                 br_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             }
         }
-
-
-
 
         double speedBoost = speedTrigger * 0.5 + 0.5;
 
@@ -249,6 +277,7 @@ public class IterativeDrive extends OpMode
         // Show the elapsed game time and wheel power.
         telemetry.addData("Status", "Run Time: " + runtime.toString());
         telemetry.addData("Motors", "left (%.2f), right (%.2f)", fl_power, fr_power);
+        telemetry.addData("Arms ", "Arm0 (%d), Arm1 (%d)", arm.arm0getPos(), arm.arm1getPos());
     }
 
     // Code to run ONCE after the driver hits STOP
@@ -262,5 +291,8 @@ public class IterativeDrive extends OpMode
         fr_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         bl_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         br_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        arm.end();
     }
+
 }

@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -29,8 +30,8 @@ public class ArmClassTest extends Thread {
         // step (using the FTC Robot Controller app on the phone).
         arm0 = hardwareMap.get(DcMotor.class, "arm0");
         arm1 = hardwareMap.get(DcMotor.class, "arm1");
-        zeroSwitch0 = hardwareMap.get(DigitalChannel.class, "start_game0");
-        zeroSwitch1 = hardwareMap.get(DigitalChannel.class, "start_game1");
+        zeroSwitch0 = hardwareMap.get(DigitalChannel.class, "zero_arm0");
+        zeroSwitch1 = hardwareMap.get(DigitalChannel.class, "zero_arm1");
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
@@ -89,7 +90,7 @@ public class ArmClassTest extends Thread {
             speed = Math.max(0, speed);
         }
         if (speed != 0) {
-            int tiks = arm0.getCurrentPosition() + (int) (10 * speed);
+            int tiks = arm0.getCurrentPosition() + (int) (100 * speed);
             arm0.setTargetPosition(tiks);
         }
     }
@@ -100,7 +101,7 @@ public class ArmClassTest extends Thread {
             speed = Math.max(0, speed);
         }
         if (speed != 0) {
-            int tiks = arm1.getCurrentPosition() + (int) (10 * speed);
+            int tiks = arm1.getCurrentPosition() + (int) (100 * speed);
             arm1.setTargetPosition(tiks);
         }
     }
@@ -145,7 +146,7 @@ public class ArmClassTest extends Thread {
         this.interrupt();
         arm0.setPower(0);
         arm1.setPower(0);
-        arm0.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        arm1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        arm0.setTargetPosition(arm0.getCurrentPosition());
+        arm1.setTargetPosition(arm1.getCurrentPosition());
     }
 }
