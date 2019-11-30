@@ -21,8 +21,6 @@ public class ArmClass extends Thread {
 
     public enum Mode {IDLE, MANUAL, PICK, BUILD, DORP}
 
-    ;
-
     private Mode mode = Mode.IDLE;
 
     public void init(HardwareMap hardwareMap) {
@@ -129,6 +127,12 @@ public class ArmClass extends Thread {
                     sleep(2000);
                     gootoo(500, 280);
                     break;
+
+                case DORP:
+                    break;
+
+                default:
+
             }
 
         } catch (InterruptedException e) {

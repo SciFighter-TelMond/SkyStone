@@ -210,7 +210,7 @@ public class IterativeDrive2 extends OpMode {
         rollerState.update(gamepad1.dpad_down);
         double rollerPower = 1;
         if ((gamepad1.dpad_up == false) && (cubeBumper.getState() == false)) {
-            rollerPower = 0.3;
+            rollerPower = 0.1;
         } else {
             rollerPower = 1;
         }
