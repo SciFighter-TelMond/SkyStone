@@ -149,4 +149,13 @@ public class ArmClassTest extends Thread {
         arm0.setTargetPosition(arm0.getCurrentPosition());
         arm1.setTargetPosition(arm1.getCurrentPosition());
     }
+
+    public int getArm0Pos(){
+        return arm0.getCurrentPosition();
+    }
+
+    public int getArm1Pos(){
+        return arm1.getCurrentPosition();
+    }
+
 }

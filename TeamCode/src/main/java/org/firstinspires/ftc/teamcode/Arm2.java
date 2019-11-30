@@ -6,8 +6,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
@@ -44,7 +42,7 @@ public class Arm2 extends OpMode {
             arm.reset();
         }
         telemetry.addData("Status", "Run Time: " + runtime.toString());
-        telemetry.addData("Arms", "arm0 (%d), arm1 (%d)", arm.arm0getPos(), arm.arm1getPos());
+        telemetry.addData("Arms", "arm0 (%d), arm1 (%d)", arm.getArm0Pos(), arm.getArm1Pos());
         telemetry.update();
     }
 

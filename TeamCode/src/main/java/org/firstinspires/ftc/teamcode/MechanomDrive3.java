@@ -33,7 +33,7 @@ public class MechanomDrive3 extends LinearOpMode {
     private DigitalChannel leftBumper = null;
     private DigitalChannel rightBumper = null;
 
-    private ArmClassTest armDrive = new ArmClassTest();
+    private ArmClassTest arm = new ArmClassTest();
 
     @Override
     public void runOpMode() {
@@ -70,13 +70,13 @@ public class MechanomDrive3 extends LinearOpMode {
         leftBumper.setMode(DigitalChannel.Mode.INPUT); // set the digital channel to input.
         rightBumper.setMode(DigitalChannel.Mode.INPUT); // set the digital channel to input.
 
-        armDrive.init(hardwareMap);
+        arm.init(hardwareMap);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
 
-        armDrive.begine();
+        arm.begine();
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
@@ -93,13 +93,13 @@ public class MechanomDrive3 extends LinearOpMode {
             double turneTrigger =  gamepad1.left_trigger;
 
             if (gamepad2.x)
-                armDrive.reset();
+                arm.reset();
 
             if (gamepad2.b)
-                armDrive.end();
+                arm.end();
 
-            armDrive.moveArm0(-gamepad2.right_stick_y);
-            armDrive.moveArm1(-gamepad2.left_stick_y);
+            arm.moveArm0(-gamepad2.right_stick_y);
+            arm.moveArm1(-gamepad2.left_stick_y);
 
             hooksState.update(gamepad1.right_bumper);
 
@@ -163,6 +163,7 @@ public class MechanomDrive3 extends LinearOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Motors", "left (%.2f), right (%.2f)", fl_power, fr_power);
             telemetry.addData("Bumper", "left (%b), right (%b)", leftBumper.getState(), rightBumper.getState());
+            telemetry.addData("Arms", "Arm0 (%d), Arm1 (%d)", arm.getArm0Pos(), arm.getArm1Pos());
             if (hooksState.getState()) telemetry.addData("Hooks", "ON");
             telemetry.update();
         }

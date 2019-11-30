@@ -14,6 +14,8 @@ public class ArmClass extends Thread {
     private DigitalChannel zeroArm0 = null;
     private DigitalChannel zeroArm1 = null;
 
+    private double power = 0.7;
+
     ArmClass() {
 
     }
@@ -45,7 +47,6 @@ public class ArmClass extends Thread {
 
     public void begin() {
         reset();
-        double power = 0.6;
         arm0.setPower(power);
         arm1.setPower(power);
     }
@@ -84,15 +85,6 @@ public class ArmClass extends Thread {
     public void run() {
         try {
 
-            /*
-            Pos Name	Arm0	Arm1
-            Pos 1 	3100	3100
-            Pos 2 	2470	5080
-            Pos 3	4700	5960
-            Pos 4   500	    280
-
-             */
-
             gooto(3100, 3100);
             sleep(2000);
             gooto(2470, 5080);
@@ -112,12 +104,16 @@ public class ArmClass extends Thread {
         arm1.setTargetPosition(arm1.getCurrentPosition());
     }
 
-    public int arm0getPos(){
+    public void resumeMove() {
+        arm0.setPower(power);
+        arm1.setPower(power);
+    }
+
+    public int getArm0Pos(){
         return arm0.getCurrentPosition();
     }
 
-    public int arm1getPos(){
+    public int getArm1Pos(){
         return arm1.getCurrentPosition();
     }
-
 }

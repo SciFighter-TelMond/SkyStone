@@ -29,20 +29,12 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -149,12 +141,12 @@ public class IterativeDrive extends OpMode
 
         // POV Mode uses left stick to go forward, and right stick to turn.
         // - This uses basic math to combine motions and is easier to drive straight.
-        double straight     = -gamepad1.right_stick_y;
-        double side         =  gamepad1.right_stick_x;
-        double turn         =  gamepad1.left_stick_x * 0.7;
-        double speedTrigger =  gamepad1.right_trigger;
-        boolean rollerBtnIn   =  gamepad1.left_bumper;
-        boolean rollerBtnOut  =  gamepad1.b;
+        double straight      = -gamepad1.right_stick_y;
+        double side          =  gamepad1.right_stick_x;
+        double turn          =  gamepad1.left_stick_x * 0.7;
+        double speedTrigger  =  gamepad1.right_trigger;
+        boolean rollerBtnIn  =  gamepad1.left_bumper;
+        boolean rollerBtnOut =  gamepad1.b;
 
         // =========================================
         // Hooks Control
@@ -177,7 +169,7 @@ public class IterativeDrive extends OpMode
             arm.end();
         }
         if (gamepad2.a) {
-            arm.begin();
+            arm.resumeMove();
         }
         if (gamepad2.x){
             arm.reset();
@@ -189,12 +181,12 @@ public class IterativeDrive extends OpMode
         // =========================================
         // Rollers Control
         // =========================================
-        int power=1;
+        double rollerPower=1;
 
         if (!rollerBtnOut) {
             if (rollerBtnIn) {
-                r_roller.setPower(power);
-                l_roller.setPower(power);
+                r_roller.setPower(rollerPower);
+                l_roller.setPower(rollerPower);
 
                 r_roller_servo.setPosition(0);
                 l_roller_servo.setPosition(1);
@@ -209,8 +201,8 @@ public class IterativeDrive extends OpMode
 
         if (!rollerBtnIn) {
             if (rollerBtnOut) {
-                r_roller.setPower(-power);
-                l_roller.setPower(-power);
+                r_roller.setPower(-rollerPower);
+                l_roller.setPower(-rollerPower);
 
                 r_roller_servo.setPosition(0);
                 l_roller_servo.setPosition(1);
@@ -277,7 +269,7 @@ public class IterativeDrive extends OpMode
         // Show the elapsed game time and wheel power.
         telemetry.addData("Status", "Run Time: " + runtime.toString());
         telemetry.addData("Motors", "left (%.2f), right (%.2f)", fl_power, fr_power);
-        telemetry.addData("Arms ", "Arm0 (%d), Arm1 (%d)", arm.arm0getPos(), arm.arm1getPos());
+        telemetry.addData("Arms", "Arm0 (%d), Arm1 (%d)", arm.getArm0Pos(), arm.getArm1Pos());
     }
 
     // Code to run ONCE after the driver hits STOP
@@ -292,7 +284,6 @@ public class IterativeDrive extends OpMode
         bl_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         br_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        arm.end();
+        arm.end(); // stop the arm
     }
-
 }
