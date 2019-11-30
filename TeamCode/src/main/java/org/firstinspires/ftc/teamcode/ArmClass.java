@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.icu.text.IDNA;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -17,8 +19,11 @@ public class ArmClass extends Thread {
 
     private double power = 0.7;
 
-    ArmClass() {
-    }
+    public enum Mode {IDLE, MANUAL, PICK, BUILD, DORP}
+
+    ;
+
+    private Mode mode = Mode.IDLE;
 
     public void init(HardwareMap hardwareMap) {
         arm0 = hardwareMap.get(DcMotor.class, "arm0");
@@ -51,6 +56,7 @@ public class ArmClass extends Thread {
         reset();
         arm0.setPower(power);
         arm1.setPower(power);
+        mode = Mode.MANUAL;
     }
 
     public void moveArm0(double speed) {
@@ -97,18 +103,38 @@ public class ArmClass extends Thread {
 
     public void run() {
         try {
-            gootoo(3100, 3100);
-            sleep(2000);
-            clamp(true);
-            gootoo(2470, 5080);
-            clamp(false);
-            sleep(2000);
-            gootoo(4700, 5960);
-            sleep(2000);
-            gootoo(500, 280);
+            switch (mode) {
+                case PICK:
+                    // peak up a cube and get back to drive position.
+                    gootoo(3100, 3100);
+                    sleep(2000);
+                    clamp(true);
+                    gootoo(2470, 5080);
+                    clamp(false);
+                    sleep(2000);
+                    gootoo(4700, 5960);
+                    sleep(2000);
+                    gootoo(500, 280);
+                    break;
+
+                case BUILD:
+                    // build
+                    gootoo(3100, 3100);
+                    sleep(2000);
+                    clamp(true);
+                    gootoo(2470, 5080);
+                    clamp(false);
+                    sleep(2000);
+                    gootoo(4700, 5960);
+                    sleep(2000);
+                    gootoo(500, 280);
+                    break;
+            }
 
         } catch (InterruptedException e) {
         }
+
+        mode = Mode.MANUAL;
     }
 
     public void end() {
@@ -147,6 +173,13 @@ public class ArmClass extends Thread {
             clampsRotate.setPosition(1);
         } else {
             clampsRotate.setPosition(0);
+        }
+    }
+
+    public void plsDo(Mode tmode) {
+        mode = tmode;
+        if (tmode != Mode.MANUAL || tmode != Mode.IDLE) {
+            start();
         }
     }
 }

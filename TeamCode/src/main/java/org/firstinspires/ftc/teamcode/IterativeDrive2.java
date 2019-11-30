@@ -168,7 +168,7 @@ public class IterativeDrive2 extends OpMode {
         // =========================================
         arm.moveArm0(-gamepad2.left_stick_y);
         arm.moveArm1(-gamepad2.right_stick_y);
-        if (gamepad2.b) {
+        if (gamepad2.b || gamepad1.b) {
             arm.end();
         }
         if (gamepad2.a) {
@@ -178,7 +178,7 @@ public class IterativeDrive2 extends OpMode {
             arm.reset();
         }
         if (gamepad2.y) {
-            arm.start();
+            arm.plsDo(ArmClass.Mode.PICK);
         }
 
         if (gamepad2.left_bumper) {
@@ -198,7 +198,6 @@ public class IterativeDrive2 extends OpMode {
         // =========================================
         // Rollers Control
         // =========================================
-        double rollerPower = 1;
         rollerServoState.update(gamepad1.left_bumper);
         if (rollerServoState.getState()) {
             r_roller_servo.setPosition(0);
@@ -209,13 +208,19 @@ public class IterativeDrive2 extends OpMode {
         }
 
         rollerState.update(gamepad1.dpad_down);
+        double rollerPower = 1;
+        if ((gamepad1.dpad_up == false) && (cubeBumper.getState() == false)) {
+            rollerPower = 0.3;
+        } else {
+            rollerPower = 1;
+        }
 
         if (gamepad1.dpad_up) {
             r_roller.setPower(-rollerPower);
             l_roller.setPower(-rollerPower);
         } else {
 
-            if (rollerState.getState() && cubeBumper.getState()) {
+            if (rollerState.getState()) {
                 r_roller.setPower(rollerPower);
                 l_roller.setPower(rollerPower);
             } else {
