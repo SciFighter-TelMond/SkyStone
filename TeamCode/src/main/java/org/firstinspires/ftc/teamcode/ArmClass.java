@@ -16,9 +16,7 @@ public class ArmClass extends Thread {
 
     private double power = 0.7;
 
-    ArmClass() {
-
-    }
+    ArmClass() { }
 
     public void init(HardwareMap hardwareMap) {
         arm0 = hardwareMap.get(DcMotor.class, "arm0");
@@ -104,7 +102,9 @@ public class ArmClass extends Thread {
         arm1.setTargetPosition(arm1.getCurrentPosition());
     }
 
-    public void resumeMove() {
+    public void resumePower() {
+        arm0.setTargetPosition(arm0.getCurrentPosition());
+        arm1.setTargetPosition(arm1.getCurrentPosition());
         arm0.setPower(power);
         arm1.setPower(power);
     }
