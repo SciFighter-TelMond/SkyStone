@@ -42,18 +42,17 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * The names of OpModes appear on the menu of the FTC Driver Station.
  * When an selection is made from the menu, the corresponding OpMode
  * class is instantiated on the Robot Controller and executed.
- *
+ * <p>
  * This particular OpMode just executes a basic Tank Drive Teleop for a two wheeled robot
  * It includes all the skeletal structure that all iterative OpModes contain.
- *
+ * <p>
  * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Iterative Drive 2", group="Iterative Opmode")
+@TeleOp(name = "Iterative Drive 2", group = "Iterative Opmode")
 //@Disabled
-public class IterativeDrive2 extends OpMode
-{
+public class IterativeDrive2 extends OpMode {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -65,15 +64,16 @@ public class IterativeDrive2 extends OpMode
     private DcMotor l_roller = null;
     private DcMotor r_roller = null;
 
-    private Servo l_roller_servo    = null;
-    private Servo r_roller_servo    = null;
+    private Servo l_roller_servo = null;
+    private Servo r_roller_servo = null;
 
-    private Servo   hooks      = null;
-    private Toggle  hooksState = new Toggle();
-    private Toggle  speedState = new Toggle();
-    private Toggle  rollerState = new Toggle();
+    private Servo hooks = null;
+    private Toggle hooksState = new Toggle();
+    private Toggle speedState = new Toggle();
+    private Toggle rollerState = new Toggle();
 
-    private Toggle  rollerServoState = new Toggle();
+    private Toggle rollerServoState = new Toggle();
+    private DigitalChannel cubeBumper = null;
 
     private DigitalChannel leftBumper = null;
     private DigitalChannel rightBumper = null;
@@ -118,8 +118,9 @@ public class IterativeDrive2 extends OpMode
         hooks.setPosition(0);
 
         // get a reference to our digitalTouch object.
-        leftBumper  = hardwareMap.get(DigitalChannel.class, "left_bumper");
+        leftBumper = hardwareMap.get(DigitalChannel.class, "left_bumper");
         rightBumper = hardwareMap.get(DigitalChannel.class, "right_bumper");
+        cubeBumper = hardwareMap.get(DigitalChannel.class, "cube_bumper");
 
         leftBumper.setMode(DigitalChannel.Mode.INPUT); // set the digital channel to input.
         rightBumper.setMode(DigitalChannel.Mode.INPUT); // set the digital channel to input.
@@ -129,7 +130,8 @@ public class IterativeDrive2 extends OpMode
 
     // Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
     @Override
-    public void init_loop() { }
+    public void init_loop() {
+    }
 
     // Code to run ONCE when the driver hits PLAY
     @Override
@@ -144,18 +146,18 @@ public class IterativeDrive2 extends OpMode
 
         // POV Mode uses left stick to go forward, and right stick to turn.
         // - This uses basic math to combine motions and is easier to drive straight.
-        double straight      = -gamepad1.right_stick_y;
-        double side          =  gamepad1.right_stick_x;
-        double turn          =  gamepad1.left_stick_x * 0.7;
-        double speedTrigger  =  gamepad1.right_trigger;
+        double straight = -gamepad1.right_stick_y;
+        double side = gamepad1.right_stick_x;
+        double turn = gamepad1.left_stick_x * 0.7;
+        double speedTrigger = gamepad1.right_trigger;
 
         // =========================================
         // Hooks Control
         // =========================================
         hooksState.update(gamepad1.right_bumper);
 
-        if(hooksState.isPressed()) {
-            if(hooksState.getState())
+        if (hooksState.isPressed()) {
+            if (hooksState.getState())
                 hooks.setPosition(1);
             else
                 hooks.setPosition(0);
@@ -172,17 +174,31 @@ public class IterativeDrive2 extends OpMode
         if (gamepad2.a) {
             arm.resumePower();
         }
-        if (gamepad2.x){
+        if (gamepad2.x) {
             arm.reset();
         }
-        if (gamepad2.y){
+        if (gamepad2.y) {
             arm.start();
+        }
+
+        if (gamepad2.left_bumper) {
+            arm.clamp(true);
+        }
+        if (gamepad2.right_bumper) {
+            arm.clamp(false);
+        }
+
+        if (gamepad2.left_trigger > 0.5) {
+            arm.rotateClamp(true);
+        }
+        if (gamepad2.right_trigger > 0.5) {
+            arm.rotateClamp(false);
         }
 
         // =========================================
         // Rollers Control
         // =========================================
-        double rollerPower=1;
+        double rollerPower = 1;
         rollerServoState.update(gamepad1.left_bumper);
         if (rollerServoState.getState()) {
             r_roller_servo.setPosition(0);
@@ -199,7 +215,7 @@ public class IterativeDrive2 extends OpMode
             l_roller.setPower(-rollerPower);
         } else {
 
-             if (rollerState.getState()) {
+            if (rollerState.getState() && cubeBumper.getState()) {
                 r_roller.setPower(rollerPower);
                 l_roller.setPower(rollerPower);
             } else {
@@ -235,7 +251,7 @@ public class IterativeDrive2 extends OpMode
         double bl_power = (straight + turn - side) * speedBoost;
         double br_power = (straight - turn + side) * speedBoost;
 
-        double m = Math.max(Math.max(fl_power,fr_power), Math.max(bl_power,br_power));
+        double m = Math.max(Math.max(fl_power, fr_power), Math.max(bl_power, br_power));
         if (m > 1) {
             fl_power /= m;
             fr_power /= m;
@@ -243,14 +259,14 @@ public class IterativeDrive2 extends OpMode
             br_power /= m;
         }
 
-        if (leftBumper.getState() == false){
-            fl_power = Math.max(0,fl_power);
-            bl_power = Math.max(0,bl_power);
+        if (leftBumper.getState() == false) {
+            fl_power = Math.max(0, fl_power);
+            bl_power = Math.max(0, bl_power);
         }
 
-        if (rightBumper.getState() == false){
-            fr_power = Math.max(0,fr_power);
-            br_power = Math.max(0,br_power);
+        if (rightBumper.getState() == false) {
+            fr_power = Math.max(0, fr_power);
+            br_power = Math.max(0, br_power);
         }
 
         // Send calculated power to wheels
