@@ -35,6 +35,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import org.firstinspires.ftc.robotcore.external.android.AndroidTextToSpeech;
 
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -79,6 +80,8 @@ public class IterativeDrive2 extends OpMode {
     private DigitalChannel rightBumper = null;
 
     private ArmClass arm = new ArmClass();
+
+    private AndroidTextToSpeech tts;
 
     // Code to run ONCE when the driver hits INIT
     @Override
@@ -125,6 +128,9 @@ public class IterativeDrive2 extends OpMode {
         leftBumper.setMode(DigitalChannel.Mode.INPUT); // set the digital channel to input.
         rightBumper.setMode(DigitalChannel.Mode.INPUT); // set the digital channel to input.
 
+        tts = new AndroidTextToSpeech();
+
+
         arm.init(hardwareMap);
     }
 
@@ -136,8 +142,9 @@ public class IterativeDrive2 extends OpMode {
     // Code to run ONCE when the driver hits PLAY
     @Override
     public void start() {
-        runtime.reset();
+        tts.initialize();
         arm.begin();
+        runtime.reset();
     }
 
     // Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
@@ -179,6 +186,18 @@ public class IterativeDrive2 extends OpMode {
         }
         if (gamepad2.y) {
             arm.plsDo(ArmClass.Mode.PICK);
+        }
+        if (gamepad2.dpad_left){
+            tts.speak("Vinkler Tipesh");
+        }
+        if (gamepad2.dpad_right){
+            tts.speak("Ubuntu");
+        }
+        if (gamepad2.dpad_up){
+            tts.speak("to to to to to");
+        }
+        if (gamepad2.dpad_down){
+            tts.speak("shalom corim hoti vinkler ani mulkat ester");
         }
 
         if (gamepad2.left_bumper) {

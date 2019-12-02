@@ -41,6 +41,8 @@ public class Arm2 extends OpMode {
         if (gamepad2.b){
             arm.reset();
         }
+
+
         telemetry.addData("Status", "Run Time: " + runtime.toString());
         telemetry.addData("Arms", "arm0 (%d), arm1 (%d)", arm.getArm0Pos(), arm.getArm1Pos());
         telemetry.update();
