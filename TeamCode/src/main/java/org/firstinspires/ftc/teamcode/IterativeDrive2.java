@@ -187,9 +187,7 @@ public class IterativeDrive2 extends OpMode {
         if (gamepad2.y) {
             arm.plsDo(ArmClass.Mode.PICK);
         }
-        if (gamepad2.dpad_left){
-            tts.speak("Vinkler Tipesh");
-        }
+
         if (gamepad2.dpad_right){
             tts.speak("Ubuntu");
         }
@@ -197,13 +195,17 @@ public class IterativeDrive2 extends OpMode {
             tts.speak("to to to to to");
         }
         if (gamepad2.dpad_down){
-            tts.speak("shalom corim hoti vinkler ani mulkat ester");
+            tts.speak("hello my name is Mantis");
         }
 
         if (gamepad2.left_bumper) {
+            telemetry.addData("left bumper true: clamp open", true);
+            telemetry.update();
             arm.clamp(true);
         }
         if (gamepad2.right_bumper) {
+            telemetry.addData("left bumper false: clamp close", false);
+            telemetry.update();
             arm.clamp(false);
         }
 
