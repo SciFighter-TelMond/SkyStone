@@ -95,19 +95,49 @@ public class ArmTest extends OpMode {
         // =========================================
         // Arm Control
         // =========================================
-        arm.moveArm0(-gamepad2.left_stick_y);
-        arm.moveArm1(-gamepad2.right_stick_y);
+        try {
+            arm.moveArm0(-gamepad2.left_stick_y);
+            arm.moveArm1(-gamepad2.right_stick_y);
+        } catch(Exception e){
+            telemetry.addData("exception", 1);
+            telemetry.addData("call Stack", e.getStackTrace());
+            telemetry.update();
+        }
         if (gamepad2.b || gamepad1.b) {
-            arm.end();
+            try {
+                arm.end();
+            } catch (Exception e) {
+                telemetry.addData("exception", 2);
+                telemetry.addData("call Stack", e.getStackTrace());
+                telemetry.update();
+            }
         }
         if (gamepad2.a) {
-            arm.resumePower();
+            try {
+                arm.resumePower();
+            } catch (Exception e) {
+                telemetry.addData("exception", 3);
+                telemetry.addData("call Stack", e.getStackTrace());
+                telemetry.update();
+            }
         }
         if (gamepad2.x) {
-            arm.reset();
+            try{
+                arm.reset();
+            } catch (Exception e) {
+                telemetry.addData("exception", 4);
+                telemetry.addData("call Stack", e.getStackTrace());
+                telemetry.update();
+            }
         }
         if (gamepad2.y) {
-            arm.plsDo(ArmClass.Mode.PICK);
+            try {
+                arm.plsDo(ArmClass.Mode.PICK);
+            } catch (Exception e) {
+                telemetry.addData("exception", 5);
+                telemetry.addData("call Stack", e.getStackTrace());
+                telemetry.update();
+            }
         }
 
 
@@ -115,19 +145,43 @@ public class ArmTest extends OpMode {
         if (gamepad2.left_bumper) {
             telemetry.addData("left bumper true: clamp open", true);
             telemetry.update();
-            arm.clamp(true);
+            try{
+                arm.clamp(true);
+            } catch (Exception e) {
+                telemetry.addData("exception", 6);
+                telemetry.addData("call Stack", e.getStackTrace());
+                telemetry.update();
+            }
         }
         if (gamepad2.right_bumper) {
             telemetry.addData("left bumper false: clamp close", false);
             telemetry.update();
-            arm.clamp(false);
+            try{
+                arm.clamp(false);
+            } catch (Exception e) {
+                telemetry.addData("exception", 7);
+                telemetry.addData("call Stack", e.getStackTrace());
+                telemetry.update();
+            }
         }
 
         if (gamepad2.left_trigger > 0.5) {
-            arm.rotateClamp(true);
+            try{
+                arm.rotateClamp(true);
+            } catch (Exception e) {
+                telemetry.addData("exception", 8);
+                telemetry.addData("call Stack", e.getStackTrace());
+                telemetry.update();
+            }
         }
         if (gamepad2.right_trigger > 0.5) {
-            arm.rotateClamp(false);
+            try{
+                arm.rotateClamp(false);
+            } catch (Exception e) {
+                telemetry.addData("exception", 9);
+                telemetry.addData("call Stack", e.getStackTrace());
+                telemetry.update();
+            }
         }
 
 
@@ -139,7 +193,12 @@ public class ArmTest extends OpMode {
     @Override
     public void stop() {
 
-
-        arm.end(); // stop the arm
+        try{
+            arm.end(); // stop the arm
+        } catch (Exception e) {
+            telemetry.addData("exception", 10);
+            telemetry.addData("call Stack", e.getStackTrace());
+            telemetry.update();
+        }
     }
 }
