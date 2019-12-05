@@ -121,9 +121,9 @@ public class IterativeDrive2 extends OpMode {
         hooks.setPosition(0);
 
         // get a reference to our digitalTouch object.
-        leftBumper = hardwareMap.get(DigitalChannel.class, "left_bumper");
+        leftBumper  = hardwareMap.get(DigitalChannel.class, "left_bumper");
         rightBumper = hardwareMap.get(DigitalChannel.class, "right_bumper");
-        cubeBumper = hardwareMap.get(DigitalChannel.class, "cube_bumper");
+        cubeBumper  = hardwareMap.get(DigitalChannel.class, "cube_bumper");
 
         leftBumper.setMode(DigitalChannel.Mode.INPUT); // set the digital channel to input.
         rightBumper.setMode(DigitalChannel.Mode.INPUT); // set the digital channel to input.
@@ -177,6 +177,7 @@ public class IterativeDrive2 extends OpMode {
         arm.moveArm1(-gamepad2.right_stick_y);
         if (gamepad2.b || gamepad1.b) {
             arm.end();
+            arm.resumePower();
         }
         if (gamepad2.a) {
             arm.resumePower();
@@ -185,7 +186,7 @@ public class IterativeDrive2 extends OpMode {
             arm.reset();
         }
         if (gamepad2.y) {
-            arm.plsDo(ArmClass.Mode.PICK);
+            arm.pleaseDo(ArmClass.Mode.PICK);
         }
 
         if (gamepad2.dpad_right){
