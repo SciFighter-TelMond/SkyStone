@@ -195,8 +195,9 @@ public class MecRobotDrive {
         bl_Drive.setPower(power);
         br_Drive.setPower(power);
 
-        hooks.setPosition(0);
-        hooksState.update(false);
+
+        hooksUp();
+
     }
 
     public void hooksDown(){
