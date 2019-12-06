@@ -21,6 +21,15 @@ public class Toggle {
         }
     }
 
+    public void set(boolean input) {
+        if (last != input) {
+            state = input;
+            changed = true;
+        } else {
+            changed = false;
+        }
+    }
+
     public boolean isPressed() {
         return pressed;
     }

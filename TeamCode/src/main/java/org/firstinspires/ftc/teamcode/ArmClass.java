@@ -91,9 +91,9 @@ public class ArmClass extends Thread {
         if (zeroArm0.getState() == false) {
             arm0.setTargetPosition(arm0.getCurrentPosition());
         }
-        if (zeroArm1.getState() == false) {
-            arm1.setTargetPosition(arm1.getCurrentPosition());
-        }
+//        if (zeroArm1.getState() == false) {
+//            arm1.setTargetPosition(arm1.getCurrentPosition());
+//        }
     }
 
     public void gootoo(int pos0, int pos1) throws InterruptedException {
@@ -116,24 +116,33 @@ public class ArmClass extends Thread {
         }
     }
 
+    public void linearDo(Mode tmode) {
+        mode = tmode;
+        if (tmode != Mode.MANUAL || tmode != Mode.IDLE) {
+            run();
+        }
+    }
+
     @Override
     public void run() {
         try {
             switch (mode) {
                 case PICK:
                     // peak up a cube and get back to drive position.
-                    gootoo(3100, 3100);
-                    gootoo(3100,5400);
+                    gootoo(3100, 3100); // 1
+                    gootoo(3100,5400);  // 2
                     clamp(true);
-                    sleep(2000);
-                    gootoo(2620, 5500);
+                    sleep(1000);
+                    gootoo(2500, 5500); // 3
                     clamp(false);
                     sleep(2000);
-                    gootoo(3680, 7202);
+                    gootoo(3680, 7202);  // 1
                     sleep(2000);
-                    gootoo(4600, 6540 );
-                    gootoo(2560,740);
-                    gootoo(930,740);
+                    gootoo(4600, 6540 ); // 2
+                    sleep(2000);
+                    gootoo(3500,740);    // 3
+                    sleep(2000);
+                    gootoo(930,740);     // 4
                     break;
 
                 case BUILD:

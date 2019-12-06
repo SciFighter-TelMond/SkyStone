@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.robotcore.external.android.AndroidTextToSpeech;
 
@@ -21,7 +21,7 @@ import org.firstinspires.ftc.robotcore.external.android.AndroidTextToSpeech;
  *
 
  */
-public class MecRobotDrive {
+public class DriveClass {
 
     /* Public OpMode members. */
     private DcMotor fl_Drive = null;
@@ -42,25 +42,23 @@ public class MecRobotDrive {
     private DigitalChannel rightBumper = null;
     private DigitalChannel cubeBumper = null;
 
-
     /* local OpMode members. */
-    HardwareMap hwMap           =  null;
-    private ElapsedTime period  = new ElapsedTime();
+    private LinearOpMode opMode = null;
+    private HardwareMap hwMap   = null;
+
 
     /* Constructor */
-    public MecRobotDrive(){
-
-    }
+    public DriveClass(LinearOpMode opMode) { this.opMode=opMode; }
 
     /* Initialize standard Hardware interfaces */
     public void init(HardwareMap hardwareMap) {
         // Save reference to Hardware map
 
-
         fl_Drive = hardwareMap.get(DcMotor.class, "fl_drive");
         fr_Drive = hardwareMap.get(DcMotor.class, "fr_drive");
         bl_Drive = hardwareMap.get(DcMotor.class, "bl_drive");
         br_Drive = hardwareMap.get(DcMotor.class, "br_drive");
+
         l_roller = hardwareMap.get(DcMotor.class, "left_roller");
         r_roller = hardwareMap.get(DcMotor.class, "right_roller");
 
@@ -97,10 +95,61 @@ public class MecRobotDrive {
 
         leftBumper.setMode(DigitalChannel.Mode.INPUT); // set the digital channel to input.
         rightBumper.setMode(DigitalChannel.Mode.INPUT); // set the digital channel to input.
+    }
 
+    public void drive(double straight, double side, double turn, double speedTrigger, double turneTrigger) {
 
+        double speedBoost = speedTrigger * 0.5 + 0.5;
+        double turnBoost  = turneTrigger * 0.5 + 0.5;
+
+        double fl_power = (straight + turn * turnBoost + side) * speedBoost;
+        double fr_power = (straight - turn * turnBoost - side) * speedBoost;
+        double bl_power = (straight + turn * turnBoost - side) * speedBoost;
+        double br_power = (straight - turn * turnBoost + side) * speedBoost;
+
+        double m = Math.max(Math.max(fl_power,fr_power), Math.max(bl_power,br_power));
+        if (m > 1) {
+            fl_power /= m;
+            fr_power /= m;
+            bl_power /= m;
+            br_power /= m;
+        }
+
+        boostState.update(speedTrigger>0.7);
+        if (boostState.isChanged()) {
+            if (boostState.getState()) {
+                fl_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                fr_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                bl_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                br_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            } else {
+                fl_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                fr_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                bl_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                br_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            }
+        }
+
+        if (boostState.getState()) {
+            if (leftBumper.getState() == false) {
+                fl_power = Math.max(0, fl_power);
+                bl_power = Math.max(0, bl_power);
+            }
+
+            if (rightBumper.getState() == false) {
+                fr_power = Math.max(0, fr_power);
+                br_power = Math.max(0, br_power);
+            }
+        }
+
+        // Send calculated power to wheels
+        fl_Drive.setPower(fl_power);
+        fr_Drive.setPower(fr_power);
+        bl_Drive.setPower(bl_power);
+        br_Drive.setPower(br_power);
 
     }
+
     public void straight(double target_meter, double speed) {
         fl_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         fr_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -121,7 +170,7 @@ public class MecRobotDrive {
 
         double power = 0.5;
 
-        while((fl_Drive.isBusy() || bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy())  ) {
+        while((fl_Drive.isBusy() /*|| bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy()*/) && opMode.opModeIsActive()   ) {
 
             int distToTarget = ticks - fr_Drive.getCurrentPosition();
 
@@ -136,8 +185,6 @@ public class MecRobotDrive {
             bl_Drive.setPower(power);
             br_Drive.setPower(power);
 
-
-
             if (leftBumper.getState() == false) {
                 fl_Drive.setTargetPosition(fl_Drive.getCurrentPosition());
                 bl_Drive.setTargetPosition(bl_Drive.getCurrentPosition());
@@ -147,8 +194,6 @@ public class MecRobotDrive {
                 fr_Drive.setTargetPosition(fr_Drive.getCurrentPosition());
                 br_Drive.setTargetPosition(br_Drive.getCurrentPosition());
             }
-
-
         }
 
     }
@@ -177,10 +222,8 @@ public class MecRobotDrive {
         bl_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         br_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        while((fl_Drive.isBusy() || bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy()) ) {
-
+        while((fl_Drive.isBusy() /*|| bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy()*/) && opMode.opModeIsActive() ) {
         }
-
     }
 
     public void stop(){
@@ -196,22 +239,50 @@ public class MecRobotDrive {
         br_Drive.setPower(power);
 
         hooks.setPosition(0);
-        hooksState.update(false);
+        hooksState.set(false);
     }
 
     public void hooksDown(){
         hooks.setPosition(1);
-        hooksState.update(true);
+        hooksState.set(true);
 
     }
     public void hooksUp(){
         hooks.setPosition(0);
-        hooksState.update(false);
+        hooksState.set(false);
 
     }
     public boolean getHooksState(){
         return hooksState.getState();
     }
 
+    public void rollers( boolean open) {
+        if (open) {
+            r_roller_servo.setPosition(0);
+            l_roller_servo.setPosition(1);
+        } else {
+            r_roller_servo.setPosition(1);
+            l_roller_servo.setPosition(0);
+        }
+    }
+
+    public void rollersIn() {
+        double rollerPower = 1;
+        if (cubeBumper.getState() == false) {
+            rollerPower = 0.1;
+        }
+        r_roller.setPower(rollerPower);
+        l_roller.setPower(rollerPower);
+    }
+
+    public void rollersOut() {
+        r_roller.setPower(-1);
+        l_roller.setPower(-1);
+    }
+
+    public void rollersStop() {
+        r_roller.setPower(0);
+        l_roller.setPower(0);
+    }
 }
 

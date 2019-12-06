@@ -55,7 +55,7 @@ public class Auto_2 extends LinearOpMode {
     private Servo   hooks      = null;
     private Boolean hooksState = false;
 
-    private MechanoDrive drive = new MechanoDrive(this);
+    private MechanomClass drive = new MechanomClass(this);
 
     @Override
     public void runOpMode() {

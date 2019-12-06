@@ -92,8 +92,6 @@ public class IterativeDrive2 extends OpMode {
         fr_Drive = hardwareMap.get(DcMotor.class, "fr_drive");
         bl_Drive = hardwareMap.get(DcMotor.class, "bl_drive");
         br_Drive = hardwareMap.get(DcMotor.class, "br_drive");
-        l_roller = hardwareMap.get(DcMotor.class, "left_roller");
-        r_roller = hardwareMap.get(DcMotor.class, "right_roller");
 
         // Set Motor directions for driving forward
         fl_Drive.setDirection(DcMotor.Direction.REVERSE);
@@ -101,16 +99,16 @@ public class IterativeDrive2 extends OpMode {
         bl_Drive.setDirection(DcMotor.Direction.REVERSE);
         br_Drive.setDirection(DcMotor.Direction.FORWARD);
 
-        l_roller.setDirection(DcMotor.Direction.REVERSE);
-        r_roller.setDirection(DcMotor.Direction.FORWARD);
-
-
         // Set Driving mode for speed control using the encoders.
         fl_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         fr_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         bl_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         br_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        l_roller = hardwareMap.get(DcMotor.class, "left_roller");
+        r_roller = hardwareMap.get(DcMotor.class, "right_roller");
+        l_roller.setDirection(DcMotor.Direction.REVERSE);
+        r_roller.setDirection(DcMotor.Direction.FORWARD);
         l_roller.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         r_roller.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -129,7 +127,6 @@ public class IterativeDrive2 extends OpMode {
         rightBumper.setMode(DigitalChannel.Mode.INPUT); // set the digital channel to input.
 
         tts = new AndroidTextToSpeech();
-
 
         arm.init(hardwareMap);
     }

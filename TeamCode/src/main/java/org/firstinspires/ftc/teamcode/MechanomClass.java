@@ -4,8 +4,9 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 
-public class MechanoDrive {
+public class MechanomClass {
 
     // Declare OpMode members.
     private DcMotor fl_Drive = null;
@@ -16,9 +17,17 @@ public class MechanoDrive {
     private DigitalChannel leftBumper  = null;
     private DigitalChannel rightBumper = null;
 
+    private DcMotor l_roller = null;
+    private DcMotor r_roller = null;
+
+    private Servo l_roller_servo = null;
+    private Servo r_roller_servo = null;
+
+    private Servo hooks = null;
+
     private LinearOpMode opMode = null;
 
-    MechanoDrive(LinearOpMode opMode) {
+    MechanomClass(LinearOpMode opMode) {
         this.opMode = opMode;
     }
 
@@ -45,6 +54,20 @@ public class MechanoDrive {
 
         leftBumper.setMode(DigitalChannel.Mode.INPUT); // set the digital channel to input.
         rightBumper.setMode(DigitalChannel.Mode.INPUT); // set the digital channel to input.
+
+
+        l_roller = hardwareMap.get(DcMotor.class, "left_roller");
+        r_roller = hardwareMap.get(DcMotor.class, "right_roller");
+        l_roller.setDirection(DcMotor.Direction.REVERSE);
+        r_roller.setDirection(DcMotor.Direction.FORWARD);
+        l_roller.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        r_roller.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        l_roller_servo = hardwareMap.get(Servo.class, "left_roller_servo");
+        r_roller_servo = hardwareMap.get(Servo.class, "right_roller_servo");
+
+        hooks = hardwareMap.get(Servo.class, "hooks");
+        hooks.setPosition(0);
     }
 
     public void straight(double target_meter) {
@@ -67,7 +90,7 @@ public class MechanoDrive {
 
         double power = 0.5;
 
-        while((fl_Drive.isBusy() || bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy()) && opMode.opModeIsActive() ) {
+        while((fl_Drive.isBusy() /*|| bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy()*/) && opMode.opModeIsActive() ) {
 
             int distToTarget = ticks - fr_Drive.getCurrentPosition();
 
@@ -81,7 +104,6 @@ public class MechanoDrive {
             fr_Drive.setPower(power);
             bl_Drive.setPower(power);
             br_Drive.setPower(power);
-
 
 
             if (leftBumper.getState() == false) {
@@ -126,7 +148,7 @@ public class MechanoDrive {
         bl_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         br_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        while((fl_Drive.isBusy() || bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy()) && opMode.opModeIsActive() ) {
+        while((fl_Drive.isBusy() /*|| bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy()*/) && opMode.opModeIsActive() ) {
             // Show the elapsed game time and wheel power.
             opMode.telemetry.addData("Status", "Motor Runs to target: %2.2g", target_meter);
             opMode.telemetry.addData("Motors", "left (%d), right (%d)", fl_Drive.getCurrentPosition(), fr_Drive.getCurrentPosition());
