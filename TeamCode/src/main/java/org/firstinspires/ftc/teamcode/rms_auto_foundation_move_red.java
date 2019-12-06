@@ -30,10 +30,8 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
 
 /**
  * This file illustrates the concept of driving a path based on time.
@@ -56,9 +54,9 @@ import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="blue foundation move", group="SciFighters")// moving the blue foundation. you are in the blue team.
+@Autonomous(name="red foundation move", group="SciFighterd")// moving the blue foundation. you are in the blue team.
 //@Disabled
-public class rms_auto_foundation_move_blue extends LinearOpMode {
+public class rms_auto_foundation_move_red extends LinearOpMode {
 
     /* Declare OpMode members. */
     private DriveClass         robot   = new DriveClass(this);   // Use a Pushbot's hardware
@@ -84,30 +82,28 @@ public class rms_auto_foundation_move_blue extends LinearOpMode {
 
 
         runtime.reset();
-        /*starting point: building area, the bridge is on the right,
+        /*starting point: building area, the bridge is on the left,
         * the front of the robot is to the wall, the hooks directed to the middle of the field.
         * please start close to the building site*/
-        // Step 1:  Drive forward (actually back) and a bit to the left (actually to the right)
-        robot.side(0.3, DriveClass.Direction.RIGHT, 0.3, 3);
+        // Step 1:  Drive forward (actually back) and a bit to the right (actually to the left)
+        robot.side(0.3, DriveClass.Direction.LEFT, 0.3, 3);
         robot.straight(1.5, DriveClass.Direction.REVERSE, 0.2, 5);
 
         sleep(200);
         // Step 2: should be in front of the foundation, hooks down
         robot.hooksDown();
         // Step 3: turn 180 with the foundation
-        robot.rotate(0.5, DriveClass.Direction.RIGHT, 0.3, 5);
+        robot.rotate(0.5, DriveClass.Direction.LEFT, 0.3, 5);
         sleep(200);
         // Step 4: set the foundation free
         robot.hooksUp();
         // Step 5: park under the bridge got to the right 1.5M
-        robot.side(1.5, DriveClass.Direction.RIGHT, 0.5, 5);
+        robot.side(1.5, DriveClass.Direction.LEFT, 0.5, 5);
 
         while (opModeIsActive() && (runtime.seconds() < 30)) {
             telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
             telemetry.update();
         }
-
-
 
 
         // Step 6:  stop

@@ -47,6 +47,7 @@ public class DriveClass {
     /* local OpMode members. */
     private LinearOpMode opMode = null;
     private HardwareMap hwMap   = null;
+    public enum Direction {LEFT, RIGHT, FORwARD, REVERSE};
 
 
     /* Constructor */
@@ -155,13 +156,18 @@ public class DriveClass {
 
     }
 
-    public void straight(double target_meter, double speed) {
+    public void straight(double target_meter, Direction direction, double speed, int timeout) {
+        ElapsedTime runTime = new ElapsedTime();
+        runTime.reset();
         fl_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         fr_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         bl_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         br_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        int ticks = (int)(1400 * target_meter);
+        int dir = 1;
+        if(direction == Direction.REVERSE)
+            dir = -1;
+        int ticks = (int)(1400 * target_meter)*dir;
 
         fl_Drive.setTargetPosition(ticks);
         fr_Drive.setTargetPosition(ticks);
@@ -175,7 +181,8 @@ public class DriveClass {
 
         double power = speed;
 
-        while((fl_Drive.isBusy() /*|| bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy()*/) && opMode.opModeIsActive()   ) {
+        while((fl_Drive.isBusy() || bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy()) &&
+                opMode.opModeIsActive()  &&  runTime.seconds() < timeout) {
 
             int distToTarget = ticks - fr_Drive.getCurrentPosition();
 
@@ -203,29 +210,23 @@ public class DriveClass {
 
     }
 
-    public void side(double target_meter, double speed) {
+    public void side(double target_meter, Direction direction, double speed, int timeout) {
+        ElapsedTime runTime = new ElapsedTime();
+        runTime.reset();
         fl_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         fr_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         bl_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         br_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        int ticks = (int)(1400 * target_meter);
+        int dir = 1;
+        if(direction == Direction.LEFT)
+            dir = -1;
+        int ticks = (int)(1400 * target_meter) * dir;
 
-
-
-
-
-
-        fl_Drive.setTargetPosition(ticks);
+         fl_Drive.setTargetPosition(ticks);
         fr_Drive.setTargetPosition(-ticks);
         bl_Drive.setTargetPosition(-ticks);
         br_Drive.setTargetPosition(ticks);
-
-
-//        fl_Drive.setPower(speed);
-//        fr_Drive.setPower(speed);
-//        bl_Drive.setPower(speed);
-//        br_Drive.setPower(speed);
 
         fl_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         fr_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -234,7 +235,8 @@ public class DriveClass {
 
         double power = speed;
 
-        while((fl_Drive.isBusy() /*|| bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy()*/) && opMode.opModeIsActive()   ) {
+        while((fl_Drive.isBusy() || bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy()) &&
+                opMode.opModeIsActive()  && runTime.seconds() < timeout  ) {
 
             int distToTarget = ticks - fr_Drive.getCurrentPosition();
 
@@ -266,14 +268,28 @@ public class DriveClass {
         }
 
     }
+/*
+* rotate
+* right rounds > 0, left rounds < 0
+* direction LEFT or RIGHT
+* speed between 0 and 1
+* timeout maximum time in seconds for operation*/
+    public void rotate(double rounds, Direction direction, double speed, double timeout) {
 
-    public void rotate(double target_meter, double speed) {
+        ElapsedTime     runtime = new ElapsedTime();
+        runtime.reset();
         fl_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         fr_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         bl_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         br_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        int ticks = (int)(1400 * target_meter);
+        /* 1 round is 5600 ticks
+        * to the right posotive
+        * to the left negative*/
+        int dir = 1;
+        if(direction == Direction.LEFT)
+            dir = -1;
+        int ticks = (int)(5600 * rounds) * dir;
 
 
 
@@ -291,7 +307,7 @@ public class DriveClass {
 
         double power = speed;
 
-        while((fl_Drive.isBusy() /*|| bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy()*/) && opMode.opModeIsActive()   ) {
+        while((fl_Drive.isBusy() || bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy()) && opMode.opModeIsActive()  && runtime.seconds() < timeout ) {
 
             int distToTarget = ticks - fr_Drive.getCurrentPosition();
 
