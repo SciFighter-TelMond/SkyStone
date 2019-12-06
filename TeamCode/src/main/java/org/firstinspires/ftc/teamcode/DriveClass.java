@@ -86,6 +86,8 @@ public class DriveClass {
 
         l_roller_servo = hardwareMap.get(Servo.class, "left_roller_servo");
         r_roller_servo = hardwareMap.get(Servo.class, "right_roller_servo");
+        r_roller_servo.setPosition(0);
+        l_roller_servo.setPosition(1);// close them
 
         hooks = hardwareMap.get(Servo.class, "hooks");
         hooks.setPosition(0);
@@ -100,10 +102,10 @@ public class DriveClass {
         rightBumper.setMode(DigitalChannel.Mode.INPUT); // set the digital channel to input.
     }
 
-    public void drive(double straight, double side, double turn, double speedTrigger, double turneTrigger) {
+    public void drive(double straight, double side, double turn, double speedTrigger, double turnTrigger) {
 
         double speedBoost = speedTrigger * 0.5 + 0.5;
-        double turnBoost  = turneTrigger * 0.5 + 0.5;
+        double turnBoost  = turnTrigger * 0.5 + 0.5;
 
         double fl_power = (straight + turn * turnBoost + side) * speedBoost;
         double fr_power = (straight - turn * turnBoost - side) * speedBoost;
@@ -171,7 +173,7 @@ public class DriveClass {
         bl_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         br_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        double power = 0.5;
+        double power = speed;
 
         while((fl_Drive.isBusy() /*|| bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy()*/) && opMode.opModeIsActive()   ) {
 
@@ -209,24 +211,117 @@ public class DriveClass {
 
         int ticks = (int)(1400 * target_meter);
 
+
+
+
+
+
         fl_Drive.setTargetPosition(ticks);
         fr_Drive.setTargetPosition(-ticks);
         bl_Drive.setTargetPosition(-ticks);
         br_Drive.setTargetPosition(ticks);
 
-        double power = 1;
-        fl_Drive.setPower(power);
-        fr_Drive.setPower(power);
-        bl_Drive.setPower(power);
-        br_Drive.setPower(power);
+
+//        fl_Drive.setPower(speed);
+//        fr_Drive.setPower(speed);
+//        bl_Drive.setPower(speed);
+//        br_Drive.setPower(speed);
 
         fl_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         fr_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         bl_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         br_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        while((fl_Drive.isBusy() /*|| bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy()*/) && opMode.opModeIsActive() ) {
+        double power = speed;
+
+        while((fl_Drive.isBusy() /*|| bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy()*/) && opMode.opModeIsActive()   ) {
+
+            int distToTarget = ticks - fr_Drive.getCurrentPosition();
+
+            if (Math.abs(fr_Drive.getCurrentPosition())<500 || Math.abs(distToTarget)<500) {
+                power = 0.5;
+            } else {
+                power = 1;
+            }
+
+            fl_Drive.setPower(power);
+            fr_Drive.setPower(power);
+            bl_Drive.setPower(power);
+            br_Drive.setPower(power);
+            opMode.telemetry.addData("fl",fl_Drive.getCurrentPosition() );
+            opMode.telemetry.addData("fr",fr_Drive.getCurrentPosition() );
+            opMode.telemetry.addData("bl",bl_Drive.getCurrentPosition() );
+            opMode.telemetry.addData("br",br_Drive.getCurrentPosition() );
+            opMode.telemetry.update();
+
+            if (leftBumper.getState() == false) {
+                fl_Drive.setTargetPosition(fl_Drive.getCurrentPosition());
+                bl_Drive.setTargetPosition(bl_Drive.getCurrentPosition());
+            }
+
+            if (rightBumper.getState() == false) {
+                fr_Drive.setTargetPosition(fr_Drive.getCurrentPosition());
+                br_Drive.setTargetPosition(br_Drive.getCurrentPosition());
+            }
         }
+
+    }
+
+    public void rotate(double target_meter, double speed) {
+        fl_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        fr_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        bl_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        br_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        int ticks = (int)(1400 * target_meter);
+
+
+
+        fl_Drive.setTargetPosition(ticks);
+        fr_Drive.setTargetPosition(-ticks);
+        bl_Drive.setTargetPosition(ticks);
+        br_Drive.setTargetPosition(-ticks);
+
+
+
+        fl_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        fr_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        bl_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        br_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        double power = speed;
+
+        while((fl_Drive.isBusy() /*|| bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy()*/) && opMode.opModeIsActive()   ) {
+
+            int distToTarget = ticks - fr_Drive.getCurrentPosition();
+
+            if (Math.abs(fr_Drive.getCurrentPosition())<500 || Math.abs(distToTarget)<500) {
+                power = 0.5;
+            } else {
+                power = 1;
+            }
+
+            fl_Drive.setPower(power);
+            fr_Drive.setPower(power);
+            bl_Drive.setPower(power);
+            br_Drive.setPower(power);
+            opMode.telemetry.addData("fl",fl_Drive.getCurrentPosition() );
+            opMode.telemetry.addData("fr",fr_Drive.getCurrentPosition() );
+            opMode.telemetry.addData("bl",bl_Drive.getCurrentPosition() );
+            opMode.telemetry.addData("br",br_Drive.getCurrentPosition() );
+            opMode.telemetry.update();
+
+            if (leftBumper.getState() == false) {
+                fl_Drive.setTargetPosition(fl_Drive.getCurrentPosition());
+                bl_Drive.setTargetPosition(bl_Drive.getCurrentPosition());
+            }
+
+            if (rightBumper.getState() == false) {
+                fr_Drive.setTargetPosition(fr_Drive.getCurrentPosition());
+                br_Drive.setTargetPosition(br_Drive.getCurrentPosition());
+            }
+        }
+
     }
 
     public void stop(){
@@ -240,6 +335,7 @@ public class DriveClass {
         fr_Drive.setPower(power);
         bl_Drive.setPower(power);
         br_Drive.setPower(power);
+        rollersStop();
 
         hooks.setPosition(0);
         hooksState.set(false);
