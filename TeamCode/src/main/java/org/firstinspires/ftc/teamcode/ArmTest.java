@@ -132,7 +132,7 @@ public class ArmTest extends OpMode {
         }
         if (gamepad2.y) {
             try {
-                arm.plsDo(ArmClass.Mode.PICK);
+                arm.pleaseDo(ArmClass.Mode.PICK);
             } catch (Exception e) {
                 telemetry.addData("exception", 5);
                 telemetry.addData("call Stack", e.getStackTrace());

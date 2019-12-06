@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -21,7 +22,7 @@ import org.firstinspires.ftc.robotcore.external.android.AndroidTextToSpeech;
  *
 
  */
-public class MecRobotDrive {
+public class DriveClass {
 
     /* Public OpMode members. */
     private DcMotor fl_Drive = null;
