@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.android.AndroidTextToSpeech;
 
@@ -21,7 +21,7 @@ import org.firstinspires.ftc.robotcore.external.android.AndroidTextToSpeech;
  *
 
  */
-public class DriveClass {
+public class MecRobotDrive {
 
     /* Public OpMode members. */
     private DcMotor fl_Drive = null;
@@ -42,6 +42,7 @@ public class DriveClass {
     private DigitalChannel rightBumper = null;
     private DigitalChannel cubeBumper = null;
 
+
     /* local OpMode members. */
     private LinearOpMode opMode = null;
     private HardwareMap hwMap   = null;
@@ -53,6 +54,7 @@ public class DriveClass {
     /* Initialize standard Hardware interfaces */
     public void init(HardwareMap hardwareMap) {
         // Save reference to Hardware map
+
 
         fl_Drive = hardwareMap.get(DcMotor.class, "fl_drive");
         fr_Drive = hardwareMap.get(DcMotor.class, "fr_drive");
