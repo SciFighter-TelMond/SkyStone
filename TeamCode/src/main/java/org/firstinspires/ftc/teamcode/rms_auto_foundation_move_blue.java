@@ -30,10 +30,8 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
 
 /**
  * This file illustrates the concept of driving a path based on time.
@@ -88,19 +86,23 @@ public class rms_auto_foundation_move_blue extends LinearOpMode {
         * the front of the robot is to the wall, the hooks directed to the middle of the field.
         * please start close to the building site*/
         // Step 1:  Drive forward (actually back) and a bit to the left (actually to the right)
-        robot.side(0.3, DriveClass.Direction.RIGHT, 0.3, 3);
-        robot.straight(1.5, DriveClass.Direction.REVERSE, 0.2, 5);
+        robot.side(0.6, DriveClass.Direction.RIGHT, 1, 3);
+        robot.straight(1.7, DriveClass.Direction.REVERSE, 0.6, 5);
 
-        sleep(200);
+        sleep(500);
         // Step 2: should be in front of the foundation, hooks down
         robot.hooksDown();
+        sleep(1500);
+        robot.straight(0.6, DriveClass.Direction.FORWARD, 0.7, 5);
         // Step 3: turn 180 with the foundation
-        robot.rotate(0.5, DriveClass.Direction.RIGHT, 0.3, 5);
+        robot.rotate(0.6, DriveClass.Direction.RIGHT, 0.5, 5);
         sleep(200);
+
         // Step 4: set the foundation free
+        sleep(200);
         robot.hooksUp();
         // Step 5: park under the bridge got to the right 1.5M
-        robot.side(1.5, DriveClass.Direction.RIGHT, 0.5, 5);
+        robot.side(2.2, DriveClass.Direction.RIGHT, 0.7, 5);
 
         while (opModeIsActive() && (runtime.seconds() < 30)) {
             telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
@@ -112,6 +114,6 @@ public class rms_auto_foundation_move_blue extends LinearOpMode {
 
         // Step 6:  stop
         robot.stop();
-        sleep(1000);
+        //sleep(1000);
     }
 }

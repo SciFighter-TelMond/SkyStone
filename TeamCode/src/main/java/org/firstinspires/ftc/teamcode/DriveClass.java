@@ -47,7 +47,7 @@ public class DriveClass {
     /* local OpMode members. */
     private LinearOpMode opMode = null;
     private HardwareMap hwMap   = null;
-    public enum Direction {LEFT, RIGHT, FORwARD, REVERSE};
+    public enum Direction {LEFT, RIGHT, FORWARD, REVERSE};
 
 
     /* Constructor */
@@ -179,17 +179,18 @@ public class DriveClass {
         bl_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         br_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
+        double drivePower = speed;
         double power = speed;
 
-        while((fl_Drive.isBusy() || bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy()) &&
+        while((fl_Drive.isBusy() /*|| bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy()*/) &&
                 opMode.opModeIsActive()  &&  runTime.seconds() < timeout) {
 
             int distToTarget = ticks - fr_Drive.getCurrentPosition();
 
-            if (Math.abs(fr_Drive.getCurrentPosition())<500 || Math.abs(distToTarget)<500) {
-                power = 0.5;
+            if (Math.abs(fr_Drive.getCurrentPosition())<200 || Math.abs(distToTarget)<700) {
+                power = drivePower/2;
             } else {
-                power = 1;
+                power = drivePower;
             }
 
             fl_Drive.setPower(power);
@@ -206,6 +207,8 @@ public class DriveClass {
                 fr_Drive.setTargetPosition(fr_Drive.getCurrentPosition());
                 br_Drive.setTargetPosition(br_Drive.getCurrentPosition());
             }
+
+            opMode.sleep(100);
         }
 
     }
@@ -233,17 +236,18 @@ public class DriveClass {
         bl_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         br_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
+        double drivePower = speed;
         double power = speed;
 
-        while((fl_Drive.isBusy() || bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy()) &&
+        while((fl_Drive.isBusy() /*|| bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy()*/) &&
                 opMode.opModeIsActive()  && runTime.seconds() < timeout  ) {
 
             int distToTarget = ticks - fr_Drive.getCurrentPosition();
 
-            if (Math.abs(fr_Drive.getCurrentPosition())<500 || Math.abs(distToTarget)<500) {
-                power = 0.5;
+            if (Math.abs(fr_Drive.getCurrentPosition())<200 || Math.abs(distToTarget)<700) {
+                power = drivePower/2;
             } else {
-                power = 1;
+                power = drivePower;
             }
 
             fl_Drive.setPower(power);
@@ -256,15 +260,17 @@ public class DriveClass {
             opMode.telemetry.addData("br",br_Drive.getCurrentPosition() );
             opMode.telemetry.update();
 
-            if (leftBumper.getState() == false) {
-                fl_Drive.setTargetPosition(fl_Drive.getCurrentPosition());
-                bl_Drive.setTargetPosition(bl_Drive.getCurrentPosition());
-            }
+            opMode.sleep(100);
 
-            if (rightBumper.getState() == false) {
-                fr_Drive.setTargetPosition(fr_Drive.getCurrentPosition());
-                br_Drive.setTargetPosition(br_Drive.getCurrentPosition());
-            }
+//            if (leftBumper.getState() == false) {
+//                fl_Drive.setTargetPosition(fl_Drive.getCurrentPosition());
+//                bl_Drive.setTargetPosition(bl_Drive.getCurrentPosition());
+//            }
+//
+//            if (rightBumper.getState() == false) {
+//                fr_Drive.setTargetPosition(fr_Drive.getCurrentPosition());
+//                br_Drive.setTargetPosition(br_Drive.getCurrentPosition());
+//            }
         }
 
     }
@@ -305,16 +311,17 @@ public class DriveClass {
         bl_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         br_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
+        double drivePower = speed;
         double power = speed;
 
-        while((fl_Drive.isBusy() || bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy()) && opMode.opModeIsActive()  && runtime.seconds() < timeout ) {
+        while((fl_Drive.isBusy() /*|| bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy()*/) && opMode.opModeIsActive()  && runtime.seconds() < timeout ) {
 
             int distToTarget = ticks - fr_Drive.getCurrentPosition();
 
-            if (Math.abs(fr_Drive.getCurrentPosition())<500 || Math.abs(distToTarget)<500) {
-                power = 0.5;
+            if (Math.abs(fr_Drive.getCurrentPosition())<200 || Math.abs(distToTarget)<700) {
+                power = drivePower/2;
             } else {
-                power = 1;
+                power = drivePower;
             }
 
             fl_Drive.setPower(power);
@@ -327,15 +334,16 @@ public class DriveClass {
             opMode.telemetry.addData("br",br_Drive.getCurrentPosition() );
             opMode.telemetry.update();
 
-            if (leftBumper.getState() == false) {
-                fl_Drive.setTargetPosition(fl_Drive.getCurrentPosition());
-                bl_Drive.setTargetPosition(bl_Drive.getCurrentPosition());
-            }
-
-            if (rightBumper.getState() == false) {
-                fr_Drive.setTargetPosition(fr_Drive.getCurrentPosition());
-                br_Drive.setTargetPosition(br_Drive.getCurrentPosition());
-            }
+            opMode.sleep(100);
+//            if (leftBumper.getState() == false) {
+//                fl_Drive.setTargetPosition(fl_Drive.getCurrentPosition());
+//                bl_Drive.setTargetPosition(bl_Drive.getCurrentPosition());
+//            }
+//
+//            if (rightBumper.getState() == false) {
+//                fr_Drive.setTargetPosition(fr_Drive.getCurrentPosition());
+//                br_Drive.setTargetPosition(br_Drive.getCurrentPosition());
+//            }
         }
 
     }
