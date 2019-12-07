@@ -54,9 +54,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="red foundation move", group="SciFighterd")// moving the blue foundation. you are in the blue team.
+@Autonomous(name="red foundation auto", group="SciFighterd")// moving the blue foundation. you are in the blue team.
 //@Disabled
-public class rms_auto_foundation_move_red extends LinearOpMode {
+public class red_foundation_auto extends LinearOpMode {
 
     /* Declare OpMode members. */
     private DriveClass         robot   = new DriveClass(this);   // Use a Pushbot's hardware
