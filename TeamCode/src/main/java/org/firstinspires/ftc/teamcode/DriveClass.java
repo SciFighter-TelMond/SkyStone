@@ -364,11 +364,12 @@ public class DriveClass {
 
     public void rollers( boolean open) {
         if (open) {
-            r_roller_servo.setPosition(0);
-            l_roller_servo.setPosition(1);
-        } else {
             r_roller_servo.setPosition(1);
             l_roller_servo.setPosition(0);
+        } else {
+            r_roller_servo.setPosition(0);
+            l_roller_servo.setPosition(1);
+
         }
     }
 
