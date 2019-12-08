@@ -30,6 +30,7 @@ package org.firstinspires.ftc.teamcode;/* Copyright (c) 2017 FIRST. All rights r
 import android.text.GetChars;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
@@ -53,7 +54,7 @@ import org.firstinspires.ftc.robotcore.internal.android.dx.util.ByteArray;
  */
 
 @TeleOp(name="Auto_1", group="Auto")
-//@Disabled
+@Disabled
 public class Auto_1 extends LinearOpMode {
 
     // Declare OpMode members.
