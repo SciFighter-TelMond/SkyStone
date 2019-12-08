@@ -13,7 +13,8 @@ public class ArmClass extends Thread {
     private DcMotor arm0 = null;
     private DcMotor arm1 = null;
     private DigitalChannel zeroArm0 = null;
-    private DigitalChannel zeroArm1 = null;
+    private DigitalChannel zeroArm1a = null;
+    private DigitalChannel zeroArm1b = null;
 
     private Servo clamps = null;
     private Servo clampsRotate = null;
@@ -48,7 +49,9 @@ public class ArmClass extends Thread {
         arm0     = hardwareMap.get(DcMotor.class, "arm0");
         arm1     = hardwareMap.get(DcMotor.class, "arm1");
         zeroArm0 = hardwareMap.get(DigitalChannel.class, "zero_arm0");
-        zeroArm1 = hardwareMap.get(DigitalChannel.class, "zero_arm1");
+        zeroArm1a = hardwareMap.get(DigitalChannel.class, "zero_arm1"); // TODO change names
+        zeroArm1a = hardwareMap.get(DigitalChannel.class, "end_arm1"); // TODO change names
+
         clamps   = hardwareMap.get(Servo.class, "clamps");
         clampsRotate = hardwareMap.get(Servo.class, "clamps_rotate");
 
@@ -57,7 +60,8 @@ public class ArmClass extends Thread {
         arm0.setDirection(DcMotor.Direction.FORWARD);
         arm1.setDirection(DcMotor.Direction.FORWARD);
         zeroArm0.setMode(DigitalChannel.Mode.INPUT);
-        zeroArm1.setMode(DigitalChannel.Mode.INPUT);
+        zeroArm1a.setMode(DigitalChannel.Mode.INPUT);
+        zeroArm1b.setMode(DigitalChannel.Mode.INPUT);
     }
 
     public void reset() {
@@ -100,9 +104,9 @@ public class ArmClass extends Thread {
     public void moveArm1(double speed) {
         if (mode != Mode.MANUAL)
             return;
-        //       if (zeroArm1.getState() == false) {
-        //           speed = Math.max(0, speed);
-        //       }
+        if (zeroArm1a.getState() == false || zeroArm1b.getState() == false ) {
+           speed = Math.max(0, speed);
+        }
         if (arm1Move || speed !=0) {
             double k = motor_speed_k * speed_boost;
             int ticks = arm1.getCurrentPosition() + (int) (k * speed);
@@ -115,11 +119,12 @@ public class ArmClass extends Thread {
         if (zeroArm0.getState() == false) {
             arm0.setTargetPosition(arm0.getCurrentPosition());
         }
-//        if (zeroArm1.getState() == false) {
-//            arm1.setTargetPosition(arm1.getCurrentPosition());
-//        }
+        if (zeroArm1a.getState() == false || zeroArm1b.getState() == false ) {
+            arm1.setTargetPosition(arm1.getCurrentPosition());
+        }
 
         if (opMode != null) {
+            opMode.telemetry.addData("Arms Switch", "Arm0:(%b), Arm1 a:(%b), b:(%b)", zeroArm0.getState(), zeroArm1a.getState(), zeroArm1b.getState());
             opMode.telemetry.addData("Arms", "Arm0 (%d), Arm1 (%d)", arm0.getCurrentPosition(), arm1.getCurrentPosition());
             opMode.telemetry.update();
         }
