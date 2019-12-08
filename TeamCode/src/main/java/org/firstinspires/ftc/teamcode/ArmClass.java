@@ -50,7 +50,7 @@ public class ArmClass extends Thread {
         arm1     = hardwareMap.get(DcMotor.class, "arm1");
         zeroArm0 = hardwareMap.get(DigitalChannel.class, "zero_arm0");
         zeroArm1a = hardwareMap.get(DigitalChannel.class, "zero_arm1"); // TODO change names
-        zeroArm1a = hardwareMap.get(DigitalChannel.class, "end_arm1"); // TODO change names
+        zeroArm1b = hardwareMap.get(DigitalChannel.class, "end_arm1"); // TODO change names
 
         clamps   = hardwareMap.get(Servo.class, "clamps");
         clampsRotate = hardwareMap.get(Servo.class, "clamps_rotate");
@@ -104,9 +104,9 @@ public class ArmClass extends Thread {
     public void moveArm1(double speed) {
         if (mode != Mode.MANUAL)
             return;
-        if (zeroArm1a.getState() == false || zeroArm1b.getState() == false ) {
-           speed = Math.max(0, speed);
-        }
+//        if (zeroArm1a.getState() == false || zeroArm1b.getState() == false ) {
+//           speed = Math.max(0, speed);
+//        }
         if (arm1Move || speed !=0) {
             double k = motor_speed_k * speed_boost;
             int ticks = arm1.getCurrentPosition() + (int) (k * speed);
