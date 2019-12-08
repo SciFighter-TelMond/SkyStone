@@ -79,7 +79,7 @@ public class IterativeDrive2 extends OpMode {
     private DigitalChannel leftBumper = null;
     private DigitalChannel rightBumper = null;
 
-    private ArmClass arm = new ArmClass();
+    private ArmClass arm = new ArmClass(this,null); // TODO:
 
     private AndroidTextToSpeech tts;
 

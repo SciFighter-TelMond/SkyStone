@@ -136,7 +136,9 @@ public class DriveClass {
             }
         }
 
-        if (boostState.getState()) {
+        opMode.telemetry.addData("Bumper", "left (%b), right (%b)", leftBumper.getState(), rightBumper.getState());
+
+        if (boostState.getState() == false) {
             if (leftBumper.getState() == false) {
                 fl_power = Math.max(0, fl_power);
                 bl_power = Math.max(0, bl_power);
@@ -180,7 +182,7 @@ public class DriveClass {
         br_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         double drivePower = speed;
-        double power = speed;
+        double power = drivePower;
 
         while((fl_Drive.isBusy() /*|| bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy()*/) &&
                 opMode.opModeIsActive()  &&  runTime.seconds() < timeout) {
@@ -198,16 +200,17 @@ public class DriveClass {
             bl_Drive.setPower(power);
             br_Drive.setPower(power);
 
-            if (leftBumper.getState() == false) {
-                fl_Drive.setTargetPosition(fl_Drive.getCurrentPosition());
-                bl_Drive.setTargetPosition(bl_Drive.getCurrentPosition());
-            }
+            if (direction == Direction.REVERSE) {
+                if (leftBumper.getState() == false) {
+                    fl_Drive.setTargetPosition(fl_Drive.getCurrentPosition());
+                    bl_Drive.setTargetPosition(bl_Drive.getCurrentPosition());
+                }
 
-            if (rightBumper.getState() == false) {
-                fr_Drive.setTargetPosition(fr_Drive.getCurrentPosition());
-                br_Drive.setTargetPosition(br_Drive.getCurrentPosition());
+                if (rightBumper.getState() == false) {
+                    fr_Drive.setTargetPosition(fr_Drive.getCurrentPosition());
+                    br_Drive.setTargetPosition(br_Drive.getCurrentPosition());
+                }
             }
-
             opMode.sleep(100);
         }
 
@@ -261,18 +264,7 @@ public class DriveClass {
             opMode.telemetry.update();
 
             opMode.sleep(100);
-
-//            if (leftBumper.getState() == false) {
-//                fl_Drive.setTargetPosition(fl_Drive.getCurrentPosition());
-//                bl_Drive.setTargetPosition(bl_Drive.getCurrentPosition());
-//            }
-//
-//            if (rightBumper.getState() == false) {
-//                fr_Drive.setTargetPosition(fr_Drive.getCurrentPosition());
-//                br_Drive.setTargetPosition(br_Drive.getCurrentPosition());
-//            }
         }
-
     }
 /*
 * rotate
@@ -335,15 +327,6 @@ public class DriveClass {
             opMode.telemetry.update();
 
             opMode.sleep(100);
-//            if (leftBumper.getState() == false) {
-//                fl_Drive.setTargetPosition(fl_Drive.getCurrentPosition());
-//                bl_Drive.setTargetPosition(bl_Drive.getCurrentPosition());
-//            }
-//
-//            if (rightBumper.getState() == false) {
-//                fr_Drive.setTargetPosition(fr_Drive.getCurrentPosition());
-//                br_Drive.setTargetPosition(br_Drive.getCurrentPosition());
-//            }
         }
 
     }
@@ -392,7 +375,7 @@ public class DriveClass {
     public void rollersIn() {
         double rollerPower = 1;
         if (cubeBumper.getState() == false) {
-            rollerPower = 0.1;
+            rollerPower = 0.05;
         }
         r_roller.setPower(rollerPower);
         l_roller.setPower(rollerPower);

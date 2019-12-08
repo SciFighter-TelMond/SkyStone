@@ -75,7 +75,7 @@ public class IterativeDrive extends OpMode
     private DigitalChannel leftBumper = null;
     private DigitalChannel rightBumper = null;
 
-    private ArmClass arm = new ArmClass();
+    private ArmClass arm = new ArmClass( this,null);
 
     // Code to run ONCE when the driver hits INIT
     @Override

@@ -83,31 +83,34 @@ public class red_foundation_auto extends LinearOpMode {
 
         runtime.reset();
         /*starting point: building area, the bridge is on the left,
-        * the front of the robot is to the wall, the hooks directed to the middle of the field.
-        * please start close to the building site*/
+         * the front of the robot is to the wall, the hooks directed to the middle of the field.
+         * please start close to the building site*/
         // Step 1:  Drive forward (actually back) and a bit to the right (actually to the left)
-        robot.side(0.3, DriveClass.Direction.LEFT, 0.3, 3);
-        robot.straight(1.5, DriveClass.Direction.REVERSE, 0.2, 5);
+        robot.side(0.6, DriveClass.Direction.LEFT, 1, 3);
+        robot.straight(1.7, DriveClass.Direction.REVERSE, 0.4, 5);
 
-        sleep(200);
+        sleep(500);
         // Step 2: should be in front of the foundation, hooks down
         robot.hooksDown();
+        sleep(1500);
+        robot.straight(0.6, DriveClass.Direction.FORWARD, 0.5, 5);
         // Step 3: turn 180 with the foundation
-        robot.rotate(0.5, DriveClass.Direction.LEFT, 0.3, 5);
+        robot.rotate(0.6, DriveClass.Direction.LEFT, 0.5, 5);
         sleep(200);
+
         // Step 4: set the foundation free
         robot.hooksUp();
+        sleep(200);
         // Step 5: park under the bridge got to the right 1.5M
-        robot.side(1.5, DriveClass.Direction.LEFT, 0.5, 5);
+        robot.side(2.2, DriveClass.Direction.LEFT, 0.7, 5);
 
         while (opModeIsActive() && (runtime.seconds() < 30)) {
             telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
             telemetry.update();
         }
 
-
         // Step 6:  stop
         robot.stop();
-        sleep(1000);
+        //sleep(1000);
     }
 }

@@ -16,7 +16,7 @@ public class Arm2 extends OpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
 
-    private ArmClass arm = new ArmClass();
+    private ArmClass arm = new ArmClass(this, null);
 
 
 

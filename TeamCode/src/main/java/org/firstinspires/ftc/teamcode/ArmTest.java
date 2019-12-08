@@ -60,7 +60,7 @@ public class ArmTest extends OpMode {
 
 
 
-    private ArmClass arm = new ArmClass();
+    private ArmClass arm = new ArmClass(this,null);
 
 
     // Code to run ONCE when the driver hits INIT

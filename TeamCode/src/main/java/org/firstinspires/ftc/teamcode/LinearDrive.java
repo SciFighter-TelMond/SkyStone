@@ -2,9 +2,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -24,9 +21,11 @@ public class LinearDrive extends LinearOpMode {
     private Toggle hooksState       = new Toggle();
     private Toggle rollerState      = new Toggle();
     private Toggle rollerServoState = new Toggle();
+    private Toggle clamps           = new Toggle();
+    private Toggle clamps_rotate    = new Toggle();
 
     private DriveClass drive = new DriveClass(this);
-    private ArmClass   arm   = new ArmClass();
+    private ArmClass   arm   = new ArmClass(this, drive);
 
     @Override
     public void runOpMode() {
@@ -54,9 +53,9 @@ public class LinearDrive extends LinearOpMode {
             double side         =  gamepad1.right_stick_x;
             double turn         =  gamepad1.left_stick_x;
             double speedTrigger =  gamepad1.right_trigger;
-            double turneTrigger =  gamepad1.left_trigger;
+            // double turneTrigger =  gamepad1.left_trigger;
 
-            drive.drive(straight, side, turn, speedTrigger, turneTrigger);
+            drive.drive(straight, side, turn, speedTrigger, speedTrigger);
 
             // =========================================
             // Hooks Control
@@ -76,7 +75,7 @@ public class LinearDrive extends LinearOpMode {
             arm.moveArm1(-gamepad2.right_stick_y);
             if (gamepad2.b || gamepad1.b) {
                 arm.end();
-                arm.resumePower();
+                // arm.resumePower();
             }
             if (gamepad2.a) {
                 arm.resumePower();
@@ -88,23 +87,15 @@ public class LinearDrive extends LinearOpMode {
                 arm.linearDo(ArmClass.Mode.PICK);
             }
 
-            if (gamepad2.left_bumper) {
-                telemetry.addData("left bumper true: clamp open", true);
-                telemetry.update();
-                arm.clamp(true);
-            }
-            if (gamepad2.right_bumper) {
-                telemetry.addData("left bumper false: clamp close", false);
-                telemetry.update();
-                arm.clamp(false);
-            }
+            clamps.update(gamepad2.left_bumper);
+            if (clamps.isChanged())
+                arm.clamp(clamps.getState());
 
-            if (gamepad2.left_trigger > 0.5) {
-                arm.rotateClamp(true);
-            }
-            if (gamepad2.right_trigger > 0.5) {
-                arm.rotateClamp(false);
-            }
+            clamps_rotate.update(gamepad2.right_bumper);
+            if (clamps_rotate.isChanged())
+                arm.rotateClamp(clamps_rotate.getState());
+
+            arm.setBoost(gamepad2.right_trigger + gamepad2.left_trigger);
 
             // =========================================
             // Rollers Control
@@ -126,7 +117,6 @@ public class LinearDrive extends LinearOpMode {
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             // telemetry.addData("Motors", "left (%.2f), right (%.2f)", fl_power, fr_power);
-            // telemetry.addData("Bumper", "left (%b), right (%b)", leftBumper.getState(), rightBumper.getState());
             telemetry.addData("Arms", "Arm0 (%d), Arm1 (%d)", arm.getArm0Pos(), arm.getArm1Pos());
             if (hooksState.getState()) telemetry.addData("Hooks", "ON");
             telemetry.update();

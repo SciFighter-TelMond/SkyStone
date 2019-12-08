@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+// import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -19,11 +21,28 @@ public class ArmClass extends Thread {
     private int manualPos0 = 0;
     private int manualPos1 = 0;
 
-    private double power = 0.7;
+    private double power         = 1;
+    private double motor_speed_k = 300;
+    private double speed_boost   = 0.5;
 
     public enum Mode {IDLE, MANUAL, PICK, BUILD, DORP}
 
     private Mode mode = Mode.IDLE;
+
+    private boolean arm0Move = false;
+    private boolean arm1Move = false;
+
+    private OpMode opMode = null;
+    private DriveClass driveClass = null;
+
+    public ArmClass(OpMode opMode, DriveClass drive)
+    {
+        this.setName("ArmClass");
+        RobotLog.d("%s", this.getName());
+
+        this.opMode = opMode ;
+        this.driveClass = drive ;
+    }
 
     public void init(HardwareMap hardwareMap) {
         arm0     = hardwareMap.get(DcMotor.class, "arm0");
@@ -39,13 +58,6 @@ public class ArmClass extends Thread {
         arm1.setDirection(DcMotor.Direction.FORWARD);
         zeroArm0.setMode(DigitalChannel.Mode.INPUT);
         zeroArm1.setMode(DigitalChannel.Mode.INPUT);
-    }
-
-
-    public ArmClass()
-    {
-        this.setName("ArmClass");
-        RobotLog.d("%s", this.getName());
     }
 
     public void reset() {
@@ -66,6 +78,10 @@ public class ArmClass extends Thread {
         mode = Mode.MANUAL;
     }
 
+    public void setBoost( double boost ) {
+        speed_boost = 0.5 + boost * 0.5;
+    }
+
     public void moveArm0(double speed) {
         if (mode != Mode.MANUAL)
             return;
@@ -73,8 +89,12 @@ public class ArmClass extends Thread {
         if (zeroArm0.getState() == false) {
             speed = Math.max(0, speed);
         }
-        int ticks = arm0.getCurrentPosition() + (int) (200 * speed);
-        arm0.setTargetPosition(ticks);
+        if (arm0Move || speed !=0) {
+            double k = motor_speed_k * speed_boost;
+            int ticks = arm0.getCurrentPosition() + (int) (k * speed);
+            arm0.setTargetPosition(ticks);
+            arm0Move = speed != 0;
+        }
     }
 
     public void moveArm1(double speed) {
@@ -83,8 +103,12 @@ public class ArmClass extends Thread {
         //       if (zeroArm1.getState() == false) {
         //           speed = Math.max(0, speed);
         //       }
-        int ticks = arm1.getCurrentPosition() + (int) (200 * speed);
-        arm1.setTargetPosition(ticks);
+        if (arm1Move || speed !=0) {
+            double k = motor_speed_k * speed_boost;
+            int ticks = arm1.getCurrentPosition() + (int) (k * speed);
+            arm1.setTargetPosition(ticks);
+            arm1Move = speed != 0;
+        }
     }
 
     public void checkups() {
@@ -94,6 +118,11 @@ public class ArmClass extends Thread {
 //        if (zeroArm1.getState() == false) {
 //            arm1.setTargetPosition(arm1.getCurrentPosition());
 //        }
+
+        if (opMode != null) {
+            opMode.telemetry.addData("Arms", "Arm0 (%d), Arm1 (%d)", arm0.getCurrentPosition(), arm1.getCurrentPosition());
+            opMode.telemetry.update();
+        }
     }
 
     public void gootoo(int pos0, int pos1) throws InterruptedException {
@@ -131,18 +160,21 @@ public class ArmClass extends Thread {
                     // peak up a cube and get back to drive position.
                     gootoo(3100, 3100); // 1
                     gootoo(3100,5400);  // 2
+                    rotateClamp(false);
                     clamp(true);
-                    sleep(1000);
+                    if (driveClass != null)
+                        driveClass.rollers(true);
+                    //sleep(1000);
                     gootoo(2500, 5500); // 3
                     clamp(false);
-                    sleep(2000);
+                    sleep(1000);
                     gootoo(3680, 7202);  // 1
-                    sleep(2000);
-                    gootoo(4600, 6540 ); // 2
-                    sleep(2000);
-                    gootoo(3500,740);    // 3
-                    sleep(2000);
-                    gootoo(930,740);     // 4
+//                    sleep(2000);
+//                    gootoo(4600, 6540 ); // 2
+//                    sleep(2000);
+//                    gootoo(3500,740);    // 3
+//                    sleep(2000);
+//                    gootoo(930,740);     // 4
                     break;
 
                 case BUILD:
