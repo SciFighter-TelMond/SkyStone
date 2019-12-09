@@ -10,6 +10,8 @@ import com.qualcomm.robotcore.util.RobotLog;
 
 public class ArmClass extends Thread {
 
+    private boolean stopFlag = true;
+
     private DcMotor arm0 = null;
     private DcMotor arm1 = null;
     private DigitalChannel zeroArm0 = null;
@@ -46,13 +48,13 @@ public class ArmClass extends Thread {
     }
 
     public void init(HardwareMap hardwareMap) {
-        arm0     = hardwareMap.get(DcMotor.class, "arm0");
-        arm1     = hardwareMap.get(DcMotor.class, "arm1");
-        zeroArm0 = hardwareMap.get(DigitalChannel.class, "zero_arm0");
+        arm0      = hardwareMap.get(DcMotor.class, "arm0");
+        arm1      = hardwareMap.get(DcMotor.class, "arm1");
+        zeroArm0  = hardwareMap.get(DigitalChannel.class, "zero_arm0");
         zeroArm1a = hardwareMap.get(DigitalChannel.class, "zero_arm1"); // TODO change names
         zeroArm1b = hardwareMap.get(DigitalChannel.class, "end_arm1"); // TODO change names
 
-        clamps   = hardwareMap.get(Servo.class, "clamps");
+        clamps       = hardwareMap.get(Servo.class, "clamps");
         clampsRotate = hardwareMap.get(Servo.class, "clamps_rotate");
 
         // Most robots need the motor on one side to be reversed to drive forward
@@ -80,6 +82,7 @@ public class ArmClass extends Thread {
         arm0.setPower(power);
         arm1.setPower(power);
         mode = Mode.MANUAL;
+        stopFlag = false;
     }
 
     public void setBoost( double boost ) {
@@ -119,10 +122,10 @@ public class ArmClass extends Thread {
         if (zeroArm0.getState() == false) {
             arm0.setTargetPosition(arm0.getCurrentPosition());
         }
-        if (zeroArm1a.getState() == false || zeroArm1b.getState() == false ) {
-            arm1.setTargetPosition(arm1.getCurrentPosition());
-        }
-
+//        if (zeroArm1a.getState() == false || zeroArm1b.getState() == false ) {
+//            arm1.setTargetPosition(arm1.getCurrentPosition());
+//        }
+//
         if (opMode != null) {
             opMode.telemetry.addData("Arms Switch", "Arm0:(%b), Arm1 a:(%b), b:(%b)", zeroArm0.getState(), zeroArm1a.getState(), zeroArm1b.getState());
             opMode.telemetry.addData("Arms", "Arm0 (%d), Arm1 (%d)", arm0.getCurrentPosition(), arm1.getCurrentPosition());
@@ -164,8 +167,8 @@ public class ArmClass extends Thread {
                 case PICK:
                     // peak up a cube and get back to drive position.
                     gootoo(3100, 3100); // 1
-                    gootoo(3100,5400);  // 2
                     rotateClamp(false);
+                    gootoo(3100,5400);  // 2
                     clamp(true);
                     if (driveClass != null)
                         driveClass.rollers(true);
@@ -199,6 +202,7 @@ public class ArmClass extends Thread {
     }
 
     public void end() {
+        stopFlag = true;
         interrupt();
         arm0.setPower(0);
         arm1.setPower(0);
@@ -213,6 +217,7 @@ public class ArmClass extends Thread {
         arm0.setPower(power);
         arm1.setPower(power);
         mode = Mode.MANUAL;
+        stopFlag = false;
     }
 
     public int getArm0Pos() {
@@ -223,6 +228,10 @@ public class ArmClass extends Thread {
         return arm1.getCurrentPosition();
     }
 
+    public boolean getArm0Zero() { return zeroArm0.getState(); }
+    public boolean getArm1ZeroA() { return zeroArm1a.getState(); }
+    public boolean getArm1ZeroB() { return zeroArm1b.getState(); }
+
     public void clamp(boolean open) {
         if (open) {
             clamps.setPosition(1);
@@ -231,11 +240,11 @@ public class ArmClass extends Thread {
         }
     }
 
-    public void rotateClamp(boolean y) {
-        if (y) {
-            clampsRotate.setPosition(1);
-        } else {
+    public void rotateClamp(boolean rot) {
+        if (rot) {
             clampsRotate.setPosition(0);
+        } else {
+            clampsRotate.setPosition(1);
         }
     }
 }

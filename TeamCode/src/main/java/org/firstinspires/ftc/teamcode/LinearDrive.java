@@ -118,6 +118,8 @@ public class LinearDrive extends LinearOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             // telemetry.addData("Motors", "left (%.2f), right (%.2f)", fl_power, fr_power);
             telemetry.addData("Arms", "Arm0 (%d), Arm1 (%d)", arm.getArm0Pos(), arm.getArm1Pos());
+            telemetry.addData("Arms Switch", "Arm0:(%b), Arm1 a:(%b), b:(%b)", arm.getArm0Zero(), arm.getArm1ZeroA(), arm.getArm1ZeroB());
+
             if (hooksState.getState()) telemetry.addData("Hooks", "ON");
             telemetry.update();
         }

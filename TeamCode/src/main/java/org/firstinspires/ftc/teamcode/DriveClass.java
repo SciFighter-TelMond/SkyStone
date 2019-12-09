@@ -364,18 +364,18 @@ public class DriveClass {
 
     public void rollers( boolean open) {
         if (open) {
-            r_roller_servo.setPosition(0);
-            l_roller_servo.setPosition(1);
-        } else {
             r_roller_servo.setPosition(1);
             l_roller_servo.setPosition(0);
+        } else {
+            r_roller_servo.setPosition(0);
+            l_roller_servo.setPosition(1);
         }
     }
 
     public void rollersIn() {
         double rollerPower = 1;
         if (cubeBumper.getState() == false) {
-            rollerPower = 0.05;
+            rollerPower = 0.1;
         }
         r_roller.setPower(rollerPower);
         l_roller.setPower(rollerPower);
