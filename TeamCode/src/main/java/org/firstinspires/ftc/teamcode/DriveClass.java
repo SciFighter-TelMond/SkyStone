@@ -103,6 +103,8 @@ public class DriveClass {
         rightBumper.setMode(DigitalChannel.Mode.INPUT); // set the digital channel to input.
     }
 
+
+    // ==================================================================================================
     public void drive(double straight, double side, double turn, double speedTrigger, double turnTrigger) {
 
         double speedBoost = speedTrigger * 0.5 + 0.5;
@@ -123,7 +125,7 @@ public class DriveClass {
 
         boostState.update(speedTrigger>0.7);
         if (boostState.isChanged()) {
-            if (boostState.getState()) {
+            if (boostState.isPressed()) {
                 fl_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 fr_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 bl_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -138,7 +140,7 @@ public class DriveClass {
 
         opMode.telemetry.addData("Bumper", "left (%b), right (%b)", leftBumper.getState(), rightBumper.getState());
 
-        if (boostState.getState() == false) {
+        if (speedBoost<0.7) {
             if (leftBumper.getState() == false) {
                 fl_power = Math.max(0, fl_power);
                 bl_power = Math.max(0, bl_power);
@@ -364,6 +366,8 @@ public class DriveClass {
 
     public void rollers( boolean open) {
         if (open) {
+            r_roller.setPower(1);
+            l_roller.setPower(1);
             r_roller_servo.setPosition(1);
             l_roller_servo.setPosition(0);
         } else {

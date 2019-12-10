@@ -104,7 +104,7 @@ public class blue_foundation_auto2 extends LinearOpMode {
         // Step 5: park under the bridge got to the right 1.5M
         robot.side(1.7, DriveClass.Direction.LEFT, 0.7, 5);
         robot.straight(0.7, DriveClass.Direction.REVERSE, 0.4, 5);
-        robot.side(1, DriveClass.Direction.LEFT, 0.7, 5);
+        robot.side(0.6, DriveClass.Direction.LEFT, 0.7, 5);
         while (opModeIsActive() && (runtime.seconds() < 30)) {
             telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
             telemetry.update();
