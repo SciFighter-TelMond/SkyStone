@@ -54,9 +54,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="blue foundation auto", group="SciFighterd")// moving the blue foundation. you are in the blue team.
+@Autonomous(name="Red Foundation", group="SciFighterd")// moving the blue foundation. you are in the blue team.
 //@Disabled
-public class blue_foundation_auto extends LinearOpMode {
+public class Auto_red_foundation extends LinearOpMode {
 
     /* Declare OpMode members. */
     private DriveClass         robot   = new DriveClass(this);   // Use a Pushbot's hardware
@@ -86,7 +86,7 @@ public class blue_foundation_auto extends LinearOpMode {
          * the front of the robot is to the wall, the hooks directed to the middle of the field.
          * please start close to the building site*/
         // Step 1:  Drive forward (actually back) and a bit to the right (actually to the left)
-        robot.side(0.6, DriveClass.Direction.RIGHT, 1, 3);
+        robot.side(0.6, DriveClass.Direction.LEFT, 1, 3);
         robot.straight(1.7, DriveClass.Direction.REVERSE, 0.4, 5);
 
         sleep(500);
@@ -102,9 +102,9 @@ public class blue_foundation_auto extends LinearOpMode {
         robot.hooksUp();
         sleep(200);
         // Step 5: park under the bridge got to the right 1.5M
-        robot.side(1.7, DriveClass.Direction.LEFT, 0.7, 5);
+        robot.side(1.7, DriveClass.Direction.RIGHT, 0.7, 5);
         robot.straight(0.7, DriveClass.Direction.REVERSE, 0.4, 5);
-        robot.side(0.6, DriveClass.Direction.LEFT, 0.7, 5);
+        robot.side(0.6, DriveClass.Direction.RIGHT, 0.7, 5);
         while (opModeIsActive() && (runtime.seconds() < 30)) {
             telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
             telemetry.update();

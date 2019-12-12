@@ -54,9 +54,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="red loading auto", group="SciFighterd")// moving the blue foundation. you are in the blue team.
+@Autonomous(name="Blue Loading", group="SciFighterd")// moving the blue foundation. you are in the blue team.
 //@Disabled
-public class red_loading_auto extends LinearOpMode {
+public class Auto_blue_loading extends LinearOpMode {
 
     /* Declare OpMode members. */
     private DriveClass         robot   = new DriveClass(this);   // Use a Pushbot's hardware
@@ -88,13 +88,13 @@ public class red_loading_auto extends LinearOpMode {
         // Step 1:  Drive forward (actually back) and a bit to the right (actually to the left)
         robot.rollers(true);
         robot.rollersIn();
-        robot.side(0.6, DriveClass.Direction.LEFT, 1, 3);
+        robot.side(0.6, DriveClass.Direction.RIGHT, 1, 3);
         robot.straight(1.7, DriveClass.Direction.FORWARD, 0.4, 5);
         robot.straight(0.2, DriveClass.Direction.REVERSE, 0.4, 5);
         robot.straight(0.2, DriveClass.Direction.FORWARD, 0.4, 5);
         robot.rollers(false);
         robot.rollersIn();
-        robot.rotate(0.3, DriveClass.Direction.RIGHT, 0.5, 5);
+        robot.rotate(0.3, DriveClass.Direction.LEFT, 0.5, 5);
         robot.straight(2.2, DriveClass.Direction.FORWARD, 0.4, 5);
         robot.rollersOut();
         robot.straight(0.4, DriveClass.Direction.REVERSE, 0.4, 5);
