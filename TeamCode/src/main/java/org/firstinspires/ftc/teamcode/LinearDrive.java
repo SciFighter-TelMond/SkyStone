@@ -25,7 +25,7 @@ public class LinearDrive extends LinearOpMode {
     private Toggle clamps_rotate    = new Toggle();
 
     private DriveClass drive = new DriveClass(this);
-    private ArmClass2   arm  = new ArmClass2(this, drive);
+    private ArmClass   arm  = new ArmClass(this, drive);
 
     @Override
     public void runOpMode() {
@@ -84,15 +84,15 @@ public class LinearDrive extends LinearOpMode {
                 arm.reset();
             }
             if (gamepad2.y) {
-                arm.linearDo(ArmClass2.Mode.PICK);
+                arm.linearDo(ArmClass.Mode.PICK);
             }
 
             if (gamepad2.dpad_up) {
-                arm.linearDo(ArmClass2.Mode.STRAIGHT);
+                arm.linearDo(ArmClass.Mode.STRAIGHT);
             }
 
             if (gamepad2.dpad_down) {
-                arm.linearDo(ArmClass2.Mode.HOME);
+                arm.linearDo(ArmClass.Mode.HOME);
             }
 
             clamps.update(gamepad2.left_bumper);

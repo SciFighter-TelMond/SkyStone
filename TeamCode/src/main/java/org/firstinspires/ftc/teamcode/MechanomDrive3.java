@@ -34,7 +34,7 @@ public class MechanomDrive3 extends LinearOpMode {
     private DigitalChannel leftBumper = null;
     private DigitalChannel rightBumper = null;
 
-    private ArmClassTest arm = new ArmClassTest();
+    private ArmClass arm = new ArmClass(this, null);
 
     @Override
     public void runOpMode() {
@@ -77,7 +77,7 @@ public class MechanomDrive3 extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-        arm.begine();
+        arm.begin();
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
