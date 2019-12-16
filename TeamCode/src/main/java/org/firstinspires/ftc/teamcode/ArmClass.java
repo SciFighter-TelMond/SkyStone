@@ -22,19 +22,12 @@ public class ArmClass extends Thread {
     private Servo clamps = null;
     private Servo clampsRotate = null;
 
-    private int manualPos0 = 0;
-    private int manualPos1 = 0;
-
     private double power = 1;
-    private double motor_speed_k = 300;
     private double speed_boost = 0.5;
 
     public enum Mode {IDLE, MANUAL, HOME, PICK, STRAIGHT, BUILD, DROP}
 
     private Mode mode = Mode.IDLE;
-
-    private boolean arm0Move = false;
-    private boolean arm1Move = false;
 
     private OpMode opMode = null;
     private DriveClass driveClass = null;
@@ -117,13 +110,7 @@ public class ArmClass extends Thread {
             speed = Math.max(0, speed);
         }
 
-//        if (!arm0Move && speed != 0) setModeArm0(true);
-//        if (arm0Move && speed == 0) setModeArm0(false);
-
-//        if (arm0Move || speed != 0) {
-            arm0.setPower(speed * speed_boost);
-//            arm0Move = speed != 0;
-//        }
+        arm0.setPower(speed * speed_boost);
     }
 
     public void moveArm1(double speed) {
@@ -133,13 +120,7 @@ public class ArmClass extends Thread {
 //           speed = Math.max(0, speed);
 //        }
 
-//        if (!arm1Move && speed != 0) setModeArm1(true);
-//        if (arm1Move && speed == 0) setModeArm1(false);
-
-//        if (arm1Move || speed != 0) {
-            arm1.setPower(speed * speed_boost);
-//            arm1Move = speed != 0;
-//        }
+        arm1.setPower(speed * speed_boost);
     }
 
     public void checkups() {
@@ -198,28 +179,21 @@ public class ArmClass extends Thread {
                     gootoo(4100, 4100);
                     gootoo(800, 200);
                     break;
+
                 case PICK:
                     // peak up a cube and get back to drive position.
-                    if (arm0.getCurrentPosition() < 3000 || arm1.getCurrentPosition() < 3000) {
-                        gootoo(3100, 3100); // 1
-                    }
+                    gootoo( 0, -1065);
+                    gootoo(2282, -1065);
+                    gootoo(2282, 3115);
                     rotateClamp(false);
-                    gootoo(3000, 5400);  // 2
                     clamp(true);
-                    if (driveClass != null)
-                        driveClass.rollers(true);
-
-                    //sleep(1000);
-                    gootoo(2500, 5500); // 3
+                    gootoo(2282, 2609);
+                    gootoo(1685, 2906);
                     clamp(false);
                     sleep(1000);
-                    gootoo(3680, 7202);  // 1
-//                    sleep(2000);
-//                    gootoo(4600, 6540 ); // 2
-//                    sleep(2000);
-//                    gootoo(3500,740);    // 3
-//                    sleep(2000);
-//                    gootoo(930,740);     // 4
+                    if (driveClass != null)
+                        driveClass.rollers(true);
+                    gootoo(2282, 2609);  // 1
                     break;
 
                 case STRAIGHT:
