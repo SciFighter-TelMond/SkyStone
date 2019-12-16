@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 // import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
@@ -24,9 +25,9 @@ public class ArmClass extends Thread {
     private int manualPos0 = 0;
     private int manualPos1 = 0;
 
-    private double power         = 1;
+    private double power = 1;
     private double motor_speed_k = 300;
-    private double speed_boost   = 0.5;
+    private double speed_boost = 0.5;
 
     public enum Mode {IDLE, MANUAL, HOME, PICK, STRAIGHT, BUILD, DROP}
 
@@ -38,23 +39,22 @@ public class ArmClass extends Thread {
     private OpMode opMode = null;
     private DriveClass driveClass = null;
 
-    public ArmClass(OpMode opMode, DriveClass drive)
-    {
+    public ArmClass(OpMode opMode, DriveClass drive) {
         this.setName("ArmClass");
         RobotLog.d("%s", this.getName());
 
-        this.opMode = opMode ;
-        this.driveClass = drive ;
+        this.opMode = opMode;
+        this.driveClass = drive;
     }
 
     public void init(HardwareMap hardwareMap) {
-        arm0      = hardwareMap.get(DcMotor.class, "arm0");
-        arm1      = hardwareMap.get(DcMotor.class, "arm1");
-        zeroArm0  = hardwareMap.get(DigitalChannel.class, "zero_arm0");
+        arm0 = hardwareMap.get(DcMotor.class, "arm0");
+        arm1 = hardwareMap.get(DcMotor.class, "arm1");
+        zeroArm0 = hardwareMap.get(DigitalChannel.class, "zero_arm0");
         zeroArm1a = hardwareMap.get(DigitalChannel.class, "zero_arm1"); // TODO change names
         zeroArm1b = hardwareMap.get(DigitalChannel.class, "end_arm1"); // TODO change names
 
-        clamps       = hardwareMap.get(Servo.class, "clamps");
+        clamps = hardwareMap.get(Servo.class, "clamps");
         clampsRotate = hardwareMap.get(Servo.class, "clamps_rotate");
 
         // Most robots need the motor on one side to be reversed to drive forward
@@ -64,6 +64,8 @@ public class ArmClass extends Thread {
         zeroArm0.setMode(DigitalChannel.Mode.INPUT);
         zeroArm1a.setMode(DigitalChannel.Mode.INPUT);
         zeroArm1b.setMode(DigitalChannel.Mode.INPUT);
+        arm0.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        arm1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     public void reset() {
@@ -73,11 +75,17 @@ public class ArmClass extends Thread {
         arm0.setTargetPosition(0);
         arm1.setTargetPosition(0);
 
-        arm0.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        arm1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        arm0.setPower(0);
+        arm1.setPower(0);
+
+        arm0.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        arm1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        arm0.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        arm1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
-    private void moveMode0( boolean drive ) {
+    private void moveMode0(boolean drive) {
         if (drive) {
             arm0.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             arm0.setPower(0);
@@ -88,7 +96,7 @@ public class ArmClass extends Thread {
         }
     }
 
-    private void moveMode1( boolean drive ) {
+    private void moveMode1(boolean drive) {
         if (drive) {
             arm1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             arm1.setPower(0);
@@ -107,7 +115,7 @@ public class ArmClass extends Thread {
         stopFlag = false;
     }
 
-    public void setBoost( double boost ) {
+    public void setBoost(double boost) {
         speed_boost = 0.5 + boost * 0.5;
     }
 
@@ -119,13 +127,13 @@ public class ArmClass extends Thread {
             speed = Math.max(0, speed);
         }
 
-        if (!arm0Move && speed !=0) moveMode0(true);
-        if (arm0Move && speed  ==0) moveMode0(false);
+//        if (!arm0Move && speed != 0) moveMode0(true);
+//        if (arm0Move && speed == 0) moveMode0(false);
 
-        if (arm0Move || speed !=0) {
-            arm0.setPower(speed*speed_boost);
-            arm0Move = speed != 0;
-        }
+//        if (arm0Move || speed != 0) {
+            arm0.setPower(speed * speed_boost);
+//            arm0Move = speed != 0;
+//        }
     }
 
     public void moveArm1(double speed) {
@@ -135,13 +143,13 @@ public class ArmClass extends Thread {
 //           speed = Math.max(0, speed);
 //        }
 
-        if (!arm1Move && speed !=0) moveMode1(true);
-        if (arm1Move && speed  ==0) moveMode1(false);
+//        if (!arm1Move && speed != 0) moveMode1(true);
+//        if (arm1Move && speed == 0) moveMode1(false);
 
-        if (arm1Move || speed !=0) {
+//        if (arm1Move || speed != 0) {
             arm1.setPower(speed * speed_boost);
-            arm1Move = speed != 0;
-        }
+//            arm1Move = speed != 0;
+//        }
     }
 
     public void checkups() {
@@ -196,17 +204,17 @@ public class ArmClass extends Thread {
 //                    if (arm0.getCurrentPosition() < 3000) {
 //                        gootoo(3100, arm1.getCurrentPosition()); // 1
 //                    }
-                    gootoo(4100,7202);
-                    gootoo(4100,4100);
-                    gootoo(800,200);
+                    gootoo(4100, 7202);
+                    gootoo(4100, 4100);
+                    gootoo(800, 200);
                     break;
                 case PICK:
                     // peak up a cube and get back to drive position.
-                    if (arm0.getCurrentPosition() < 3000 || arm1.getCurrentPosition()<3000) {
+                    if (arm0.getCurrentPosition() < 3000 || arm1.getCurrentPosition() < 3000) {
                         gootoo(3100, 3100); // 1
                     }
                     rotateClamp(false);
-                    gootoo(3000,5400);  // 2
+                    gootoo(3000, 5400);  // 2
                     clamp(true);
                     if (driveClass != null)
                         driveClass.rollers(true);
@@ -230,13 +238,16 @@ public class ArmClass extends Thread {
                     break;
 
 
-                default: break;
+                default:
+                    break;
             }
+        } catch (InterruptedException e) {
+            RobotLog.d("Arm Thread interrupted!");
+        } catch (Exception e) {
+            RobotLog.logStackTrace(e);
         }
-        catch (InterruptedException e) { RobotLog.d("Arm Thread interrupted!"); }
-        catch (Exception e) { RobotLog.logStackTrace(e); }
-        moveMode0(false);
-        moveMode1(false);
+        moveMode0(true);
+        moveMode1(true);
         mode = Mode.MANUAL;
     }
 
@@ -267,9 +278,17 @@ public class ArmClass extends Thread {
         return arm1.getCurrentPosition();
     }
 
-    public boolean getArm0Zero()  { return zeroArm0.getState();  }
-    public boolean getArm1ZeroA() { return zeroArm1a.getState(); }
-    public boolean getArm1ZeroB() { return zeroArm1b.getState(); }
+    public boolean getArm0Zero() {
+        return zeroArm0.getState();
+    }
+
+    public boolean getArm1ZeroA() {
+        return zeroArm1a.getState();
+    }
+
+    public boolean getArm1ZeroB() {
+        return zeroArm1b.getState();
+    }
 
     public void clamp(boolean open) {
         if (open) {
