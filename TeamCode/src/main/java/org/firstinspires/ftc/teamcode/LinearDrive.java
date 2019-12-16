@@ -87,6 +87,10 @@ public class LinearDrive extends LinearOpMode {
                 arm.linearDo(ArmClass.Mode.PICK);
             }
 
+            if (gamepad2.y && gamepad2.dpad_left) {
+                arm.pleaseDo(ArmClass.Mode.PICK);
+            }
+
             if (gamepad2.dpad_up) {
                 arm.linearDo(ArmClass.Mode.STRAIGHT);
             }

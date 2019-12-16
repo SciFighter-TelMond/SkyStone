@@ -379,7 +379,7 @@ public class DriveClass {
     public void rollersIn() {
         double rollerPower = 1;
         if (cubeBumper.getState() == false) {
-            rollerPower = 0.1;
+            rollerPower = 0.05;
         }
         r_roller.setPower(rollerPower);
         l_roller.setPower(rollerPower);

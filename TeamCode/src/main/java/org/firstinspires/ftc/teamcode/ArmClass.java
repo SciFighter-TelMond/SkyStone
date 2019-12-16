@@ -11,26 +11,29 @@ import com.qualcomm.robotcore.util.RobotLog;
 
 public class ArmClass extends Thread {
 
-    private boolean stopFlag = true;
+    volatile private boolean stopFlag = true;
 
-    private DcMotor arm0 = null;
-    private DcMotor arm1 = null;
-    private DigitalChannel zeroArm0 = null;
-    private DigitalChannel zeroArm1a = null;
-    private DigitalChannel zeroArm1b = null;
+    volatile private DcMotor arm0 = null;
+    volatile private DcMotor arm1 = null;
+    volatile private DigitalChannel zeroArm0 = null;
+    volatile private DigitalChannel zeroArm1a = null;
+    volatile private DigitalChannel zeroArm1b = null;
 
-    private Servo clamps = null;
-    private Servo clampsRotate = null;
+    volatile private Servo clamps = null;
+    volatile private Servo clampsRotate = null;
 
-    private double power = 1;
-    private double speed_boost = 0.5;
+    volatile private double power = 1;
+    volatile private double speed_boost = 0.5;
 
     public enum Mode {IDLE, MANUAL, HOME, PICK, STRAIGHT, BUILD, DROP}
 
-    private Mode mode = Mode.IDLE;
+    volatile private Mode mode = Mode.IDLE;
 
-    private OpMode opMode = null;
-    private DriveClass driveClass = null;
+    volatile private int posArm0 = 0;
+    volatile private int posArm1 = 0;
+
+    volatile private OpMode opMode = null;
+    volatile private DriveClass driveClass = null;
 
     public ArmClass(OpMode opMode, DriveClass drive) {
         this.setName("ArmClass");
@@ -78,8 +81,8 @@ public class ArmClass extends Thread {
 
     private void setModeArm0(boolean drive) {
         if (drive) {
-            arm0.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             arm0.setPower(0);
+            arm0.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         } else {
             arm0.setTargetPosition(arm0.getCurrentPosition());
             arm0.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -89,8 +92,8 @@ public class ArmClass extends Thread {
 
     private void setModeArm1(boolean drive) {
         if (drive) {
-            arm1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             arm1.setPower(0);
+            arm1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         } else {
             arm1.setTargetPosition(arm1.getCurrentPosition());
             arm1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -131,6 +134,17 @@ public class ArmClass extends Thread {
             arm1.setTargetPosition(arm1.getCurrentPosition());
         }
 
+        if (Math.abs(arm0.getCurrentPosition() - posArm0) <= 5){
+            arm0.setTargetPosition(arm0.getCurrentPosition());
+        }
+        if (Math.abs(arm1.getCurrentPosition() - posArm1) <= 5){
+            arm1.setTargetPosition(arm1.getCurrentPosition());
+        }
+
+        posArm0 = arm0.getCurrentPosition();
+        posArm1 = arm1.getCurrentPosition();
+
+
         if (opMode != null) {
             opMode.telemetry.addData("Arms Switch", "Arm0:(%b), Arm1 a:(%b), b:(%b)", zeroArm0.getState(), zeroArm1a.getState(), zeroArm1b.getState());
             opMode.telemetry.addData("Arms", "Arm0 (%d), Arm1 (%d)", arm0.getCurrentPosition(), arm1.getCurrentPosition());
@@ -142,11 +156,11 @@ public class ArmClass extends Thread {
         arm0.setTargetPosition(pos0);
         arm1.setTargetPosition(pos1);
         while (arm0.isBusy()) {
-            sleep(100);
+            sleep(20);
             checkups();
         }
         while (arm1.isBusy()) {
-            sleep(100);
+            sleep(20);
             checkups();
         }
     }
@@ -182,7 +196,7 @@ public class ArmClass extends Thread {
 
                 case PICK:
                     // peak up a cube and get back to drive position.
-                    gootoo( 0, -1065);
+                    gootoo(arm0.getCurrentPosition(), -1065);
                     gootoo(2282, -1065);
                     gootoo(2282, 3115);
                     rotateClamp(false);
