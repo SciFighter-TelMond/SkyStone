@@ -68,24 +68,22 @@ public class ArmClass extends Thread {
         arm1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
+    public void begin() {
+        reset();
+        mode = Mode.MANUAL;
+        stopFlag = false;
+    }
+
     public void reset() {
         arm0.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         arm1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        arm0.setTargetPosition(0);
-        arm1.setTargetPosition(0);
-
-        arm0.setPower(0);
-        arm1.setPower(0);
-
-        arm0.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        arm1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
         arm0.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         arm1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        setModeArm0(true);
+        setModeArm1(true);
     }
 
-    private void moveMode0(boolean drive) {
+    private void setModeArm0(boolean drive) {
         if (drive) {
             arm0.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             arm0.setPower(0);
@@ -96,7 +94,7 @@ public class ArmClass extends Thread {
         }
     }
 
-    private void moveMode1(boolean drive) {
+    private void setModeArm1(boolean drive) {
         if (drive) {
             arm1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             arm1.setPower(0);
@@ -105,14 +103,6 @@ public class ArmClass extends Thread {
             arm1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             arm1.setPower(power);
         }
-    }
-
-    public void begin() {
-        reset();
-        arm0.setPower(power);
-        arm1.setPower(power);
-        mode = Mode.MANUAL;
-        stopFlag = false;
     }
 
     public void setBoost(double boost) {
@@ -127,8 +117,8 @@ public class ArmClass extends Thread {
             speed = Math.max(0, speed);
         }
 
-//        if (!arm0Move && speed != 0) moveMode0(true);
-//        if (arm0Move && speed == 0) moveMode0(false);
+//        if (!arm0Move && speed != 0) setModeArm0(true);
+//        if (arm0Move && speed == 0) setModeArm0(false);
 
 //        if (arm0Move || speed != 0) {
             arm0.setPower(speed * speed_boost);
@@ -143,8 +133,8 @@ public class ArmClass extends Thread {
 //           speed = Math.max(0, speed);
 //        }
 
-//        if (!arm1Move && speed != 0) moveMode1(true);
-//        if (arm1Move && speed == 0) moveMode1(false);
+//        if (!arm1Move && speed != 0) setModeArm1(true);
+//        if (arm1Move && speed == 0) setModeArm1(false);
 
 //        if (arm1Move || speed != 0) {
             arm1.setPower(speed * speed_boost);
@@ -197,8 +187,8 @@ public class ArmClass extends Thread {
     @Override
     public void run() {
         try {
-            moveMode0(false);
-            moveMode1(false);
+            setModeArm0(false);
+            setModeArm1(false);
             switch (mode) {
                 case HOME:
 //                    if (arm0.getCurrentPosition() < 3000) {
@@ -246,8 +236,8 @@ public class ArmClass extends Thread {
         } catch (Exception e) {
             RobotLog.logStackTrace(e);
         }
-        moveMode0(true);
-        moveMode1(true);
+        setModeArm0(true);
+        setModeArm1(true);
         mode = Mode.MANUAL;
     }
 
