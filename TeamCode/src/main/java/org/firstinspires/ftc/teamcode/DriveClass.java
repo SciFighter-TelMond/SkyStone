@@ -123,7 +123,7 @@ public class DriveClass {
             br_power /= m;
         }
 
-        boostState.update(speedTrigger>0.7);
+        boostState.update(speedTrigger > 0.7 || turnTrigger > 0.7);
         if (boostState.isChanged()) {
             if (boostState.isPressed()) {
                 fl_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

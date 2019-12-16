@@ -106,7 +106,7 @@ public class ArmClass extends Thread {
     }
 
     public void setBoost(double boost) {
-        speed_boost = 0.5 + boost * 0.5;
+        speed_boost = 0.3 + boost * 0.7;
     }
 
     public void moveArm0(double speed) {
