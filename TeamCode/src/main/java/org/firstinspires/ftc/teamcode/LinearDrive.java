@@ -53,9 +53,9 @@ public class LinearDrive extends LinearOpMode {
             double side         =  gamepad1.right_stick_x;
             double turn         =  gamepad1.left_stick_x;
             double speedTrigger =  gamepad1.right_trigger;
-            // double turneTrigger =  gamepad1.left_trigger;
+            double turnTrigger  =  gamepad1.left_trigger;
 
-            drive.drive(straight, side, turn, speedTrigger, speedTrigger);
+            drive.drive(straight, side, turn, speedTrigger, turnTrigger);
 
             // =========================================
             // Hooks Control
@@ -85,6 +85,10 @@ public class LinearDrive extends LinearOpMode {
             }
             if (gamepad2.y) {
                 arm.linearDo(ArmClass.Mode.PICK);
+            }
+
+            if (gamepad2.y && gamepad2.dpad_left) {
+                arm.pleaseDo(ArmClass.Mode.PICK);
             }
 
             if (gamepad2.dpad_up) {

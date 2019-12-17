@@ -123,7 +123,7 @@ public class DriveClass {
             br_power /= m;
         }
 
-        boostState.update(speedTrigger>0.7);
+        boostState.update(speedTrigger > 0.7 || turnTrigger > 0.7);
         if (boostState.isChanged()) {
             if (boostState.isPressed()) {
                 fl_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -379,7 +379,7 @@ public class DriveClass {
     public void rollersIn() {
         double rollerPower = 1;
         if (cubeBumper.getState() == false) {
-            rollerPower = 0.1;
+            rollerPower = 0.05;
         }
         r_roller.setPower(rollerPower);
         l_roller.setPower(rollerPower);
