@@ -35,6 +35,8 @@ public class ArmClass extends Thread {
     volatile private OpMode opMode = null;
     volatile private DriveClass driveClass = null;
 
+    static final int STAY = 999999;
+
     public ArmClass(OpMode opMode, DriveClass drive) {
         this.setName("ArmClass");
         RobotLog.d("%s", this.getName());
@@ -153,6 +155,9 @@ public class ArmClass extends Thread {
     }
 
     public void gootoo(int pos0, int pos1) throws InterruptedException {
+        if (pos0 == STAY) pos0 = arm0.getCurrentPosition();
+        if (pos1 == STAY) pos1 = arm1.getCurrentPosition();
+
         arm0.setTargetPosition(pos0);
         arm1.setTargetPosition(pos1);
         while (arm0.isBusy()) {
@@ -196,7 +201,7 @@ public class ArmClass extends Thread {
 
                 case PICK:
                     // peak up a cube and get back to drive position.
-                    gootoo(arm0.getCurrentPosition(), -1065);
+                    gootoo(STAY, -1065);
                     gootoo(2282, -1065);
                     gootoo(2282, 3115);
                     rotateClamp(false);
