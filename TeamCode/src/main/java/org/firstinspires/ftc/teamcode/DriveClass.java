@@ -25,33 +25,35 @@ import org.firstinspires.ftc.robotcore.external.android.AndroidTextToSpeech;
 public class DriveClass {
 
     /* Public OpMode members. */
-    private DcMotor fl_Drive = null;
-    private DcMotor fr_Drive = null;
-    private DcMotor bl_Drive = null;
-    private DcMotor br_Drive = null;
-    private Toggle boostState = new Toggle();
-    private DcMotor l_roller = null;
-    private DcMotor r_roller = null;
+    volatile private DcMotor fl_Drive = null;
+    volatile private DcMotor fr_Drive = null;
+    volatile private DcMotor bl_Drive = null;
+    volatile private DcMotor br_Drive = null;
+    volatile private Toggle boostState = new Toggle();
+    volatile private DcMotor l_roller = null;
+    volatile private DcMotor r_roller = null;
 
-    private Servo l_roller_servo = null;
-    private Servo r_roller_servo = null;
+    volatile private Servo l_roller_servo = null;
+    volatile private Servo r_roller_servo = null;
 
-    private Servo   hooks    = null;
-    private Toggle hooksState = new Toggle();
+    volatile private Servo   hooks    = null;
+    volatile private Toggle hooksState = new Toggle();
 
-    private DigitalChannel leftBumper = null;
-    private DigitalChannel rightBumper = null;
-    private DigitalChannel cubeBumper = null;
+    volatile private DigitalChannel leftBumper = null;
+    volatile private DigitalChannel rightBumper = null;
+    volatile private DigitalChannel cubeBumper = null;
 
 
     /* local OpMode members. */
-    private LinearOpMode opMode = null;
-    private HardwareMap hwMap   = null;
+    volatile private LinearOpMode opMode = null;
+    volatile private HardwareMap hwMap   = null;
     public enum Direction {LEFT, RIGHT, FORWARD, REVERSE};
 
 
     /* Constructor */
-    public DriveClass(LinearOpMode opMode) { this.opMode=opMode; }
+    public DriveClass(LinearOpMode opMode) {
+        this.opMode=opMode;
+    }
 
     /* Initialize standard Hardware interfaces */
     public void init(HardwareMap hardwareMap) {
@@ -110,10 +112,10 @@ public class DriveClass {
         double speedBoost = speedTrigger * 0.5 + 0.5;
         double turnBoost  = turnTrigger * 0.5 + 0.5;
 
-        double fl_power = (straight + turn * turnBoost + side) * speedBoost;
-        double fr_power = (straight - turn * turnBoost - side) * speedBoost;
-        double bl_power = (straight + turn * turnBoost - side) * speedBoost;
-        double br_power = (straight - turn * turnBoost + side) * speedBoost;
+        double fl_power = (straight + side) * speedBoost + turn * turnBoost;
+        double fr_power = (straight - side) * speedBoost - turn * turnBoost;
+        double bl_power = (straight - side) * speedBoost + turn * turnBoost;
+        double br_power = (straight + side) * speedBoost - turn * turnBoost;
 
         double m = Math.max(Math.max(fl_power,fr_power), Math.max(bl_power,br_power));
         if (m > 1) {
@@ -123,7 +125,7 @@ public class DriveClass {
             br_power /= m;
         }
 
-        boostState.update(speedTrigger > 0.7 || turnTrigger > 0.7);
+        boostState.update(speedTrigger > 0.7 || turnTrigger > 0.85);
         if (boostState.isChanged()) {
             if (boostState.isPressed()) {
                 fl_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

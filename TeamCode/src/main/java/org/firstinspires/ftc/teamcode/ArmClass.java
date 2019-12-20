@@ -130,16 +130,16 @@ public class ArmClass extends Thread {
 
     public void checkups() {
         if (zeroArm0.getState() == false) {
-            arm0.setTargetPosition(arm0.getCurrentPosition());
+            arm0.setTargetPosition(Math.max(arm0.getCurrentPosition(), arm0.getTargetPosition()));
         }
         if (zeroArm1a.getState() == true && zeroArm1b.getState() == true) {
             arm1.setTargetPosition(arm1.getCurrentPosition());
         }
 
-        if (Math.abs(arm0.getCurrentPosition() - posArm0) <= 5){
+        if (Math.abs(arm0.getCurrentPosition() - posArm0) <= 10){
             arm0.setTargetPosition(arm0.getCurrentPosition());
         }
-        if (Math.abs(arm1.getCurrentPosition() - posArm1) <= 5){
+        if (Math.abs(arm1.getCurrentPosition() - posArm1) <= 10){
             arm1.setTargetPosition(arm1.getCurrentPosition());
         }
 
@@ -161,16 +161,17 @@ public class ArmClass extends Thread {
         arm0.setTargetPosition(pos0);
         arm1.setTargetPosition(pos1);
         while (arm0.isBusy()) {
-            sleep(20);
+            sleep(50);
             checkups();
         }
         while (arm1.isBusy()) {
-            sleep(20);
+            sleep(50);
             checkups();
         }
     }
 
     public void pleaseDo(Mode tmode) {
+        interrupt();
         mode = tmode;
         if (tmode != Mode.MANUAL || tmode != Mode.IDLE) {
             start();
@@ -187,6 +188,7 @@ public class ArmClass extends Thread {
     @Override
     public void run() {
         try {
+            power = 0.5; // TODO: remove
             setModeArm0(false);
             setModeArm1(false);
             switch (mode) {
@@ -194,32 +196,31 @@ public class ArmClass extends Thread {
 //                    if (arm0.getCurrentPosition() < 3000) {
 //                        gootoo(3100, arm1.getCurrentPosition()); // 1
 //                    }
-                    gootoo(4100, 7202);
-                    gootoo(4100, 4100);
-                    gootoo(800, 200);
+                    gootoo(2400, 2150);
+                    gootoo(0, -400);
                     break;
 
                 case PICK:
                     // peak up a cube and get back to drive position.
-                    gootoo(STAY, -1065);
-                    gootoo(2282, -1065);
+                    gootoo(1000, STAY);
+                    gootoo(2300, 2300);
                     gootoo(2282, 3115);
                     rotateClamp(false);
                     clamp(true);
-                    gootoo(2282, 2609);
-                    gootoo(1685, 2906);
-                    clamp(false);
-                    sleep(1000);
                     if (driveClass != null)
                         driveClass.rollers(true);
-                    gootoo(2282, 2609);  // 1
+//                    gootoo(2282, 2609);
+                    gootoo(2210, 3540);
+                    gootoo(1300, 3090);
+                    clamp(false);
+                    sleep(1000);
+                    gootoo(2210, 3540);
                     break;
 
                 case STRAIGHT:
-                    gootoo(arm0.getCurrentPosition(), 9800);
-                    gootoo(760, 9800);
+                    gootoo(1000, STAY);
+                    gootoo(2400, 2150);
                     break;
-
 
                 default:
                     break;

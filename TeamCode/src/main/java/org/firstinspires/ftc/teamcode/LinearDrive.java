@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
-    FTC - SCI-Fighter
+    FTC - SCI-Fighters
     Mechanom Drive 3
 
     Drive with left right bumpers stops and Hooks.
@@ -83,20 +83,17 @@ public class LinearDrive extends LinearOpMode {
             if (gamepad2.x) {
                 arm.reset();
             }
-            if (gamepad2.y) {
-                arm.linearDo(ArmClass.Mode.PICK);
+
+            if (gamepad2.y && gamepad2.dpad_right) {
+                arm.pleaseDo(ArmClass.Mode.STRAIGHT);
             }
 
             if (gamepad2.y && gamepad2.dpad_left) {
                 arm.pleaseDo(ArmClass.Mode.PICK);
             }
 
-            if (gamepad2.dpad_up) {
-                arm.linearDo(ArmClass.Mode.STRAIGHT);
-            }
-
-            if (gamepad2.dpad_down) {
-                arm.linearDo(ArmClass.Mode.HOME);
+            if (gamepad2.y && gamepad2.dpad_down) {
+                arm.pleaseDo(ArmClass.Mode.HOME);
             }
 
             clamps.update(gamepad2.left_bumper);
