@@ -84,16 +84,16 @@ public class LinearDrive extends LinearOpMode {
                 arm.reset();
             }
 
-            if (gamepad2.y && gamepad2.dpad_right) {
-                arm.pleaseDo(ArmClass.Mode.STRAIGHT);
+            if (gamepad2.y && gamepad2.dpad_down) {
+                arm.linearDo(ArmClass.Mode.HOME);
+            }
+
+            if (gamepad2.y && gamepad2.dpad_up) {
+                arm.linearDo(ArmClass.Mode.BUILD);
             }
 
             if (gamepad2.y && gamepad2.dpad_left) {
-                arm.pleaseDo(ArmClass.Mode.PICK);
-            }
-
-            if (gamepad2.y && gamepad2.dpad_down) {
-                arm.pleaseDo(ArmClass.Mode.HOME);
+                arm.linearDo(ArmClass.Mode.PICK);
             }
 
             clamps.update(gamepad2.left_bumper);
