@@ -19,10 +19,15 @@ public class LinearDrive extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
 
     private Toggle hooksState       = new Toggle();
-    private Toggle rollerState      = new Toggle();
+    private Toggle rollersRunIn     = new Toggle();
+    private Toggle rollersRunOut    = new Toggle();
     private Toggle rollerServoState = new Toggle();
     private Toggle clamps           = new Toggle();
     private Toggle clamps_rotate    = new Toggle();
+
+    private Toggle armDoHome         = new Toggle();
+    private Toggle armDoPick         = new Toggle();
+    private Toggle armDoBuild        = new Toggle();
 
     private DriveClass drive = new DriveClass(this);
     private ArmClass   arm  = new ArmClass(this, drive);
@@ -80,20 +85,24 @@ public class LinearDrive extends LinearOpMode {
             if (gamepad2.a) {
                 arm.resumePower();
             }
-            if (gamepad2.x) {
+            if (gamepad2.x & gamepad2.dpad_left) {
                 arm.reset();
             }
 
-            if (gamepad2.y && gamepad2.dpad_down) {
-                arm.linearDo(ArmClass.Mode.HOME);
+            armDoHome.update(gamepad2.x && gamepad2.dpad_down);
+            armDoPick.update(gamepad2.y && gamepad2.dpad_left);
+            armDoBuild.update(gamepad2.y && gamepad2.dpad_right);
+
+            if (armDoHome.isClicked()) {
+                arm.pleaseDo(ArmClass.Mode.HOME);
             }
 
-            if (gamepad2.y && gamepad2.dpad_up) {
-                arm.linearDo(ArmClass.Mode.BUILD);
+            if (armDoPick.isClicked()) {
+                arm.pleaseDo(ArmClass.Mode.PICK);
             }
 
-            if (gamepad2.y && gamepad2.dpad_left) {
-                arm.linearDo(ArmClass.Mode.PICK);
+            if (armDoBuild.isClicked()) {
+                arm.pleaseDo(ArmClass.Mode.BUILD);
             }
 
             clamps.update(gamepad2.left_bumper);
@@ -109,17 +118,22 @@ public class LinearDrive extends LinearOpMode {
             // =========================================
             // Rollers Control
             // =========================================
-            rollerServoState.update(gamepad1.left_bumper);
-            drive.rollers(rollerServoState.getState());
+            boolean rollerBtl = gamepad1.left_bumper || (gamepad2.x && gamepad2.dpad_up);
+            rollerServoState.update(rollerBtl);
+            if (rollerServoState.isChanged())
+                drive.rollers(rollerServoState.getState());
 
-            rollerState.update(gamepad1.dpad_down);
-            if (gamepad1.dpad_up) {
-                drive.rollersOut();
+            rollersRunIn.update(gamepad1.dpad_down);
+            rollersRunOut.update(gamepad1.dpad_up);
+            if (rollersRunOut.isPressed()) {
+                drive.rollersRunOut();
             } else {
-                if (rollerState.getState()) {
-                    drive.rollersIn();
-                } else {
-                    drive.rollersStop();
+                if (rollersRunOut.isChanged() || rollersRunIn.isChanged()) {
+                    if (rollersRunIn.getState()) {
+                        drive.rollersRunIn();
+                    } else {
+                        drive.rollersStop();
+                    }
                 }
             }
 

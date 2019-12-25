@@ -383,7 +383,11 @@ public class DriveClass {
         }
     }
 
-    public void rollersIn() {
+    public double getRollersPower() {
+        return r_roller.getPower();
+    }
+
+    public void rollersRunIn() {
         double rollerPower = 1;
         if (cubeBumper.getState() == false) {
             rollerPower = 0.05;
@@ -392,7 +396,7 @@ public class DriveClass {
         l_roller.setPower(rollerPower);
     }
 
-    public void rollersOut() {
+    public void rollersRunOut() {
         r_roller.setPower(-1);
         l_roller.setPower(-1);
     }

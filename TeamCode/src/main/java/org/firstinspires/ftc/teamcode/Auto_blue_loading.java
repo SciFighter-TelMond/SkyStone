@@ -87,16 +87,16 @@ public class Auto_blue_loading extends LinearOpMode {
          * please start close to the building site*/
         // Step 1:  Drive forward (actually back) and a bit to the right (actually to the left)
         robot.rollers(true);
-        robot.rollersIn();
+        robot.rollersRunIn();
         robot.side(0.6, DriveClass.Direction.RIGHT, 1, 3);
         robot.straight(1.7, DriveClass.Direction.FORWARD, 0.4, 5);
         robot.straight(0.2, DriveClass.Direction.REVERSE, 0.4, 5);
         robot.straight(0.2, DriveClass.Direction.FORWARD, 0.4, 5);
         robot.rollers(false);
-        robot.rollersIn();
+        robot.rollersRunIn();
         robot.rotate(0.3, DriveClass.Direction.LEFT, 0.5, 5);
         robot.straight(2.2, DriveClass.Direction.FORWARD, 0.4, 5);
-        robot.rollersOut();
+        robot.rollersRunOut();
         robot.straight(0.4, DriveClass.Direction.REVERSE, 0.4, 5);
 
         sleep(500);

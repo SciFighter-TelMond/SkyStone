@@ -41,4 +41,8 @@ public class Toggle {
     public boolean getState() {
         return state;
     }
+
+    public boolean isClicked() {
+        return changed && pressed;
+    }
 }

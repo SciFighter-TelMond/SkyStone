@@ -3,9 +3,7 @@ package org.firstinspires.ftc.teamcode;
 // import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -163,7 +161,7 @@ public class ArmClass extends Thread {
         if (zeroArm0.getState() == false) {
             arm0.setTargetPosition(Math.max(arm0.getCurrentPosition(), arm0.getTargetPosition()));
         }
-        if (zeroArm1.getState() == true) {
+        if (zeroArm1.getState() == false) {
             arm1.setTargetPosition(Math.max(arm1.getCurrentPosition(), arm1.getTargetPosition()));
         }
 
@@ -208,9 +206,11 @@ public class ArmClass extends Thread {
     }
 
     public void pleaseDo(Mode tmode) {
-        if (tmode != Mode.MANUAL || tmode != Mode.IDLE)
+        if (mode != Mode.MANUAL && mode != Mode.IDLE) {
+            interrupt();
             return;
-        interrupt();
+        }
+        RobotLog.d("Arm pleaseDo");
         mode = tmode;
         if (tmode != Mode.MANUAL || tmode != Mode.IDLE) {
             start();
@@ -227,36 +227,46 @@ public class ArmClass extends Thread {
     @Override
     public void run() {
         try {
-            power = 0.3; // TODO: remove
+            power = 0.4; // TODO: remove
             setModeArm(false);
             switch (mode) {
                 case HOME:
+                    RobotLog.d("Arm do: HOME");
                     rotateClamp(true);
                     gootoo(0, 0);
+                    RobotLog.d("Arm do: HOME/");
                     break;
 
                 case PICK:
                     // peak up a cube and get back to drive position.
-                    gootoo(300, 0);
+                    double rollersState = 0;
+                    RobotLog.d("Arm do: PICK");
                     rotateClamp(false);
-                    clamp(true);
                     if (driveClass != null) {
-                        driveClass.rollersIn();
+                        RobotLog.d("Arm do: PICK - Rollers");
+                        rollersState = driveClass.getRollersPower();
+                        driveClass.rollersRunIn();
                         driveClass.rollers(true);
                     }
-                    gootoo(0, 0);
+                    gootoo(400, 0);
+                    clamp(true);
+                    gootoo(-100, -100);
                     clamp(false);
                     sleep(1000);
-                    gootoo(300, 0);
+                    gootoo(400, 0);
                     if (driveClass != null) {
-                        driveClass.rollersStop();
-                        driveClass.rollers(false);
+                        if (rollersState==0)
+                            driveClass.rollersStop();
                     }
+                    RobotLog.d("Arm do: PICK/");
                     break;
 
                 case BUILD:
-                    gootoo(200, 0);
-                    gootoo(200,200);
+                    RobotLog.d("Arm do: BUILD");
+                    if (arm0.getTargetPosition() < 100)
+                        gootoo(300, 0);
+                    gootoo(300,400);
+                    RobotLog.d("Arm do: BUILD/");
                     break;
 
                 default:
