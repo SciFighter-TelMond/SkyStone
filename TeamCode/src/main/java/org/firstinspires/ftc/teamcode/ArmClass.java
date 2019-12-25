@@ -30,6 +30,7 @@ public class ArmClass extends Thread {
 
     volatile private Mode mode = Mode.IDLE;
 
+    // volatile private Toggle SpeedModeArm0 = new Toggle();
     volatile private int posArm0 = 0;
     volatile private int posArm1 = 0;
 
@@ -47,6 +48,7 @@ public class ArmClass extends Thread {
     }
 
     public void init(HardwareMap hardwareMap) {
+        RobotLog.d("ArmClass: Init");
         arm0 = hardwareMap.get(DcMotorEx.class, "arm0");
         arm1 = hardwareMap.get(DcMotorEx.class, "arm1");
         zeroArm0 = hardwareMap.get(DigitalChannel.class, "zero_arm0");
@@ -63,15 +65,18 @@ public class ArmClass extends Thread {
         zeroArm1.setMode(DigitalChannel.Mode.INPUT);
         arm0.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         arm1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        RobotLog.d("ArmClass: /init ");
     }
 
     public void begin() {
+        RobotLog.d("ArmClass: begin");
         reset();
         mode = Mode.MANUAL;
         stopFlag = false;
     }
 
     public void reset() {
+        RobotLog.d("ArmClass: reset");
         arm0.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         arm1.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         arm0.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
@@ -122,15 +127,24 @@ public class ArmClass extends Thread {
         if (zeroArm0.getState() == false) {
             speed = Math.max(0, speed);
         }
-        if (speed!=0) {
-            arm0.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-            arm0.setPower(speed * speed_boost);
-            posArm0 = arm0.getCurrentPosition();
-        } else {
-            arm0.setTargetPosition(posArm0);
-            arm0.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-            arm0.setPower(1);
-        }
+
+        arm0.setPower(speed * speed_boost);
+// TODO: switching modes make the arm jumpy (special down speed).
+//      // switching modes to stop the arm from falling.
+//        SpeedModeArm0.update(speed!=0);
+//        if (SpeedModeArm0.isChanged()) {
+//            if (SpeedModeArm0.isPressed()) {
+//                arm0.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+//            } else {
+//                arm0.setTargetPosition(arm0.getCurrentPosition());
+//                arm0.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+//                arm0.setPower(0.5);
+//            }
+//        }
+//        if (speed!=0) {
+//            arm0.setPower(speed * speed_boost);
+//        }
+
     }
 
     public void moveArm1(double speed) {
@@ -139,7 +153,7 @@ public class ArmClass extends Thread {
         if (zeroArm1.getState() == false) {
            speed = Math.max(0, speed);
         }
-        if (speed>0 && arm1.getCurrentPosition() > 900){ // TODO: -speed*200
+        if (speed>0 && arm1.getCurrentPosition() > 950 -speed*20 ){ // TODO:
             speed=0;
         }
         arm1.setPower(speed * speed_boost / 2);
@@ -153,17 +167,18 @@ public class ArmClass extends Thread {
             arm1.setTargetPosition(Math.max(arm1.getCurrentPosition(), arm1.getTargetPosition()));
         }
 
-        int diff0 = Math.abs(arm0.getCurrentPosition() - posArm0);
-        if (diff0 <= 10){
-            arm0.setTargetPosition(arm0.getCurrentPosition());
-            opMode.telemetry.addData("BRAKE", "Arm0 diff %d", diff0);
-        }
-
-        int diff1 = Math.abs(arm1.getCurrentPosition() - posArm1);
-        if (diff1 <= 10){
-            arm1.setTargetPosition(arm1.getCurrentPosition());
-            opMode.telemetry.addData("BRAKE", "Arm1 diff %d", diff1);
-        }
+// TODO: checkout why the safty bray works when not supposed to.
+//        int diff0 = Math.abs(arm0.getCurrentPosition() - posArm0);
+//        if (diff0 <= 5){
+//            arm0.setTargetPosition(arm0.getCurrentPosition());
+//            opMode.telemetry.addData("BRAKE", "Arm0 diff %d", diff0);
+//        }
+//        //
+//        int diff1 = Math.abs(arm1.getCurrentPosition() - posArm1);
+//        if (diff1 <= 5){
+//            arm1.setTargetPosition(arm1.getCurrentPosition());
+//            opMode.telemetry.addData("BRAKE", "Arm1 diff %d", diff1);
+//        }
 
         posArm0 = arm0.getCurrentPosition();
         posArm1 = arm1.getCurrentPosition();
@@ -193,6 +208,8 @@ public class ArmClass extends Thread {
     }
 
     public void pleaseDo(Mode tmode) {
+        if (tmode != Mode.MANUAL || tmode != Mode.IDLE)
+            return;
         interrupt();
         mode = tmode;
         if (tmode != Mode.MANUAL || tmode != Mode.IDLE) {
@@ -214,6 +231,7 @@ public class ArmClass extends Thread {
             setModeArm(false);
             switch (mode) {
                 case HOME:
+                    rotateClamp(true);
                     gootoo(0, 0);
                     break;
 
@@ -249,11 +267,13 @@ public class ArmClass extends Thread {
         } catch (Exception e) {
             RobotLog.logStackTrace(e);
         }
+        power = 1; // TODO: remove
         setModeArm(true);
         mode = Mode.MANUAL;
     }
 
     public void end() {
+        RobotLog.d("ArmClass: begin");
         stopFlag = true;
         interrupt();
         arm0.setPower(0);
@@ -264,10 +284,7 @@ public class ArmClass extends Thread {
     }
 
     public void resumePower() {
-        arm0.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        arm1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        arm0.setTargetPosition(arm0.getCurrentPosition());
-        arm1.setTargetPosition(arm1.getCurrentPosition());
+        RobotLog.d("ArmClass: Resume");
         setModeArm(true);
         mode = Mode.MANUAL;
         stopFlag = false;

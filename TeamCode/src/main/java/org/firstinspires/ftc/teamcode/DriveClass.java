@@ -84,6 +84,11 @@ public class DriveClass {
         bl_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         br_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        fl_Drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        fr_Drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        bl_Drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        br_Drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         l_roller.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         r_roller.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
