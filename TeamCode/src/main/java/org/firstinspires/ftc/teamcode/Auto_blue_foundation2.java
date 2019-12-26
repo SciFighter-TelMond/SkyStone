@@ -29,11 +29,11 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import android.speech.tts.TextToSpeech;
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.android.AndroidTextToSpeech;
 
 /**
  * This file illustrates the concept of driving a path based on time.
@@ -56,14 +56,14 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Blue Foundation", group="SciFighterd")// moving the blue foundation. you are in the blue team.
+@Autonomous(name="Blue Foundation 2 park side", group="SciFighterd")// moving the blue foundation. you are in the blue team.
 //@Disabled
-public class Auto_blue_foundation extends LinearOpMode {
+public class Auto_blue_foundation2 extends LinearOpMode {
 
     /* Declare OpMode members. */
     private DriveClass         robot   = new DriveClass(this);   // Use a Pushbot's hardware
     private ElapsedTime     runtime = new ElapsedTime();
-
+    private AndroidTextToSpeech tts;
 
 
     @Override
@@ -78,6 +78,8 @@ public class Auto_blue_foundation extends LinearOpMode {
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Status", "Ready to run");    //
         telemetry.update();
+        tts.initialize();
+
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -87,33 +89,36 @@ public class Auto_blue_foundation extends LinearOpMode {
         /*starting point: building area, the bridge is on the left,
          * the front of the robot is to the wall, the hooks directed to the middle of the field.
          * please start close to the building site*/
-        // Step 1:  Drive forward (actually back) and a bit to the right (actually to the left)
+        // Step 1:  Drive forward (actually back) and a bit to the left (actually to the right)
         robot.side(0.6, DriveClass.Direction.RIGHT, 1, 3);
-        robot.straight(1.7, DriveClass.Direction.REVERSE, 0.4, 5);
+        robot.straight(1.7, DriveClass.Direction.REVERSE, 0.2, 5);
 
         sleep(500);
         // Step 2: should be in front of the foundation, hooks down
         robot.hooksDown();
         sleep(1500);
-        robot.straight(1.7, DriveClass.Direction.FORWARD, 0.5, 5);
-        // Step 3: turn 180 with the foundation
-        //robot.rotate(0.6, DriveClass.Direction.LEFT, 0.5, 5);
+        // Step 3: drive backward (actually forward)
+        robot.straight(1.2, DriveClass.Direction.FORWARD, 0.5, 5);
+        // Step 4: turn 90 with the foundation
+        robot.rotate(0.3, DriveClass.Direction.LEFT, 0.5, 5);
         sleep(200);
-
-        // Step 4: set the foundation free
+        // Step 5: go forrward and to the right (actually backward and to the left
+        robot.straight(0.3, DriveClass.Direction.REVERSE, 0.5, 5);
+        robot.side(0.3, DriveClass.Direction.LEFT, 0.5, 5);
+        sleep(200);
+        // Step 6: set the foundation free
         robot.hooksUp();
         sleep(200);
-        // Step 5: park under the bridge got to the right 1.5M
-        robot.side(1.7, DriveClass.Direction.LEFT, 0.7, 5);
-        robot.straight(0.7, DriveClass.Direction.REVERSE, 0.4, 5);
-        robot.side(0.6, DriveClass.Direction.LEFT, 0.7, 5);
+        // Step 7: park under the bridge go forward
+        robot.straight(1.7, DriveClass.Direction.FORWARD, 0.5, 5);
+
         while (opModeIsActive() && (runtime.seconds() < 30)) {
             telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
             telemetry.update();
         }
-
-        // Step 6:  stop
+        tts.speak("hhhanukaaa hhhanukaaa, hag Yafe Kol Kach");
+        // Step 8:  stop
         robot.stop();
-        //sleep(1000);
+
     }
 }
