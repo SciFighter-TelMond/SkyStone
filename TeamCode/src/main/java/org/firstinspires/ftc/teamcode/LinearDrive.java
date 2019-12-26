@@ -118,11 +118,11 @@ public class LinearDrive extends LinearOpMode {
             }
 
             if (armFloorUp.isClicked()){
-                arm.currFloor++;
+                arm.floorPlus();
                 arm.pleaseDo(ArmClass.Mode.BUILD);
             }
             if (armFloorDown.isClicked()){
-                arm.currFloor--;
+                arm.floorMinus();
                 arm.pleaseDo(ArmClass.Mode.BUILD);
             }
 

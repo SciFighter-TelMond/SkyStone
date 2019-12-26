@@ -37,7 +37,7 @@ public class ArmClass extends Thread {
 
     static final int STAY = 999999;
 
-    volatile public int currFloor = 0;
+    volatile private int currFloor = 1;
 
     public ArmClass(OpMode opMode, DriveClass drive) {
         this.setName("ArmClass");
@@ -254,28 +254,28 @@ public class ArmClass extends Thread {
 
                     switch (currFloor) {
                         case 1:
-                            gootoo(100, 100);
+                            gootoo(305, 435);
                             break;
                         case 2:
-                            gootoo(200, 200);
+                            gootoo(720, 490);
                             break;
                         case 3:
-                            gootoo(300, 300);
+                            gootoo(1025, 530);
                             break;
                         case 4:
-                            gootoo(400, 400);
+                            gootoo(1225, 855);
                             break;
                         case 5:
-                            gootoo(500, 500);
+                            gootoo(1535, 835);
                             break;
                         case 6:
-                            gootoo(600, 600);
+//                            gootoo(600, 600);
                             break;
                         case 7:
-                            gootoo(700, 700);
+//                            gootoo(700, 700);
                             break;
                         case 8:
-                            gootoo(800, 800);
+//                            gootoo(800, 800);
                             break;
                         default:
                             break;
@@ -331,4 +331,21 @@ public class ArmClass extends Thread {
         return zeroArm1.getState();
     }
 
+    public void floorPlus(){
+        if (currFloor >= 8){
+            currFloor = 8;
+        }
+        else{
+            currFloor++;
+        }
+    }
+
+    public void floorMinus(){
+        if (currFloor <= 1){
+            currFloor = 1;
+        }
+        else{
+            currFloor--;
+        }
+    }
 }

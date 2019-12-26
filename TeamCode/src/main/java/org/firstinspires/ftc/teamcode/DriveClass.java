@@ -7,8 +7,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.android.AndroidTextToSpeech;
-
 
 /**
  * This is NOT an opmode.
@@ -29,26 +27,25 @@ public class DriveClass {
     volatile private DcMotor fr_Drive = null;
     volatile private DcMotor bl_Drive = null;
     volatile private DcMotor br_Drive = null;
-    volatile private Toggle boostState = new Toggle();
     volatile private DcMotor l_roller = null;
     volatile private DcMotor r_roller = null;
 
     volatile private Servo l_roller_servo = null;
     volatile private Servo r_roller_servo = null;
 
-    volatile private Servo   hooks    = null;
+    volatile private Toggle boostState = new Toggle();
     volatile private Toggle hooksState = new Toggle();
+    volatile private Servo  hooks      = null;
 
     volatile private DigitalChannel leftBumper = null;
     volatile private DigitalChannel rightBumper = null;
-    volatile private DigitalChannel cubeBumper = null;
+    volatile private DigitalChannel blockBumper = null;
 
 
     /* local OpMode members. */
     volatile private LinearOpMode opMode = null;
     volatile private HardwareMap hwMap   = null;
     public enum Direction {LEFT, RIGHT, FORWARD, REVERSE};
-
 
     /* Constructor */
     public DriveClass(LinearOpMode opMode) {
@@ -102,14 +99,17 @@ public class DriveClass {
         hooksState.update(false);
 
         // get a reference to our digitalTouch object.
-        leftBumper = hardwareMap.get(DigitalChannel.class, "left_bumper");
+        leftBumper  = hardwareMap.get(DigitalChannel.class, "left_bumper");
         rightBumper = hardwareMap.get(DigitalChannel.class, "right_bumper");
-        cubeBumper = hardwareMap.get(DigitalChannel.class, "cube_bumper");
+        blockBumper = hardwareMap.get(DigitalChannel.class, "cube_bumper");
 
         leftBumper.setMode(DigitalChannel.Mode.INPUT); // set the digital channel to input.
         rightBumper.setMode(DigitalChannel.Mode.INPUT); // set the digital channel to input.
     }
 
+    public boolean getBlockBumperState() {
+        return blockBumper.getState();
+    }
 
     // ==================================================================================================
     public void drive(double straight, double side, double turn, double speedTrigger, double turnTrigger) {
@@ -389,7 +389,7 @@ public class DriveClass {
 
     public void rollersRunIn() {
         double rollerPower = 1;
-        if (cubeBumper.getState() == false) {
+        if (blockBumper.getState() == false) {
             rollerPower = 0.05;
         }
         r_roller.setPower(rollerPower);
