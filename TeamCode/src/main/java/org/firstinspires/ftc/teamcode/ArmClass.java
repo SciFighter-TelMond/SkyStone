@@ -27,6 +27,7 @@ public class ArmClass extends Thread {
     public enum Mode {IDLE, MANUAL, HOME, PICK, STRAIGHT, BUILD, DROP}
 
     volatile private Mode mode = Mode.IDLE;
+    volatile private int buildFloor = 0;
 
     // volatile private Toggle SpeedModeArm0 = new Toggle();
     volatile private int posArm0 = 0;
@@ -127,22 +128,6 @@ public class ArmClass extends Thread {
         }
 
         arm0.setPower(speed * speed_boost);
-// TODO: switching modes make the arm jumpy (special down speed).
-//      // switching modes to stop the arm from falling.
-//        SpeedModeArm0.update(speed!=0);
-//        if (SpeedModeArm0.isChanged()) {
-//            if (SpeedModeArm0.isPressed()) {
-//                arm0.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-//            } else {
-//                arm0.setTargetPosition(arm0.getCurrentPosition());
-//                arm0.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-//                arm0.setPower(0.5);
-//            }
-//        }
-//        if (speed!=0) {
-//            arm0.setPower(speed * speed_boost);
-//        }
-
     }
 
     public void moveArm1(double speed) {
@@ -166,17 +151,17 @@ public class ArmClass extends Thread {
         }
 
 // TODO: checkout why the safty bray works when not supposed to.
-//        int diff0 = Math.abs(arm0.getCurrentPosition() - posArm0);
-//        if (diff0 <= 5){
-//            arm0.setTargetPosition(arm0.getCurrentPosition());
-//            opMode.telemetry.addData("BRAKE", "Arm0 diff %d", diff0);
-//        }
-//        //
-//        int diff1 = Math.abs(arm1.getCurrentPosition() - posArm1);
-//        if (diff1 <= 5){
-//            arm1.setTargetPosition(arm1.getCurrentPosition());
-//            opMode.telemetry.addData("BRAKE", "Arm1 diff %d", diff1);
-//        }
+        int diff0 = Math.abs(arm0.getCurrentPosition() - posArm0);
+        if (diff0 <= 5){
+            arm0.setTargetPosition(arm0.getCurrentPosition());
+            opMode.telemetry.addData("BRAKE", "Arm0 diff %d", diff0);
+        }
+        //
+        int diff1 = Math.abs(arm1.getCurrentPosition() - posArm1);
+        if (diff1 <= 5){
+            arm1.setTargetPosition(arm1.getCurrentPosition());
+            opMode.telemetry.addData("BRAKE", "Arm1 diff %d", diff1);
+        }
 
         posArm0 = arm0.getCurrentPosition();
         posArm1 = arm1.getCurrentPosition();
@@ -248,16 +233,16 @@ public class ArmClass extends Thread {
                         driveClass.rollersRunIn();
                         driveClass.rollers(true);
                     }
-                    gootoo(400, 0);
+                    gootoo(500, 0);
                     clamp(true);
-                    gootoo(-100, -100);
+                    gootoo(-200, -200);
                     clamp(false);
-                    sleep(1000);
-                    gootoo(400, 0);
                     if (driveClass != null) {
                         if (rollersState==0)
                             driveClass.rollersStop();
                     }
+                    sleep(1000);
+                    gootoo(400, 0);
                     RobotLog.d("Arm do: PICK/");
                     break;
 
