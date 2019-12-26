@@ -27,7 +27,6 @@ public class ArmClass extends Thread {
     public enum Mode {IDLE, MANUAL, HOME, PICK, STRAIGHT, BUILD, DROP}
 
     volatile private Mode mode = Mode.IDLE;
-    volatile private int buildFloor = 0;
 
     // volatile private Toggle SpeedModeArm0 = new Toggle();
     volatile private int posArm0 = 0;
@@ -37,6 +36,8 @@ public class ArmClass extends Thread {
     volatile private DriveClass driveClass = null;
 
     static final int STAY = 999999;
+
+    volatile public int currFloor = 0;
 
     public ArmClass(OpMode opMode, DriveClass drive) {
         this.setName("ArmClass");
@@ -111,7 +112,7 @@ public class ArmClass extends Thread {
             arm0.setPower(power);
             arm1.setTargetPosition(arm1.getCurrentPosition());
             arm1.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-            arm1.setPower(power/2);
+            arm1.setPower(power / 2);
         }
     }
 
@@ -134,10 +135,10 @@ public class ArmClass extends Thread {
         if (mode != Mode.MANUAL)
             return;
         if (zeroArm1.getState() == false) {
-           speed = Math.max(0, speed);
+            speed = Math.max(0, speed);
         }
-        if (speed>0 && arm1.getCurrentPosition() > 950 -speed*20 ){ // TODO:
-            speed=0;
+        if (speed > 0 && arm1.getCurrentPosition() > 950 - speed * 20) { // TODO:
+            speed = 0;
         }
         arm1.setPower(speed * speed_boost / 2);
     }
@@ -152,13 +153,13 @@ public class ArmClass extends Thread {
 
 // TODO: checkout why the safty bray works when not supposed to.
         int diff0 = Math.abs(arm0.getCurrentPosition() - posArm0);
-        if (diff0 <= 5){
+        if (diff0 <= 5) {
             arm0.setTargetPosition(arm0.getCurrentPosition());
             opMode.telemetry.addData("BRAKE", "Arm0 diff %d", diff0);
         }
         //
         int diff1 = Math.abs(arm1.getCurrentPosition() - posArm1);
-        if (diff1 <= 5){
+        if (diff1 <= 5) {
             arm1.setTargetPosition(arm1.getCurrentPosition());
             opMode.telemetry.addData("BRAKE", "Arm1 diff %d", diff1);
         }
@@ -238,7 +239,7 @@ public class ArmClass extends Thread {
                     gootoo(-200, -200);
                     clamp(false);
                     if (driveClass != null) {
-                        if (rollersState==0)
+                        if (rollersState == 0)
                             driveClass.rollersStop();
                     }
                     sleep(1000);
@@ -250,7 +251,36 @@ public class ArmClass extends Thread {
                     RobotLog.d("Arm do: BUILD");
                     if (arm0.getTargetPosition() < 100)
                         gootoo(300, 0);
-                    gootoo(300,400);
+
+                    switch (currFloor) {
+                        case 1:
+                            gootoo(100, 100);
+                            break;
+                        case 2:
+                            gootoo(200, 200);
+                            break;
+                        case 3:
+                            gootoo(300, 300);
+                            break;
+                        case 4:
+                            gootoo(400, 400);
+                            break;
+                        case 5:
+                            gootoo(500, 500);
+                            break;
+                        case 6:
+                            gootoo(600, 600);
+                            break;
+                        case 7:
+                            gootoo(700, 700);
+                            break;
+                        case 8:
+                            gootoo(800, 800);
+                            break;
+                        default:
+                            break;
+                    }
+
                     RobotLog.d("Arm do: BUILD/");
                     break;
 
@@ -300,4 +330,5 @@ public class ArmClass extends Thread {
     public boolean getArm1ZeroA() {
         return zeroArm1.getState();
     }
+
 }

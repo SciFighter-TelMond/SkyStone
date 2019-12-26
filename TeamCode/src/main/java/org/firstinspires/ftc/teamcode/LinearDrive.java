@@ -30,6 +30,9 @@ public class LinearDrive extends LinearOpMode {
     private Toggle armDoPick         = new Toggle();
     private Toggle armDoBuild        = new Toggle();
 
+    private Toggle armFloorUp        = new Toggle();
+    private Toggle armFloorDown = new Toggle();
+
     private Toggle cubeBumperToggle = new Toggle();
     volatile private DigitalChannel cubeBumper = null;
 
@@ -99,6 +102,8 @@ public class LinearDrive extends LinearOpMode {
             armDoHome.update(gamepad2.x && gamepad2.dpad_down);
             armDoPick.update(gamepad2.y && gamepad2.dpad_left);
             armDoBuild.update(gamepad2.y && gamepad2.dpad_right);
+            armFloorUp.update(gamepad2.y && gamepad2.dpad_up);
+            armFloorDown.update(gamepad2.y && gamepad2.dpad_down);
 
             if (armDoHome.isClicked()) {
                 arm.pleaseDo(ArmClass.Mode.HOME);
@@ -111,6 +116,16 @@ public class LinearDrive extends LinearOpMode {
             if (armDoBuild.isClicked()) {
                 arm.pleaseDo(ArmClass.Mode.BUILD);
             }
+
+            if (armFloorUp.isClicked()){
+                arm.currFloor++;
+                arm.pleaseDo(ArmClass.Mode.BUILD);
+            }
+            if (armFloorDown.isClicked()){
+                arm.currFloor--;
+                arm.pleaseDo(ArmClass.Mode.BUILD);
+            }
+
 
             clamps.update(gamepad2.left_bumper);
             if (clamps.isChanged())
