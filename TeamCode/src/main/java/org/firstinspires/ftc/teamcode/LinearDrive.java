@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -29,6 +30,10 @@ public class LinearDrive extends LinearOpMode {
     private Toggle armDoPick         = new Toggle();
     private Toggle armDoBuild        = new Toggle();
 
+    private Toggle cubeBumperToggle = new Toggle();
+    volatile private DigitalChannel cubeBumper = null;
+
+
     private DriveClass drive = new DriveClass(this);
     private ArmClass   arm  = new ArmClass(this, drive);
 
@@ -36,6 +41,8 @@ public class LinearDrive extends LinearOpMode {
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
+
+        cubeBumper = hardwareMap.get(DigitalChannel.class, "cube_bumper");
 
         drive.init(hardwareMap);
         arm.init(hardwareMap);
@@ -123,12 +130,13 @@ public class LinearDrive extends LinearOpMode {
             if (rollerServoState.isChanged())
                 drive.rollers(rollerServoState.getState());
 
+            cubeBumperToggle.update(cubeBumper.getState());
             rollersRunIn.update(gamepad1.dpad_down);
             rollersRunOut.update(gamepad1.dpad_up);
             if (rollersRunOut.isPressed()) {
                 drive.rollersRunOut();
             } else {
-                if (rollersRunOut.isChanged() || rollersRunIn.isChanged()) {
+                if (rollersRunOut.isChanged() || rollersRunIn.isChanged() || cubeBumperToggle.isChanged())  {
                     if (rollersRunIn.getState()) {
                         drive.rollersRunIn();
                     } else {
