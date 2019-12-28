@@ -39,7 +39,7 @@ public class DriveClass {
 
     volatile private DigitalChannel leftBumper = null;
     volatile private DigitalChannel rightBumper = null;
-    volatile private DigitalChannel blockBumper = null;
+    volatile private DigitalChannel stoneBumper = null;
 
 
     /* local OpMode members. */
@@ -55,7 +55,6 @@ public class DriveClass {
     /* Initialize standard Hardware interfaces */
     public void init(HardwareMap hardwareMap) {
         // Save reference to Hardware map
-
 
         fl_Drive = hardwareMap.get(DcMotor.class, "fl_drive");
         fr_Drive = hardwareMap.get(DcMotor.class, "fr_drive");
@@ -101,14 +100,14 @@ public class DriveClass {
         // get a reference to our digitalTouch object.
         leftBumper  = hardwareMap.get(DigitalChannel.class, "left_bumper");
         rightBumper = hardwareMap.get(DigitalChannel.class, "right_bumper");
-        blockBumper = hardwareMap.get(DigitalChannel.class, "cube_bumper");
+        stoneBumper = hardwareMap.get(DigitalChannel.class, "cube_bumper");
 
         leftBumper.setMode(DigitalChannel.Mode.INPUT); // set the digital channel to input.
         rightBumper.setMode(DigitalChannel.Mode.INPUT); // set the digital channel to input.
     }
 
-    public boolean getBlockBumperState() {
-        return blockBumper.getState();
+    public boolean getStoneBumperState() {
+        return stoneBumper.getState();
     }
 
     // ==================================================================================================
@@ -130,8 +129,9 @@ public class DriveClass {
             br_power /= m;
         }
 
+        boolean oldMode = fl_Drive.getMode() == DcMotor.RunMode.RUN_TO_POSITION;
         boostState.update(speedTrigger > 0.7 || turnTrigger > 0.85);
-        if (boostState.isChanged()) {
+        if (boostState.isChanged() || oldMode) {
             if (boostState.isPressed()) {
                 fl_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                 fr_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -298,14 +298,10 @@ public class DriveClass {
             dir = -1;
         int ticks = (int)(5600 * rounds) * dir;
 
-
-
         fl_Drive.setTargetPosition(ticks);
         fr_Drive.setTargetPosition(-ticks);
         bl_Drive.setTargetPosition(ticks);
         br_Drive.setTargetPosition(-ticks);
-
-
 
         fl_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         fr_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -337,22 +333,34 @@ public class DriveClass {
 
             opMode.sleep(100);
         }
-
     }
 
     public void stop(){
+        fl_Drive.setPower(0);
+        fr_Drive.setPower(0);
+        bl_Drive.setPower(0);
+        br_Drive.setPower(0);
+
+        if (fl_Drive.getMode() == DcMotor.RunMode.RUN_TO_POSITION) {
+            fl_Drive.setTargetPosition(fl_Drive.getCurrentPosition());
+            fr_Drive.setTargetPosition(fr_Drive.getCurrentPosition());
+            bl_Drive.setTargetPosition(bl_Drive.getCurrentPosition());
+            br_Drive.setTargetPosition(br_Drive.getCurrentPosition());
+        }
+    }
+
+    public void end(){
+        fl_Drive.setPower(0);
+        fr_Drive.setPower(0);
+        bl_Drive.setPower(0);
+        br_Drive.setPower(0);
+
         fl_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         fr_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         bl_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         br_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        double power = 0;
-        fl_Drive.setPower(power);
-        fr_Drive.setPower(power);
-        bl_Drive.setPower(power);
-        br_Drive.setPower(power);
         rollersStop();
-
         hooks.setPosition(0);
         hooksState.set(false);
     }
@@ -389,7 +397,7 @@ public class DriveClass {
 
     public void rollersRunIn() {
         double rollerPower = 1;
-        if (blockBumper.getState() == false) {
+        if (stoneBumper.getState() == false) {
             rollerPower = 0.05;
         }
         r_roller.setPower(rollerPower);

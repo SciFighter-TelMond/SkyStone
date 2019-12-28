@@ -54,8 +54,8 @@ import org.firstinspires.ftc.robotcore.external.android.AndroidTextToSpeech;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Basic: HanukaBot", group="Linear Opmode")
-//@Disabled
+@TeleOp(name="Hanuka Bot", group="Linear Opmode")
+@Disabled
 public class HanukaBotOpMode_Linear extends LinearOpMode {
 
     // Declare OpMode members.
