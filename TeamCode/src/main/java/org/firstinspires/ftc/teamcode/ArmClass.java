@@ -100,7 +100,7 @@ public class ArmClass extends Thread {
         }
     }
 
-    private void setModeArm(boolean drive) {
+    public void setModeArm(boolean drive) {
         if (drive) {
             arm0.setPower(0);
             arm0.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);

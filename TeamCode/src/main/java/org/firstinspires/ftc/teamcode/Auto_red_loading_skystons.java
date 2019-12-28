@@ -34,28 +34,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 /**
- * This file illustrates the concept of driving a path based on time.
- * It uses the common Pushbot hardware class to define the drive on the robot.
- * The code is structured as a LinearOpMode
- *
- * The code assumes that you do NOT have encoders on the wheels,
- *   otherwise you would use: PushbotAutoDriveByEncoder;
- *
- *   The desired path in this example is:
- *   - Drive forward for 3 seconds
- *   - Spin right for 1.3 seconds
- *   - Drive Backwards for 1 Second
- *   - Stop and close the claw.
- *
- *  The code is written in a simple form with no optimizations.
- *  However, there are several ways that this type of sequence could be streamlined,
- *
- * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
 @Autonomous(name="Red Loading Skystone", group="SciFighterd")// moving the blue foundation. you are in the blue team.
@@ -63,11 +46,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class Auto_red_loading_skystons extends LinearOpMode {
 
     /* Declare OpMode members. */
-    private DriveClass      robot   = new DriveClass(this);   // Use a Pushbot's hardware
+    private DriveClass robot = new DriveClass(this);   // Use a Pushbot's hardware
+    private ArmClass   arm   = new ArmClass(this, robot);
+
     private ElapsedTime     runtime = new ElapsedTime();
 
-    ColorSensor sensorColor;
-    DistanceSensor sensorDistance;
+    private ColorSensor sensorColor;
+    private DistanceSensor sensorDistance;
+    private ColorSensor sensorColorDown;
 
     @Override
     public void runOpMode() {
@@ -77,9 +63,11 @@ public class Auto_red_loading_skystons extends LinearOpMode {
          * The init() method of the hardware class does all the work here
          */
 
-        sensorColor = hardwareMap.get(ColorSensor.class, "sensor_color");
-        sensorDistance = hardwareMap.get(DistanceSensor.class, "sensor_color");
+        sensorColor = hardwareMap.get(ColorSensor.class, "color_left");
+        sensorDistance = hardwareMap.get(DistanceSensor.class, "color_left");
+        sensorColorDown = hardwareMap.get(ColorSensor.class,"color_down");
 
+        arm.init(hardwareMap);
         robot.init(hardwareMap);
 
         // Send telemetry message to signify robot waiting;
@@ -88,38 +76,91 @@ public class Auto_red_loading_skystons extends LinearOpMode {
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-
+        arm.begin();
+        arm.setModeArm(false);
 
         runtime.reset();
-        /*starting point: building area, the bridge is on the left,
-         * the front of the robot is to the wall, the hooks directed to the middle of the field.
-         * please start close to the building site*/
-        // Step 1:  Drive forward (actually back) and a bit to the right (actually to the left)
-        robot.rollers(true);
-        robot.rollersRunIn();
-        robot.side(0.6, DriveClass.Direction.LEFT, 1, 3);
 
-        robot.straight(1.3, DriveClass.Direction.FORWARD, 0.4, 5);
-        robot.drive(0.2,0,0,0,0);
+        try {
+            robot.side(0.6, DriveClass.Direction.RIGHT, 1, 3);
+            arm.gootoo(250, 0);
+            arm.rotateClamp(true);
+            arm.clamp(true);
+            robot.straight(1, DriveClass.Direction.FORWARD, 0.4, 4);
+            robot.drive(0.2, 0, 0, 0, 0);
 
-        while (sensorDistance.getDistance(DistanceUnit.CM)>4){
+            while (sensorDistance.getDistance(DistanceUnit.CM) > 3 && opModeIsActive()) {
+                sleep(10);
+            }
+            robot.stop();
+
+            robot.drive(0, 0.2, 0, 0, 0);
+
+            while (isSkyStone(sensorColor) && opModeIsActive()) {
+                sleep(10);
+            }
+            robot.stop();
+
+            robot.side(0.2, DriveClass.Direction.LEFT, 1, 1);
+
+            arm.gootoo(200, 200);
+            arm.clamp(false);
+            sleep(500);
+            arm.gootoo(250, 100);
+            robot.straight(-0.1, DriveClass.Direction.FORWARD,0.5,1);
+
+            robot.drive(0,-0.5,0,0,0);
+            while (!isRed(sensorColorDown) && opModeIsActive()) {
+                sleep(10);
+            }
+            robot.stop();
+            robot.side(0.4, DriveClass.Direction.LEFT,0.5,1);
+            arm.clamp(true);
+            arm.gootoo(250,0);
+            arm.clamp(false);
+            arm.gootoo(0,0);
+            robot.drive(0,0.5,0,0,0);
+            while (!isRed(sensorColorDown) && opModeIsActive()) {
+                sleep(10);
+            }
+            robot.stop();
+        } catch (InterruptedException e) {
+            RobotLog.d("Arm Thread interrupted!");
         }
 
+        robot.end();
+        arm.end();
+    }
 
-        sleep(500);
+    boolean isSkyStone(ColorSensor sensor) {
+        double r = sensor.red();
+        double g = sensor.green();
+        double b = sensor.blue();
+        double a = sensor.alpha();
 
+        telemetry.addData("Red  ", r);
+        telemetry.addData("Green", g);
+        telemetry.addData("Blue ", b);
+        telemetry.addData("Alpha", a);
+        telemetry.update();
 
-        // Step 2: should be in front of the foundation, hooks down
+        boolean skystone = r < 0.1 && g < 0.1 && b < 0.1;
+        return skystone;
+    }
 
-        sleep(200);
+    boolean isRed( ColorSensor sensor) {
+        double r = sensor.red();
+        double g = sensor.green();
+        double b = sensor.blue();
+        double a = sensor.alpha();
 
-              while (opModeIsActive() && (runtime.seconds() < 30)) {
-            telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
-            telemetry.update();
-        }
+        telemetry.addData("Red  ", r);
+        telemetry.addData("Green", g);
+        telemetry.addData("Blue ", b);
+        telemetry.addData("Alpha", a);
+        telemetry.update();
 
-        // Step 6:  stop
-        robot.stop();
-        //sleep(1000);
+        boolean red = r > 0.5;
+        return red;
     }
 }
