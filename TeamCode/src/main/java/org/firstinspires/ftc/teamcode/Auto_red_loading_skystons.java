@@ -50,6 +50,7 @@ public class Auto_red_loading_skystons extends LinearOpMode {
     private ArmClass   arm   = new ArmClass(this, robot);
 
     private ElapsedTime     runtime = new ElapsedTime();
+    private ElapsedTime     timer = new ElapsedTime();
 
     private ColorSensor sensorColor;
     private DistanceSensor sensorDistance;
@@ -82,45 +83,58 @@ public class Auto_red_loading_skystons extends LinearOpMode {
         runtime.reset();
 
         try {
-            robot.side(0.6, DriveClass.Direction.RIGHT, 1, 3);
+
+            //robot.side(0.6, DriveClass.Direction.RIGHT, 1, 3);
             arm.gootoo(250, 0);
             arm.rotateClamp(true);
             arm.clamp(true);
             robot.straight(1, DriveClass.Direction.FORWARD, 0.4, 4);
+
+            // drive straight close to stones
             robot.drive(0.2, 0, 0, 0, 0);
-
-            while (sensorDistance.getDistance(DistanceUnit.CM) > 3 && opModeIsActive()) {
+            timer.reset();
+            while (sensorDistance.getDistance(DistanceUnit.CM) > 3 && opModeIsActive() && timer.seconds()<5) {
+                telemetry.addData("Dist  ",sensorDistance.getDistance(DistanceUnit.CM));
+                telemetry.update();
                 sleep(10);
             }
             robot.stop();
 
-            robot.drive(0, 0.2, 0, 0, 0);
-
-            while (isSkyStone(sensorColor) && opModeIsActive()) {
+            // drive LEFT : search for SkyStone
+            robot.drive(0, -0.2, 0, 0, 0);
+            timer.reset();
+            while (isSkyStone(sensorColor) && opModeIsActive() && timer.seconds()<5) {
                 sleep(10);
             }
             robot.stop();
 
-            robot.side(0.2, DriveClass.Direction.LEFT, 1, 1);
 
-            arm.gootoo(200, 200);
+            // drive LEFT one block
+            robot.side(0.8, DriveClass.Direction.LEFT, 1, 1);
+
+            arm.gootoo(100, 400);
             arm.clamp(false);
             sleep(500);
-            arm.gootoo(250, 100);
+            arm.gootoo(250, 200);
             robot.straight(-0.1, DriveClass.Direction.FORWARD,0.5,1);
 
-            robot.drive(0,-0.5,0,0,0);
-            while (!isRed(sensorColorDown) && opModeIsActive()) {
+            // drive RIGHT : search for red line (under the brig)
+            robot.drive(0,0.5,0,0,0);
+            timer.reset();
+            while (!isRed(sensorColorDown) && opModeIsActive() && timer.seconds()<2) {
                 sleep(10);
             }
             robot.stop();
-            robot.side(0.4, DriveClass.Direction.LEFT,0.5,1);
+            robot.side(2, DriveClass.Direction.RIGHT,0.5,1);
             arm.clamp(true);
             arm.gootoo(250,0);
             arm.clamp(false);
             arm.gootoo(0,0);
+
+            // drive LEFT : beck to line.
             robot.drive(0,0.5,0,0,0);
-            while (!isRed(sensorColorDown) && opModeIsActive()) {
+            timer.reset();
+            while (!isRed(sensorColorDown) && opModeIsActive() && timer.seconds()<5) {
                 sleep(10);
             }
             robot.stop();
@@ -160,7 +174,7 @@ public class Auto_red_loading_skystons extends LinearOpMode {
         telemetry.addData("Alpha", a);
         telemetry.update();
 
-        boolean red = r > 0.5;
+        boolean red = r > 0.8 && g > 0.8 && b > 0.8;
         return red;
     }
 }
