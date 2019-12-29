@@ -63,7 +63,7 @@ public class Auto_blue_foundation2 extends LinearOpMode {
     /* Declare OpMode members. */
     private DriveClass         robot   = new DriveClass(this);   // Use a Pushbot's hardware
     private ElapsedTime     runtime = new ElapsedTime();
-    private AndroidTextToSpeech tts;
+
 
 
     @Override
@@ -78,7 +78,7 @@ public class Auto_blue_foundation2 extends LinearOpMode {
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Status", "Ready to run");    //
         telemetry.update();
-        tts.initialize();
+
 
 
         // Wait for the game to start (driver presses PLAY)
@@ -90,7 +90,7 @@ public class Auto_blue_foundation2 extends LinearOpMode {
          * the front of the robot is to the wall, the hooks directed to the middle of the field.
          * please start close to the building site*/
         // Step 1:  Drive forward (actually back) and a bit to the left (actually to the right)
-        robot.side(0.6, DriveClass.Direction.RIGHT, 1, 3);
+        robot.side(0.5, DriveClass.Direction.RIGHT, 1, 3);
         robot.straight(1.7, DriveClass.Direction.REVERSE, 0.2, 5);
 
         sleep(500);
@@ -98,9 +98,12 @@ public class Auto_blue_foundation2 extends LinearOpMode {
         robot.hooksDown();
         sleep(1500);
         // Step 3: drive backward (actually forward)
-        robot.straight(1.2, DriveClass.Direction.FORWARD, 0.5, 5);
+       // robot.straight(1, DriveClass.Direction.FORWARD, 0.5, 5);
         // Step 4: turn 90 with the foundation
-        robot.rotate(0.3, DriveClass.Direction.LEFT, 0.5, 5);
+        for(int i = 0; i < 5; i ++) {
+            robot.rotate(0.15, DriveClass.Direction.LEFT, 0.5, 5);
+            robot.straight(0.4, DriveClass.Direction.FORWARD, 0.5, 5);
+        }
         sleep(200);
         // Step 5: go forrward and to the right (actually backward and to the left
         robot.straight(0.3, DriveClass.Direction.REVERSE, 0.5, 5);
@@ -116,7 +119,7 @@ public class Auto_blue_foundation2 extends LinearOpMode {
             telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
             telemetry.update();
         }
-        tts.speak("hhhanukaaa hhhanukaaa, hag Yafe Kol Kach");
+
         // Step 8:  stop
         robot.stop();
 

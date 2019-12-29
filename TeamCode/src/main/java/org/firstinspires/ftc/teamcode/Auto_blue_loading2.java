@@ -29,11 +29,10 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import android.speech.tts.TextToSpeech;
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.RobotLog;
 
 /**
  * This file illustrates the concept of driving a path based on time.
@@ -56,15 +55,16 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Blue Foundation", group="SciFighterd")// moving the blue foundation. you are in the blue team.
+@Autonomous(name="Blue Loading 2", group="SciFighterd")// moving the blue foundation. you are in the blue team.
 //@Disabled
-public class Auto_blue_foundation extends LinearOpMode {
+public class Auto_blue_loading2 extends LinearOpMode {
 
     /* Declare OpMode members. */
     private DriveClass         robot   = new DriveClass(this);   // Use a Pushbot's hardware
+    private ArmClass    arm = new ArmClass(this, robot);
     private ElapsedTime     runtime = new ElapsedTime();
 
-
+    private Toggle clamps_rotate    = new Toggle();
 
     @Override
     public void runOpMode() {
@@ -74,10 +74,30 @@ public class Auto_blue_foundation extends LinearOpMode {
          * The init() method of the hardware class does all the work here
          */
         robot.init(hardwareMap);
-
+        arm.init(hardwareMap);
+        arm.begin();
+        arm.reset();
+        arm.rotateClamp(clamps_rotate.getState());// turn clamps to
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Status", "Ready to run");    //
         telemetry.update();
+
+        robot.straight(1.5, DriveClass.Direction.FORWARD, 0.4, 5);
+        // find special cube
+        //and stop in front of
+        try {
+            arm.gootoo(300, 300);
+            arm.gootoo(100, 300);
+            arm.clamp(false);
+            arm.gootoo(300, 200);
+            robot.side(3, DriveClass.Direction.LEFT, 0.5, 5);
+
+
+        }catch (InterruptedException e) {
+            RobotLog.d("Arm Thread interrupted!");
+        }
+
+
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -88,28 +108,27 @@ public class Auto_blue_foundation extends LinearOpMode {
          * the front of the robot is to the wall, the hooks directed to the middle of the field.
          * please start close to the building site*/
         // Step 1:  Drive forward (actually back) and a bit to the right (actually to the left)
-        robot.side(0.6, DriveClass.Direction.RIGHT, 1, 3);
-        robot.straight(1.7, DriveClass.Direction.REVERSE, 0.4, 5);
+//        robot.rollers(true);
+//        robot.rollersRunIn();
+//        robot.side(0.6, DriveClass.Direction.RIGHT, 1, 3);
+//        robot.straight(1.7, DriveClass.Direction.FORWARD, 0.4, 5);
+//        robot.straight(0.2, DriveClass.Direction.REVERSE, 0.4, 5);
+//        robot.straight(0.2, DriveClass.Direction.FORWARD, 0.4, 5);
+//        robot.rollers(false);
+//        robot.rollersRunIn();
+//        robot.rotate(0.3, DriveClass.Direction.LEFT, 0.5, 5);
+//        robot.straight(2.2, DriveClass.Direction.FORWARD, 0.4, 5);
+//        robot.rollersRunOut();
+//        robot.straight(0.4, DriveClass.Direction.REVERSE, 0.4, 5);
 
         sleep(500);
+
+
         // Step 2: should be in front of the foundation, hooks down
-        robot.hooksDown();
-        sleep(1500);
-        robot.straight(1.7, DriveClass.Direction.FORWARD, 0.5, 5);
-        // Step 3: turn 180 with the foundation
-        //robot.rotate(0.6, DriveClass.Direction.LEFT, 0.5, 5);
+
         sleep(200);
 
-        // Step 4: set the foundation free
-        robot.hooksUp();
-        sleep(200);
-        // Step 5: park under the bridge got to the right 1.5M
-        robot.side(1.7, DriveClass.Direction.LEFT, 0.7, 5);
-        robot.straight(1.8, DriveClass.Direction.REVERSE, 0.4, 5);
-        robot.side(1.5, DriveClass.Direction.RIGHT, 0.7, 5);
-        robot.straight(1, DriveClass.Direction.FORWARD, 0.4, 5);
-        robot.side(2, DriveClass.Direction.LEFT, 0.7, 5);
-        while (opModeIsActive() && (runtime.seconds() < 30)) {
+              while (opModeIsActive() && (runtime.seconds() < 30)) {
             telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
             telemetry.update();
         }
