@@ -54,9 +54,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Red Foundation-hooks in front", group="SciFighterd")// moving the blue foundation. you are in the blue team.
+@Autonomous(name="TEST", group="SciFighterd")// moving the blue foundation. you are in the blue team.
 //@Disabled
-public class Auto_red_foundation extends LinearOpMode {
+public class Auto_test extends LinearOpMode {
 
     /* Declare OpMode members. */
     private DriveClass         robot   = new DriveClass(this);   // Use a Pushbot's hardware
@@ -82,46 +82,13 @@ public class Auto_red_foundation extends LinearOpMode {
 
 
         runtime.reset();
-        /*starting point: building area, the bridge is on the left,
+        /*starting point: building area, the bridge is on the right,
          * the front of the robot is to the wall, the hooks directed to the middle of the field.
          * please start close to the building site*/
-        // Step 1:  Drive forward (actually back) and a bit to the right (actually to the left)
-        robot.side(0.6, DriveClass.Direction.LEFT, 1, 3);
-        robot.straight(1.7, DriveClass.Direction.REVERSE, 0.4, 3);
-
-        sleep(200);
-        // Step 2: should be in front of the foundation, hooks down
-        robot.hooksDown();
-        sleep(400);
-        // Step 3: drag the foundation to the wall
-        robot.straight(1.7, DriveClass.Direction.FORWARD, 0.7, 3);
-
-
-
-
-        // Step 4: set the foundation free
-        robot.hooksUp();
-        sleep(100);
-        /////////////////////////////////////////////////////////////////////////////////////
-        // Step 5: a)go to the side of the foundation b)push it to the wall c)go in front of the foundation d) move it to the wall
-        //   BLUE                                           RED
-        //  |                                                       |
-        // a|    <---|                                      |--->   |a
-        //  |b ^|---->                                      <---|^ b|
-        //  V-->|  c                                         c  |<--V
-        //      |                                               |
-        //======V==============||||||||||||||||||===============V=======
-        //
-        /////////////////////////////////////////////////////////////////////////////////////
-        robot.side(1.5, DriveClass.Direction.RIGHT, 0.9, 3);
-        robot.straight(1, DriveClass.Direction.REVERSE, 0.9, 3);
-        robot.side(0.4, DriveClass.Direction.LEFT, 0.9, 3);
-        robot.straight(0.8, DriveClass.Direction.REVERSE, 0.9, 3);
-        robot.side(1.1, DriveClass.Direction.LEFT, 0.9, 3);
-        robot.straight(1.2, DriveClass.Direction.FORWARD, 0.9, 3);
-        // Step 6: drive to the side - park under the bridge
-        robot.side(2, DriveClass.Direction.RIGHT, 0.9, 3);
-        while (opModeIsActive() && (runtime.seconds() < 30)) {
+        // Step 1:  Drive forward (actually back) and a bit to the left (actually to the right)
+        robot.side(2, DriveClass.Direction.RIGHT, 1, 3);
+        sleep(3000);
+        robot.side(2, DriveClass.Direction.LEFT, 1, 3);        while (opModeIsActive() && (runtime.seconds() < 30)) {
             telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
             telemetry.update();
         }

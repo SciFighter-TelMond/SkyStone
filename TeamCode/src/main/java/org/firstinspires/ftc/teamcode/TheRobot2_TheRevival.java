@@ -50,7 +50,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @TeleOp(name = "OldRobot", group = "Iterative Opmode")
-//@Disabled
+@Disabled
 public class TheRobot2_TheRevival extends OpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
