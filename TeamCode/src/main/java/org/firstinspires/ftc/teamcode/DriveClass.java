@@ -462,6 +462,9 @@ public class DriveClass {
     public boolean isSkyStoneRight() {
         return isSkyStone(sensorColorRight);
     }
+    public boolean isSkyStoneLeft(){
+        return isSkyStone(sensorColorLeft);
+    }
 
     boolean isSkyStone(ColorSensor sensor) {
         double r = sensor.red();
