@@ -50,7 +50,7 @@ public class LinearDrive extends LinearOpMode {
         drive.init(hardwareMap);
         arm.init(hardwareMap);
 
-        drive.setCap(false);
+        drive.setCapstone(false);
 
 
         // Wait for the game to start (driver presses PLAY)
@@ -88,7 +88,7 @@ public class LinearDrive extends LinearOpMode {
             //==========================================
             capStone.update(gamepad1.x);
             if (capStone.isClicked()) {
-                drive.seCap(capStone.getState());
+                drive.setCapstone(capStone.getState());
             }
 
             // =========================================
