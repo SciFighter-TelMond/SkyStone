@@ -121,8 +121,10 @@ public class ArmClass extends Thread {
     }
 
     public void moveArm0(double speed) {
-        if (mode != Mode.MANUAL)
+        if (mode != Mode.MANUAL){
+            this.interrupt();
             return;
+        }
 
         if (zeroArm0.getState() == false) {
             speed = Math.max(0, speed);
@@ -132,8 +134,10 @@ public class ArmClass extends Thread {
     }
 
     public void moveArm1(double speed) {
-        if (mode != Mode.MANUAL)
+        if (mode != Mode.MANUAL){
+            this.interrupt();
             return;
+        }
         if (zeroArm1.getState() == false) {
             speed = Math.max(0, speed);
         }

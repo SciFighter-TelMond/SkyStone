@@ -4,38 +4,43 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-/**
-    FTC - SCI-Fighters
-    Mechanom Drive 3
+import org.firstinspires.ftc.robotcore.external.android.AndroidTextToSpeech;
 
-    Drive with left right bumpers stops and Hooks.
+/**
+ * FTC - SCI-Fighters
+ * Mechanom Drive 3
+ * <p>
+ * Drive with left right bumpers stops and Hooks.
  */
 
-@TeleOp(name="Linear Drive", group="SciFighters")
+@TeleOp(name = "Linear Drive", group = "SciFighters")
 //@Disabled
 public class LinearDrive extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
 
-    private Toggle hooksState       = new Toggle();
-    private Toggle rollersRunIn     = new Toggle();
-    private Toggle rollersRunOut    = new Toggle();
+    private Toggle hooksState = new Toggle();
+    private Toggle rollersRunIn = new Toggle();
+    private Toggle rollersRunOut = new Toggle();
     private Toggle rollerServoState = new Toggle();
-    private Toggle clamps           = new Toggle();
-    private Toggle clamps_rotate    = new Toggle();
+    private Toggle clamps = new Toggle();
+    private Toggle clamps_rotate = new Toggle();
 
-    private Toggle armDoHome         = new Toggle();
-    private Toggle armDoPick         = new Toggle();
-    private Toggle armDoBuild        = new Toggle();
+    private Toggle armDoHome = new Toggle();
+    private Toggle armDoPick = new Toggle();
+    private Toggle armDoBuild = new Toggle();
 
-    private Toggle armFloorUp        = new Toggle();
+    private Toggle armFloorUp = new Toggle();
     private Toggle armFloorDown = new Toggle();
 
     private Toggle stoneBumperToggle = new Toggle();
 
+    private Toggle capStone = new Toggle();
+
     private DriveClass drive = new DriveClass(this);
-    private ArmClass   arm  = new ArmClass(this, drive);
+    private ArmClass arm = new ArmClass(this, drive);
+
 
     @Override
     public void runOpMode() {
@@ -44,6 +49,9 @@ public class LinearDrive extends LinearOpMode {
 
         drive.init(hardwareMap);
         arm.init(hardwareMap);
+
+        drive.setCap(false);
+
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -59,20 +67,36 @@ public class LinearDrive extends LinearOpMode {
 
             // POV Mode uses left stick to go forward, and right stick to turn.
             // - This uses basic math to combine motions and is easier to drive straight.
-            double straight     = -gamepad1.right_stick_y;
-            double side         =  gamepad1.right_stick_x;
-            double turn         =  gamepad1.left_stick_x;
-            double speedTrigger =  gamepad1.right_trigger;
-            double turnTrigger  =  gamepad1.left_trigger;
+            double straight = -gamepad1.right_stick_y;
+            double side = gamepad1.right_stick_x;
+            double turn = gamepad1.left_stick_x;
+            double speedTrigger = gamepad1.right_trigger;
+            double turnTrigger = gamepad1.left_trigger;
+            boolean slowLeft = gamepad1.dpad_left;
+            boolean slowRight = gamepad1.dpad_right;
 
+            if (slowLeft) {
+                side = -0.2;
+            }
+            if (slowRight) {
+                side = 0.2;
+            }
             drive.drive(straight, side, turn, speedTrigger, turnTrigger);
+
+            //==========================================
+            //CapStone
+            //==========================================
+            capStone.update(gamepad1.x);
+            if (capStone.isClicked()) {
+                drive.seCap(capStone.getState());
+            }
 
             // =========================================
             // Hooks Control
             // =========================================
             hooksState.update(gamepad1.right_bumper);
-            if(hooksState.isPressed()) {
-                if(hooksState.getState())
+            if (hooksState.isPressed()) {
+                if (hooksState.getState())
                     drive.hooksDown();
                 else
                     drive.hooksUp();
@@ -112,11 +136,11 @@ public class LinearDrive extends LinearOpMode {
                 arm.pleaseDo(ArmClass.Mode.BUILD);
             }
 
-            if (armFloorUp.isClicked()){
+            if (armFloorUp.isClicked()) {
                 arm.floorPlus();
                 arm.pleaseDo(ArmClass.Mode.BUILD);
             }
-            if (armFloorDown.isClicked()){
+            if (armFloorDown.isClicked()) {
                 arm.floorMinus();
                 arm.pleaseDo(ArmClass.Mode.BUILD);
             }
@@ -146,7 +170,7 @@ public class LinearDrive extends LinearOpMode {
             if (rollersRunOut.isPressed()) {
                 drive.rollersRunOut();
             } else {
-                if (rollersRunOut.isChanged() || rollersRunIn.isChanged() || stoneBumperToggle.isChanged())  {
+                if (rollersRunOut.isChanged() || rollersRunIn.isChanged() || stoneBumperToggle.isChanged()) {
                     if (rollersRunIn.getState()) {
                         drive.rollersRunIn();
                     } else {
@@ -154,6 +178,7 @@ public class LinearDrive extends LinearOpMode {
                     }
                 }
             }
+
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
