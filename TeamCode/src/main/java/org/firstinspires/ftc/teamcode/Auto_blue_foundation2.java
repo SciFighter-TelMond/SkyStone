@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -57,7 +58,7 @@ import org.firstinspires.ftc.robotcore.external.android.AndroidTextToSpeech;
  */
 
 @Autonomous(name="Blue Foundation 2 park side", group="SciFighterd")// moving the blue foundation. you are in the blue team.
-//@Disabled
+@Disabled
 public class Auto_blue_foundation2 extends LinearOpMode {
 
     /* Declare OpMode members. */
