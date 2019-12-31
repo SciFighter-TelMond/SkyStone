@@ -547,11 +547,11 @@ public class DriveClass {
 
     public void setCapstone(boolean open) {
         if (open == true) {
-            capstone.setPosition(1);
+            capstone.setPosition(0);
         }
 
         if (open == false) {
-            capstone.setPosition(0);
+            capstone.setPosition(1);
         }
 
     }
