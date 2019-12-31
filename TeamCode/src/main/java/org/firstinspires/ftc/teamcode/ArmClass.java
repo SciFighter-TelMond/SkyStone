@@ -196,10 +196,11 @@ public class ArmClass extends Thread {
     }
 
     public void pleaseDo(Mode tmode) {
-        if (mode != Mode.MANUAL && mode != Mode.IDLE) {
-            interrupt();
-            return;
-        }
+//        TODO figure out why this exists (ask zeev)
+//        if (mode != Mode.MANUAL && mode != Mode.IDLE) {
+//            interrupt();
+//            return;
+//        }
         RobotLog.d("Arm pleaseDo");
         mode = tmode;
         if (tmode != Mode.MANUAL || tmode != Mode.IDLE) {
