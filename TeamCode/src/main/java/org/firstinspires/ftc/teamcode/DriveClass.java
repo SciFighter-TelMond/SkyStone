@@ -247,6 +247,54 @@ public class DriveClass {
 
     }
 
+    public void straight_ignoreBumper(double target_meter, Direction direction, double speed, int timeout) {
+        ElapsedTime runTime = new ElapsedTime();
+        runTime.reset();
+        fl_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        fr_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        bl_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        br_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        int dir = 1;
+        if(direction == Direction.REVERSE)
+            dir = -1;
+        int ticks = (int)(1400 * target_meter)*dir;
+
+        fl_Drive.setTargetPosition(ticks);
+        fr_Drive.setTargetPosition(ticks);
+        bl_Drive.setTargetPosition(ticks);
+        br_Drive.setTargetPosition(ticks);
+
+        fl_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        fr_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        bl_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        br_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        double drivePower = speed;
+        double power = drivePower;
+
+        while((fl_Drive.isBusy() /*|| bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy()*/) &&
+                opMode.opModeIsActive()  &&  runTime.seconds() < timeout) {
+
+            int distToTarget = ticks - fr_Drive.getCurrentPosition();
+
+            if (Math.abs(fr_Drive.getCurrentPosition())<200 || Math.abs(distToTarget)<700) {
+                power = drivePower/2;
+            } else {
+                power = drivePower;
+            }
+
+            fl_Drive.setPower(power);
+            fr_Drive.setPower(power);
+            bl_Drive.setPower(power);
+            br_Drive.setPower(power);
+
+
+            opMode.sleep(100);
+        }
+
+    }
+
     public void side(double target_meter, Direction direction, double speed, int timeout) {
         ElapsedTime runTime = new ElapsedTime();
         runTime.reset();
