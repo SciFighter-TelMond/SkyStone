@@ -94,10 +94,10 @@ public class Auto_red_loading extends LinearOpMode {
         robot.straight(0.2, DriveClass.Direction.FORWARD, 0.4, 5);
         robot.rollers(false);
         robot.rollersRunIn();
-        robot.rotate(0.3, DriveClass.Direction.RIGHT, 0.5, 5);
-        robot.straight(2.2, DriveClass.Direction.FORWARD, 0.4, 5);
+        robot.rotate(0.31, DriveClass.Direction.RIGHT, 0.5, 5);
+        robot.straight(2.3, DriveClass.Direction.FORWARD, 0.4, 5);
         robot.rollersRunOut();
-        robot.straight(0.4, DriveClass.Direction.REVERSE, 0.4, 5);
+        robot.straight(0.3, DriveClass.Direction.REVERSE, 0.4, 5);
 
         sleep(500);
 

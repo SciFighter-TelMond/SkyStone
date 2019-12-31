@@ -95,15 +95,15 @@ public class Auto_blue_foundation_rotate extends LinearOpMode {
         sleep(400);
         // Step 3: drag the foundation to the wall
         robot.straight(0.5, DriveClass.Direction.FORWARD, 1, 3);
-        robot.rotate(0.95, DriveClass.Direction.RIGHT, 0.7, 5);
+        robot.rotate(0.82, DriveClass.Direction.RIGHT, 0.7, 5);
         robot.straight_ignoreBumper(1.3, DriveClass.Direction.REVERSE, 0.7, 3);
-        robot.side(1, DriveClass.Direction.LEFT, 0.7, 3);
+        robot.side(0.5, DriveClass.Direction.LEFT, 0.7, 3);
 
 
         // Step 4: set the foundation free
         robot.hooksUp();
         sleep(100);
-        robot.side(1.5, DriveClass.Direction.RIGHT, 0.7, 3);
+        robot.side(2.3, DriveClass.Direction.RIGHT, 0.7, 3);
            while (opModeIsActive() && (runtime.seconds() < 30)) {
             telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
             telemetry.update();
