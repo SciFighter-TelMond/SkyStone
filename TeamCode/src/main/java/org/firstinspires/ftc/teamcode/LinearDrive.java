@@ -62,6 +62,7 @@ public class LinearDrive extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
+            drive.isSkyStoneLeft();
             // Choose to drive using either Tank Mode, or POV Mode
             // Comment out the method that's not used.  The default below is POV.
 
@@ -76,10 +77,10 @@ public class LinearDrive extends LinearOpMode {
             boolean slowRight = gamepad1.dpad_right;
 
             if (slowLeft) {
-                side = -0.2;
+                side = -0.2 * 2;
             }
             if (slowRight) {
-                side = 0.2;
+                side = 0.2 * 2;
             }
             drive.drive(straight, side, turn, speedTrigger, turnTrigger);
 
@@ -186,7 +187,7 @@ public class LinearDrive extends LinearOpMode {
             telemetry.addData("Arms", "Arm0 (%d), Arm1 (%d)", arm.getArm0Pos(), arm.getArm1Pos());
             telemetry.addData("Arms Switch", "Arm0:(%b), Arm1:(%b)", arm.getArm0Zero(), arm.getArm1ZeroA());
 
-            if (hooksState.getState()) telemetry.addData("Hooks", "ON");
+            //if (hooksState.getState()) telemetry.addData("Hooks", "ON");
             telemetry.update();
         } // end of if (opModeisActive)
         arm.end();

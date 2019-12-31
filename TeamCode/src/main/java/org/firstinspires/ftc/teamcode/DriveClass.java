@@ -167,7 +167,7 @@ public class DriveClass {
             }
         }
 
-        opMode.telemetry.addData("Bumper", "left (%b), right (%b)", leftBumper.getState(), rightBumper.getState());
+        //opMode.telemetry.addData("Bumper", "left (%b), right (%b)", leftBumper.getState(), rightBumper.getState());
 
         if (speedBoost < 0.7) {
             if (leftBumper.getState() == false) {
@@ -242,7 +242,7 @@ public class DriveClass {
                     br_Drive.setTargetPosition(br_Drive.getCurrentPosition());
                 }
             }
-            opMode.sleep(100);
+            opMode.sleep(20);
         }
 
     }
@@ -294,7 +294,7 @@ public class DriveClass {
             opMode.telemetry.addData("br", br_Drive.getCurrentPosition());
             opMode.telemetry.update();
 
-            opMode.sleep(100);
+            opMode.sleep(20);
         }
     }
 
@@ -354,7 +354,7 @@ public class DriveClass {
             opMode.telemetry.addData("br", br_Drive.getCurrentPosition());
             opMode.telemetry.update();
 
-            opMode.sleep(100);
+            opMode.sleep(20);
         }
     }
 
@@ -481,24 +481,18 @@ public class DriveClass {
                 hsvValues);
 
         float hue = hsvValues[0];
-        boolean skystone = hue > 110;
-        opMode.telemetry.addData("Red  ", r);
-        opMode.telemetry.addData("Green", g);
-        opMode.telemetry.addData("Blue ", b);
-        opMode.telemetry.addData("Alpha", a);
-        opMode.telemetry.addData("Hue ", hue);
-        opMode.telemetry.addData("skystone ", skystone);
-        opMode.telemetry.update();
+        boolean skystone = hue > 110 && a > 600;
+        opMode.telemetry.addData("Sky:","%b - H: %03.02f, [R:%1.0f, G:%1.0f, B:%1.0f, A:%1.0f]", skystone,hue,r,g,b,a );
         return skystone;
     }
 
     public void setCapstone(boolean open) {
         if (open == true) {
-            capstone.setPosition(1);
+            capstone.setPosition(0);
         }
 
         if (open == false) {
-            capstone.setPosition(0);
+            capstone.setPosition(1);
         }
 
     }
