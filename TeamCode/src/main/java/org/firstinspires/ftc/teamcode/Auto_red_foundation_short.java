@@ -54,12 +54,12 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Red Loading", group="SciFighterd")// moving the blue foundation. you are in the blue team.
+@Autonomous(name="Red Foundation Short - hooks front", group="SciFighters")// moving the blue foundation. you are in the blue team.
 //@Disabled
-public class Auto_red_loading extends LinearOpMode {
+public class Auto_red_foundation_short extends LinearOpMode {
 
     /* Declare OpMode members. */
-    private DriveClass      robot   = new DriveClass(this);   // Use a Pushbot's hardware
+    private DriveClass         robot   = new DriveClass(this,false);   // Use a Pushbot's hardware
     private ElapsedTime     runtime = new ElapsedTime();
 
 
@@ -86,27 +86,25 @@ public class Auto_red_loading extends LinearOpMode {
          * the front of the robot is to the wall, the hooks directed to the middle of the field.
          * please start close to the building site*/
         // Step 1:  Drive forward (actually back) and a bit to the right (actually to the left)
-        robot.rollers(true);
-        robot.rollersRunIn();
-        // robot.side(0.6, DriveClass.Direction.LEFT, 1, 3);
-        robot.straight(1.7, DriveClass.Direction.FORWARD, 0.4, 5);
-        robot.straight(0.2, DriveClass.Direction.REVERSE, 0.4, 5);
-        robot.straight(0.2, DriveClass.Direction.FORWARD, 0.4, 5);
-        robot.rollers(false);
-        robot.rollersRunIn();
-        robot.straight(0.6, DriveClass.Direction.REVERSE, 0.4, 5);
+        robot.side(0.6, DriveClass.Direction.LEFT, 1, 3);
+        robot.straight(1.9, DriveClass.Direction.REVERSE, 0.4, 3);
 
-        robot.rotate(0.26, DriveClass.Direction.RIGHT, 0.5, 5);
-        robot.rollersStop();
-        robot.straight(2.3, DriveClass.Direction.FORWARD, 0.6, 5);
-        robot.rollersRunOut();
-        robot.straight(0.9, DriveClass.Direction.REVERSE, 0.6, 5);
-        robot.side(0.2, DriveClass.Direction.LEFT, 0.6, 3);
+        sleep(190);
+        // Step 2: should be in front of the foundation, hooks down
+        robot.hooksDown();
+        sleep(390);
+        // Step 3: drag the foundation to the wall
+        robot.straight(1.7, DriveClass.Direction.FORWARD, 0.7, 3);
 
+        // Step 4: set the foundation free
+        robot.hooksUp();
+        sleep(100);
+        robot.side(2.25, DriveClass.Direction.RIGHT, 0.9, 3);
 //        while (opModeIsActive() && (runtime.seconds() < 30)) {
 //            telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
 //            telemetry.update();
 //        }
+
 
         // Step 6:  stop
         robot.stop();

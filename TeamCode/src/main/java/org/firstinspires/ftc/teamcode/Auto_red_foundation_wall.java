@@ -54,12 +54,12 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Red Loading", group="SciFighterd")// moving the blue foundation. you are in the blue team.
+@Autonomous(name="Red Foundation Wall - hooks front", group="SciFighters")// moving the blue foundation. you are in the blue team.
 //@Disabled
-public class Auto_red_loading extends LinearOpMode {
+public class Auto_red_foundation_wall extends LinearOpMode {
 
     /* Declare OpMode members. */
-    private DriveClass      robot   = new DriveClass(this);   // Use a Pushbot's hardware
+    private DriveClass         robot   = new DriveClass(this,false);   // Use a Pushbot's hardware
     private ElapsedTime     runtime = new ElapsedTime();
 
 
@@ -86,27 +86,48 @@ public class Auto_red_loading extends LinearOpMode {
          * the front of the robot is to the wall, the hooks directed to the middle of the field.
          * please start close to the building site*/
         // Step 1:  Drive forward (actually back) and a bit to the right (actually to the left)
-        robot.rollers(true);
-        robot.rollersRunIn();
-        // robot.side(0.6, DriveClass.Direction.LEFT, 1, 3);
-        robot.straight(1.7, DriveClass.Direction.FORWARD, 0.4, 5);
-        robot.straight(0.2, DriveClass.Direction.REVERSE, 0.4, 5);
-        robot.straight(0.2, DriveClass.Direction.FORWARD, 0.4, 5);
-        robot.rollers(false);
-        robot.rollersRunIn();
-        robot.straight(0.6, DriveClass.Direction.REVERSE, 0.4, 5);
+        robot.side(0.6, DriveClass.Direction.LEFT, 1, 3);
+        robot.straight(1.9, DriveClass.Direction.REVERSE, 0.4, 3);
 
-        robot.rotate(0.26, DriveClass.Direction.RIGHT, 0.5, 5);
-        robot.rollersStop();
-        robot.straight(2.3, DriveClass.Direction.FORWARD, 0.6, 5);
-        robot.rollersRunOut();
-        robot.straight(0.9, DriveClass.Direction.REVERSE, 0.6, 5);
-        robot.side(0.2, DriveClass.Direction.LEFT, 0.6, 3);
+        sleep(190);
+        // Step 2: should be in front of the foundation, hooks down
+        robot.hooksDown();
+        sleep(390);
+        // Step 3: drag the foundation to the wall
+        robot.straight(1.7, DriveClass.Direction.FORWARD, 0.7, 3);
 
+
+
+
+        // Step 4: set the foundation free
+        robot.hooksUp();
+        sleep(100);
+        /////////////////////////////////////////////////////////////////////////////////////
+        // Step 5: a)go to the side of the foundation b)push it to the wall c)go in front of the foundation d) move it to the wall
+        //   BLUE                                           RED
+        //  |                                                       |
+        // a|    <---|                                      |--->   |a
+        //  |b ^|---->                                      <---|^ b|
+        //  V-->|  c                                         c  |<--V
+        //      |                                               |
+        //======V==============||||||||||||||||||===============V=======
+        //
+        /////////////////////////////////////////////////////////////////////////////////////
+        robot.side(1.5, DriveClass.Direction.RIGHT, 0.9, 3);
+        robot.straight(0.74, DriveClass.Direction.REVERSE, 0.9, 3);
+        robot.side(0.7, DriveClass.Direction.LEFT, 0.9, 3);
+        robot.side(0.05, DriveClass.Direction.RIGHT,0.9,1);
+        robot.straight(0.8, DriveClass.Direction.REVERSE, 0.9, 3);
+        robot.side(1.3, DriveClass.Direction.LEFT, 0.9, 3);
+        robot.straight(1.2, DriveClass.Direction.FORWARD, 0.9, 3);
+        // Step 6: drive to the side - park under the bridge
+        robot.side(2.25, DriveClass.Direction.RIGHT, 0.9, 3);
+        robot.straight(0.7, DriveClass.Direction.FORWARD, 0.5, 2);
 //        while (opModeIsActive() && (runtime.seconds() < 30)) {
 //            telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
 //            telemetry.update();
 //        }
+
 
         // Step 6:  stop
         robot.stop();

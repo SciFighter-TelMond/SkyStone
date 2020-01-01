@@ -41,20 +41,16 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 /**
  */
 
-@Autonomous(name="Red Loading Skystone", group="SciFighterd")// moving the blue foundation. you are in the blue team.
+@Autonomous(name="Red Sky-Stone", group="SciFighterd")// moving the blue foundation. you are in the blue team.
 //@Disabled
 public class Auto_red_loading_skystons extends LinearOpMode {
 
     /* Declare OpMode members. */
     private DriveClass robot = new DriveClass(this);   // Use a Pushbot's hardware
-    private ArmClass   arm   = new ArmClass(this, robot);
+    private ArmClass arm = new ArmClass(this, robot);
 
-    private ElapsedTime     runtime = new ElapsedTime();
-    private ElapsedTime     timer = new ElapsedTime();
-
-    private ColorSensor sensorColor;
-    private DistanceSensor sensorDistance;
-    private ColorSensor sensorColorDown;
+    private ElapsedTime runtime = new ElapsedTime();
+    private ElapsedTime timer = new ElapsedTime();
 
     @Override
     public void runOpMode() {
@@ -63,10 +59,6 @@ public class Auto_red_loading_skystons extends LinearOpMode {
          * Initialize the drive system variables.
          * The init() method of the hardware class does all the work here
          */
-
-        sensorColor = hardwareMap.get(ColorSensor.class, "color_left");
-        sensorDistance = hardwareMap.get(DistanceSensor.class, "color_left");
-        sensorColorDown = hardwareMap.get(ColorSensor.class,"color_down");
 
         arm.init(hardwareMap);
         robot.init(hardwareMap);
@@ -88,55 +80,61 @@ public class Auto_red_loading_skystons extends LinearOpMode {
             arm.gootoo(250, 0);
             arm.rotateClamp(true);
             arm.clamp(true);
-            robot.straight(1, DriveClass.Direction.FORWARD, 0.4, 4);
+            robot.straight(1, DriveClass.Direction.FORWARD, 0.7, 4);
 
             // drive straight close to stones
-            robot.drive(0.2, 0, 0, 0, 0);
+            robot.drive(0.3, 0, 0, 0, 0);
             timer.reset();
-            while (sensorDistance.getDistance(DistanceUnit.CM) > 3 && opModeIsActive() && timer.seconds()<5) {
-                telemetry.addData("Dist  ",sensorDistance.getDistance(DistanceUnit.CM));
+            while (robot.getSensorDistanceLeft() > 3 && opModeIsActive() && timer.seconds() < 5) {
+                telemetry.addData("Dist  ", robot.getSensorDistanceLeft());
                 telemetry.update();
                 sleep(10);
             }
             robot.stop();
 
             // drive LEFT : search for SkyStone
-            robot.drive(0, -0.2, 0, 0, 0);
+            robot.drive(0, -0.5, 0, 0, 0);
             timer.reset();
-            while (isSkyStone(sensorColor) && opModeIsActive() && timer.seconds()<5) {
+            while (!robot.isSkyStoneLeft() && opModeIsActive() && timer.seconds()<10) {
+                telemetry.update();
                 sleep(10);
             }
-            robot.stop();
-
 
             // drive LEFT one block
-            robot.side(0.8, DriveClass.Direction.LEFT, 1, 1);
-
-            arm.gootoo(100, 400);
-            arm.clamp(false);
-            sleep(500);
-            arm.gootoo(250, 200);
-            robot.straight(-0.1, DriveClass.Direction.FORWARD,0.5,1);
-
-            // drive RIGHT : search for red line (under the brig)
-            robot.drive(0,0.5,0,0,0);
-            timer.reset();
-            while (!isRed(sensorColorDown) && opModeIsActive() && timer.seconds()<2) {
-                sleep(10);
-            }
+            robot.side(0.35, DriveClass.Direction.LEFT, 0.4, 2);
             robot.stop();
-            robot.side(2, DriveClass.Direction.RIGHT,0.5,1);
-            arm.clamp(true);
-            arm.gootoo(250,0);
-            arm.clamp(false);
-            arm.gootoo(0,0);
+//            arm.gootoo(100, 400);
+//            arm.clamp(false);
+//            sleep(500);
+//            arm.gootoo(250, 200);
+//            robot.straight(-0.1, DriveClass.Direction.FORWARD,0.5,1);
+//
+//            // drive RIGHT : search for red line (under the brig)
+//            robot.drive(0,0.5,0,0,0);
+//            timer.reset();
+//            while (!isRed(sensorColorDown) && opModeIsActive() && timer.seconds()<2) {
+//                sleep(10);
+//            }
+//            robot.stop();
+//            robot.side(2, DriveClass.Direction.RIGHT,0.5,1);
+//            arm.clamp(true);
+//            arm.gootoo(250,0);
+//            arm.clamp(false);
+//            arm.gootoo(0,0);
+//
+//            // drive LEFT : beck to line.
+//            robot.drive(0,0.5,0,0,0);
+//            timer.reset();
+//            while (!isRed(sensorColorDown) && opModeIsActive() && timer.seconds()<5) {
+//                sleep(10);
+//            }
 
-            // drive LEFT : beck to line.
-            robot.drive(0,0.5,0,0,0);
-            timer.reset();
-            while (!isRed(sensorColorDown) && opModeIsActive() && timer.seconds()<5) {
-                sleep(10);
+
+            while (opModeIsActive() && (runtime.seconds() < 30)) {
+                robot.isSkyStoneLeft();
+                telemetry.update();
             }
+
             robot.stop();
         } catch (InterruptedException e) {
             RobotLog.d("Arm Thread interrupted!");
@@ -146,35 +144,4 @@ public class Auto_red_loading_skystons extends LinearOpMode {
         arm.end();
     }
 
-    boolean isSkyStone(ColorSensor sensor) {
-        double r = sensor.red();
-        double g = sensor.green();
-        double b = sensor.blue();
-        double a = sensor.alpha();
-
-        telemetry.addData("Red  ", r);
-        telemetry.addData("Green", g);
-        telemetry.addData("Blue ", b);
-        telemetry.addData("Alpha", a);
-        telemetry.update();
-
-        boolean skystone = r < 0.1 && g < 0.1 && b < 0.1;
-        return skystone;
-    }
-
-    boolean isRed( ColorSensor sensor) {
-        double r = sensor.red();
-        double g = sensor.green();
-        double b = sensor.blue();
-        double a = sensor.alpha();
-
-        telemetry.addData("Red  ", r);
-        telemetry.addData("Green", g);
-        telemetry.addData("Blue ", b);
-        telemetry.addData("Alpha", a);
-        telemetry.update();
-
-        boolean red = r > 0.8 && g > 0.8 && b > 0.8;
-        return red;
-    }
 }

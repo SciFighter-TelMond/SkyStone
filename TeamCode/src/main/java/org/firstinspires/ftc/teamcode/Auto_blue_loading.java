@@ -88,28 +88,25 @@ public class Auto_blue_loading extends LinearOpMode {
         // Step 1:  Drive forward (actually back) and a bit to the right (actually to the left)
         robot.rollers(true);
         robot.rollersRunIn();
-        robot.side(0.6, DriveClass.Direction.RIGHT, 1, 3);
+        // robot.side(0.6, DriveClass.Direction.RIGHT, 1, 3);
         robot.straight(1.7, DriveClass.Direction.FORWARD, 0.4, 5);
         robot.straight(0.2, DriveClass.Direction.REVERSE, 0.4, 5);
         robot.straight(0.2, DriveClass.Direction.FORWARD, 0.4, 5);
         robot.rollers(false);
         robot.rollersRunIn();
-        robot.rotate(0.31, DriveClass.Direction.LEFT, 0.5, 5);
-        robot.straight(2.3, DriveClass.Direction.FORWARD, 0.4, 5);
+        robot.straight(0.6, DriveClass.Direction.REVERSE, 0.4, 5);
+
+        robot.rotate(0.26, DriveClass.Direction.LEFT, 0.5, 5);
+        robot.rollersStop();
+        robot.straight(2.3, DriveClass.Direction.FORWARD, 0.6, 5);
         robot.rollersRunOut();
-        robot.straight(0.3, DriveClass.Direction.REVERSE, 0.4, 5);
+        robot.straight(0.9, DriveClass.Direction.REVERSE, 0.6, 5);
+        robot.side(0.2, DriveClass.Direction.RIGHT, 0.6, 3);
 
-        sleep(500);
-
-
-        // Step 2: should be in front of the foundation, hooks down
-
-        sleep(200);
-
-              while (opModeIsActive() && (runtime.seconds() < 30)) {
-            telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
-            telemetry.update();
-        }
+//        while (opModeIsActive() && (runtime.seconds() < 30)) {
+//            telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
+//            telemetry.update();
+//        }
 
         // Step 6:  stop
         robot.stop();
