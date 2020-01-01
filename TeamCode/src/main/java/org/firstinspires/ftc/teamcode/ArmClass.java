@@ -195,15 +195,14 @@ public class ArmClass extends Thread {
         }
     }
 
-    public void pleaseDo(Mode tmode) {
-//        TODO figure out why this exists (ask zeev)
-//        if (mode != Mode.MANUAL && mode != Mode.IDLE) {
-//            interrupt();
-//            return;
-//        }
+    public void pleaseDo(Mode newMode) {
+        if (mode != Mode.MANUAL && mode != Mode.IDLE) {
+            interrupt();
+            return;
+        }
         RobotLog.d("Arm pleaseDo");
-        mode = tmode;
-        if (tmode != Mode.MANUAL || tmode != Mode.IDLE) {
+        mode = newMode;
+        if (newMode != Mode.MANUAL || newMode != Mode.IDLE) {
             start();
         }
     }
