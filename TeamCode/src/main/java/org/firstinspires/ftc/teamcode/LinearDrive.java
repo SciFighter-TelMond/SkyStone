@@ -38,7 +38,7 @@ public class LinearDrive extends LinearOpMode {
 
     private Toggle capStone = new Toggle();
 
-    private DriveClass drive = new DriveClass(this);
+    private DriveClass drive = new DriveClass(this,false);
     private ArmClass arm = new ArmClass(this, drive);
 
 

@@ -114,14 +114,14 @@ public class Auto_blue_foundation extends LinearOpMode {
         //======V==============||||||||||||========================
         //
         /////////////////////////////////////////////////////////////////////////////////////
-        robot.side(1.5, DriveClass.Direction.LEFT, 0.9, 3);
+        robot.side(1.6, DriveClass.Direction.LEFT, 0.9, 3);
         robot.straight(1, DriveClass.Direction.REVERSE, 0.9, 3);
-        robot.side(0.4, DriveClass.Direction.RIGHT, 0.9, 3);
+        robot.side(0.5, DriveClass.Direction.RIGHT, 0.9, 3);
         robot.straight(0.8, DriveClass.Direction.REVERSE, 0.9, 3);
         robot.side(1.1, DriveClass.Direction.RIGHT, 0.9, 3);
         robot.straight(1.2, DriveClass.Direction.FORWARD, 0.9, 3);
         // Step 6: drive to the side - park under the bridge
-        robot.side(2, DriveClass.Direction.LEFT, 0.9, 3);
+        robot.side(2.4, DriveClass.Direction.LEFT, 0.9, 3);
         while (opModeIsActive() && (runtime.seconds() < 30)) {
             telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
             telemetry.update();

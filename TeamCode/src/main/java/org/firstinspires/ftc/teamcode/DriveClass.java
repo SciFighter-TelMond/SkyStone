@@ -56,13 +56,18 @@ public class DriveClass {
     volatile private LinearOpMode opMode = null;
     volatile private HardwareMap hwMap = null;
 
-    public enum Direction {LEFT, RIGHT, FORWARD, REVERSE}
+    public enum Direction {LEFT, RIGHT, FORWARD, REVERSE};
 
-    ;
+    private boolean useBrake;
 
     /* Constructor */
+    public DriveClass(LinearOpMode opMode,boolean useBrake) {
+        this.opMode = opMode;
+        this.useBrake = useBrake;
+    }
     public DriveClass(LinearOpMode opMode) {
         this.opMode = opMode;
+        this.useBrake = true;
     }
 
     /* Initialize standard Hardware interfaces */
@@ -93,10 +98,13 @@ public class DriveClass {
         bl_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         br_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        fl_Drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        fr_Drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        bl_Drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        br_Drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        if(useBrake) {
+//            fl_Drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//            fr_Drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//            bl_Drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//            br_Drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        }
 
         l_roller.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         r_roller.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
