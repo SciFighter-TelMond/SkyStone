@@ -93,45 +93,65 @@ public class Auto_red_loading_skystons extends LinearOpMode {
             robot.stop();
 
             // drive LEFT : search for SkyStone
-            robot.drive(0, -0.5, 0, 0, 0);
+            robot.drive(0, -0.8, 0, 0, 0);
             timer.reset();
             while (!robot.isSkyStoneLeft() && opModeIsActive() && timer.seconds()<10) {
                 telemetry.update();
                 sleep(10);
             }
 
+            if(timer.seconds()<1) {
+                robot.side(0.20, DriveClass.Direction.LEFT, 0.4, 2);
+            }
+            else
+            {
             // drive LEFT one block
-            robot.side(0.35, DriveClass.Direction.LEFT, 0.4, 2);
+            robot.side(0.32, DriveClass.Direction.LEFT, 0.4, 2);
+            robot.stop();}
+
+            // catch STONE
+            arm.gootoo(90, 430);
+            arm.clamp(false);
+            sleep(500);
+            arm.gootoo(300, 300);
+
+            // drive backwards
+            robot.straight(0.3, DriveClass.Direction.REVERSE,0.5,1);
+
+            // drive RIGHT : search for red line (under the brig)
+            robot.drive(0,0.7,0,0,0);
+            timer.reset();
+            while (!robot.isRed() && opModeIsActive() && timer.seconds()<8) {
+                // telemetry.update();
+                sleep(1);
+            }
             robot.stop();
-//            arm.gootoo(100, 400);
-//            arm.clamp(false);
-//            sleep(500);
-//            arm.gootoo(250, 200);
-//            robot.straight(-0.1, DriveClass.Direction.FORWARD,0.5,1);
-//
-//            // drive RIGHT : search for red line (under the brig)
-//            robot.drive(0,0.5,0,0,0);
-//            timer.reset();
-//            while (!isRed(sensorColorDown) && opModeIsActive() && timer.seconds()<2) {
-//                sleep(10);
-//            }
-//            robot.stop();
-//            robot.side(2, DriveClass.Direction.RIGHT,0.5,1);
-//            arm.clamp(true);
-//            arm.gootoo(250,0);
-//            arm.clamp(false);
-//            arm.gootoo(0,0);
-//
-//            // drive LEFT : beck to line.
-//            robot.drive(0,0.5,0,0,0);
-//            timer.reset();
-//            while (!isRed(sensorColorDown) && opModeIsActive() && timer.seconds()<5) {
-//                sleep(10);
-//            }
+
+            // slide RIGHT to put stone
+            robot.side(0.7, DriveClass.Direction.RIGHT,0.5,2);
+            robot.straight(0.2, DriveClass.Direction.FORWARD,0.5,1);
+            robot.stop();
+
+            arm.clamp(true);
+
+            arm.gootoo(300,0);
+
+            arm.clamp(false);
+
+            //arm.gootoo(,0);
 
 
+            // drive LEFT : beck to line.
+            robot.drive(0,-0.5,0,0,0);
+            timer.reset();
+            while (!robot.isRed() && opModeIsActive() && timer.seconds()<2) {
+                //telemetry.update();
+                sleep(1);
+            }
+
+            robot.stop();
             while (opModeIsActive() && (runtime.seconds() < 30)) {
-                robot.isSkyStoneLeft();
+                robot.isRed();
                 telemetry.update();
             }
 

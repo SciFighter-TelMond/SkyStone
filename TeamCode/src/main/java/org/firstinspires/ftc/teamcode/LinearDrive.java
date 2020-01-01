@@ -38,7 +38,7 @@ public class LinearDrive extends LinearOpMode {
 
     private Toggle capStone = new Toggle();
 
-    private DriveClass drive = new DriveClass(this,false);
+    private DriveClass drive = new DriveClass(this,true);
     private ArmClass arm = new ArmClass(this, drive);
 
 
@@ -62,7 +62,7 @@ public class LinearDrive extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
-            drive.isSkyStoneLeft();
+            // drive.isRed();
             // Choose to drive using either Tank Mode, or POV Mode
             // Comment out the method that's not used.  The default below is POV.
 
@@ -185,7 +185,7 @@ public class LinearDrive extends LinearOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             // telemetry.addData("Motors", "left (%.2f), right (%.2f)", fl_power, fr_power);
             telemetry.addData("Arms", "Arm0 (%d), Arm1 (%d)", arm.getArm0Pos(), arm.getArm1Pos());
-            telemetry.addData("Arms Switch", "Arm0:(%b), Arm1:(%b)", arm.getArm0Zero(), arm.getArm1ZeroA());
+            // telemetry.addData("Arms Switch", "Arm0:(%b), Arm1:(%b)", arm.getArm0Zero(), arm.getArm1ZeroA());
 
             //if (hooksState.getState()) telemetry.addData("Hooks", "ON");
             telemetry.update();
