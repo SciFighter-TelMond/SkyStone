@@ -113,16 +113,16 @@ public class Auto_red_foundation_bridge extends LinearOpMode {
         //======V==============||||||||||||||||||===============V=======
         //
         /////////////////////////////////////////////////////////////////////////////////////
-        robot.side(1.5, DriveClass.Direction.RIGHT, 0.9, 3);
+        robot.side(1.3, DriveClass.Direction.RIGHT, 0.9, 3);
         robot.straight(0.74, DriveClass.Direction.REVERSE, 0.9, 3);
         robot.side(0.7, DriveClass.Direction.LEFT, 0.9, 3);
         robot.side(0.05, DriveClass.Direction.RIGHT,0.9,1);
-        robot.straight(0.8, DriveClass.Direction.REVERSE, 0.9, 3);
+        robot.straight(1, DriveClass.Direction.REVERSE, 0.9, 3);
         robot.side(1.3, DriveClass.Direction.LEFT, 0.9, 3);
-        robot.straight(1.2, DriveClass.Direction.FORWARD, 0.9, 3);
+        robot.straight(1.1, DriveClass.Direction.FORWARD, 0.9, 3);
         // Step 6: drive to the side - park under the bridge
-        robot.straight(0.65, DriveClass.Direction.REVERSE, 0.5, 2);
-        robot.side(2.25, DriveClass.Direction.RIGHT, 0.9, 3);
+        robot.straight(0.5, DriveClass.Direction.REVERSE, 0.5, 2);
+        robot.side(2.4, DriveClass.Direction.RIGHT, 0.9, 3);
 //        while (opModeIsActive() && (runtime.seconds() < 30)) {
 //            telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
 //            telemetry.update();

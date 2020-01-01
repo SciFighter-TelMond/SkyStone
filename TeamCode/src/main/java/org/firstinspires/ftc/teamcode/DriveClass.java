@@ -572,6 +572,27 @@ public class DriveClass {
         opMode.telemetry.addData("Red:","%b - H: %03.02f, [R:%1.0f, G:%1.0f, B:%1.0f, A:%1.0f]", red,hue,r,g,b,a );
         return red;
     }
+
+    public  boolean isBlue() {
+        ColorSensor sensor = sensorColorDown;
+        double r = sensor.red();
+        double g = sensor.green();
+        double b = sensor.blue();
+        double a = sensor.alpha();
+
+        float hsvValues[] = {0F, 0F, 0F};
+        final int SCALE_FACTOR = 255;
+
+        Color.RGBToHSV((int) (sensor.red() * SCALE_FACTOR),
+                (int) (sensor.green() * SCALE_FACTOR),
+                (int) (sensor.blue() * SCALE_FACTOR),
+                hsvValues);
+
+        float hue = hsvValues[0];
+        boolean blue = hue > 220 && hue < 260;
+        opMode.telemetry.addData("Red:","%b - H: %03.02f, [R:%1.0f, G:%1.0f, B:%1.0f, A:%1.0f]", blue,hue,r,g,b,a );
+        return blue;
+    }
 }
 
 
