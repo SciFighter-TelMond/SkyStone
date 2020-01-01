@@ -54,12 +54,12 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Red Foundation-hooks in front", group="SciFighterd")// moving the blue foundation. you are in the blue team.
+@Autonomous(name="Red Foundation-hooks in front", group="SciFighters")// moving the blue foundation. you are in the blue team.
 //@Disabled
 public class Auto_red_foundation extends LinearOpMode {
 
     /* Declare OpMode members. */
-    private DriveClass         robot   = new DriveClass(this);   // Use a Pushbot's hardware
+    private DriveClass         robot   = new DriveClass(this,false);   // Use a Pushbot's hardware
     private ElapsedTime     runtime = new ElapsedTime();
 
 
@@ -87,12 +87,12 @@ public class Auto_red_foundation extends LinearOpMode {
          * please start close to the building site*/
         // Step 1:  Drive forward (actually back) and a bit to the right (actually to the left)
         robot.side(0.6, DriveClass.Direction.LEFT, 1, 3);
-        robot.straight(1.7, DriveClass.Direction.REVERSE, 0.4, 3);
+        robot.straight(1.9, DriveClass.Direction.REVERSE, 0.4, 3);
 
-        sleep(200);
+        sleep(190);
         // Step 2: should be in front of the foundation, hooks down
         robot.hooksDown();
-        sleep(400);
+        sleep(390);
         // Step 3: drag the foundation to the wall
         robot.straight(1.7, DriveClass.Direction.FORWARD, 0.7, 3);
 
@@ -114,10 +114,11 @@ public class Auto_red_foundation extends LinearOpMode {
         //
         /////////////////////////////////////////////////////////////////////////////////////
         robot.side(1.5, DriveClass.Direction.RIGHT, 0.9, 3);
-        robot.straight(1, DriveClass.Direction.REVERSE, 0.9, 3);
-        robot.side(0.4, DriveClass.Direction.LEFT, 0.9, 3);
+        robot.straight(0.74, DriveClass.Direction.REVERSE, 0.9, 3);
+        robot.side(0.7, DriveClass.Direction.LEFT, 0.9, 3);
+        robot.side(0.05, DriveClass.Direction.RIGHT,0.9,1);
         robot.straight(0.8, DriveClass.Direction.REVERSE, 0.9, 3);
-        robot.side(1.1, DriveClass.Direction.LEFT, 0.9, 3);
+        robot.side(1.3, DriveClass.Direction.LEFT, 0.9, 3);
         robot.straight(1.2, DriveClass.Direction.FORWARD, 0.9, 3);
         // Step 6: drive to the side - park under the bridge
         robot.side(2.25, DriveClass.Direction.RIGHT, 0.9, 3);
@@ -125,6 +126,7 @@ public class Auto_red_foundation extends LinearOpMode {
             telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
             telemetry.update();
         }
+
 
         // Step 6:  stop
         robot.stop();
