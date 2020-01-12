@@ -87,12 +87,12 @@ public class Auto_blue_foundation_short extends LinearOpMode {
          * please start close to the building site*/
         // Step 1:  Drive forward (actually back) and a bit to the left (actually to the right)
         robot.side(0.6, DriveClass.Direction.RIGHT, 1, 3);
-        robot.straight(1.7, DriveClass.Direction.REVERSE, 0.4, 3);
+        robot.straight(2, DriveClass.Direction.REVERSE, 0.3, 4);
 
         sleep(200);
         // Step 2: should be in front of the foundation, hooks down
         robot.hooksDown();
-        sleep(400);
+        sleep(500);
         // Step 3: drag the foundation to the wall
         robot.straight(1.7, DriveClass.Direction.FORWARD, 0.7, 3);
 

@@ -86,18 +86,18 @@ public class Auto_blue_foundation_bridge extends LinearOpMode {
          * the front of the robot is to the wall, the hooks directed to the middle of the field.
          * please start close to the building site*/
         // Step 1:  Drive forward (actually back) and a bit to the left (actually to the right)
-        robot.side(0.6, DriveClass.Direction.RIGHT, 1, 3);
-        robot.straight(1.7, DriveClass.Direction.REVERSE, 0.4, 3);
+        robot.side(0.6, DriveClass.Direction.RIGHT, 0.7, 3);
+        robot.straight(1.3, DriveClass.Direction.REVERSE, 0.7, 4);
+        robot.straight(0.5, DriveClass.Direction.REVERSE, 0.2, 5);
 
-        sleep(200);
+        // sleep(200);
         // Step 2: should be in front of the foundation, hooks down
+        robot.drive(-0.2,0,0,0,0);
         robot.hooksDown();
-        sleep(400);
+        sleep(500);
+        robot.stop();
         // Step 3: drag the foundation to the wall
-        robot.straight(1.7, DriveClass.Direction.FORWARD, 0.7, 3);
-
-
-
+        robot.straight(1.8, DriveClass.Direction.FORWARD, 0.7, 3);
 
         // Step 4: set the foundation free
         robot.hooksUp();
@@ -112,20 +112,15 @@ public class Auto_blue_foundation_bridge extends LinearOpMode {
         //======V==============||||||||||||========================
         //
         /////////////////////////////////////////////////////////////////////////////////////
-        robot.side(1.3, DriveClass.Direction.LEFT, 0.9, 3);
-        robot.straight(0.74, DriveClass.Direction.REVERSE, 0.9, 3);
-        robot.side(0.7, DriveClass.Direction.RIGHT, 0.9, 3);
-        robot.side(0.05, DriveClass.Direction.LEFT,0.9,1);
-        robot.straight(1, DriveClass.Direction.REVERSE, 0.9, 3);
-        robot.side(1.3, DriveClass.Direction.RIGHT, 0.9, 3);
-        robot.straight(1.1, DriveClass.Direction.FORWARD, 0.9, 3);
+        robot.side(1.44, DriveClass.Direction.LEFT, 0.9, 3);
+        robot.straight(1.1, DriveClass.Direction.REVERSE, 0.9, 3);
+        robot.side(0.5, DriveClass.Direction.RIGHT, 0.9, 3);
+        robot.straight(0.8, DriveClass.Direction.REVERSE, 0.9, 3);
+        robot.side(1.1, DriveClass.Direction.RIGHT, 0.9, 3);
+        robot.straight(1.2, DriveClass.Direction.FORWARD, 0.9, 3);
         // Step 6: drive to the side - park under the bridge
-        robot.straight(0.5, DriveClass.Direction.REVERSE, 0.5, 2);
+        robot.straight(0.4, DriveClass.Direction.REVERSE, 0.5, 2);
         robot.side(2.4, DriveClass.Direction.LEFT, 0.9, 3);
-//        while (opModeIsActive() && (runtime.seconds() < 30)) {
-//            telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
-//            telemetry.update();
-//        }
 
         // Step 6:  stop
         robot.stop();
