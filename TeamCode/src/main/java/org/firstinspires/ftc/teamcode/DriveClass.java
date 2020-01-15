@@ -478,7 +478,7 @@ public class DriveClass {
     public void rollersRunIn() {
         double rollerPower = 1;
         if (stoneBumper.getState() == false) {
-            rollerPower = 0.05;
+            rollerPower = 0.1;
         }
         r_roller.setPower(rollerPower);
         l_roller.setPower(rollerPower);
@@ -549,7 +549,6 @@ public class DriveClass {
         if (open == false) {
             capstone.setPosition(1);
         }
-
     }
 
     public  boolean isRed() {

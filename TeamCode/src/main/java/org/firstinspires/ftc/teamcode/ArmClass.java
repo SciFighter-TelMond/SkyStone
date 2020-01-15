@@ -3,9 +3,11 @@ package org.firstinspires.ftc.teamcode;
 // import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.RobotLog;
 
@@ -37,7 +39,7 @@ public class ArmClass extends Thread {
 
     static final int STAY = 999999;
 
-    volatile private int currFloor = 1;
+    volatile private int currFloor = 0;
 
     public ArmClass(OpMode opMode, DriveClass drive) {
         this.setName("ArmClass");
@@ -65,6 +67,34 @@ public class ArmClass extends Thread {
         zeroArm1.setMode(DigitalChannel.Mode.INPUT);
         arm0.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         arm1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+
+        arm0.setTargetPositionTolerance(20);
+        arm1.setTargetPositionTolerance(20);
+
+
+        //==============================
+        // PIDF control
+
+        RobotLog.d("Arm Velocity PID =======================================================");
+        PIDFCoefficients pidf0 = arm0.getPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        PIDFCoefficients pidf1 = arm1.getPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER);
+
+        RobotLog.d(pidf0.toString()); // p=2.000000 i=0.500000 d=0.000000 f=11.100006
+        RobotLog.d(pidf1.toString()); // p=2.000000 i=0.500000 d=0.000000 f=11.100006
+
+        // Arm 0
+        pidf0.p = 4;  pidf0.i = 3; pidf0.d = 0.1;
+        arm0.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidf0);
+        arm0.setPositionPIDFCoefficients(7);
+
+        // Arm 1
+        pidf1.p = 4;  pidf1.i = 3; pidf1.d = 0.1;
+        arm1.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidf1);
+        arm1.setPositionPIDFCoefficients(7);
+
+        RobotLog.d(pidf0.toString());
+        RobotLog.d(pidf1.toString());
+
         RobotLog.d("ArmClass: /init ");
     }
 
@@ -117,12 +147,13 @@ public class ArmClass extends Thread {
     }
 
     public void setBoost(double boost) {
-        speed_boost = 0.3 + boost * 0.7;
+        speed_boost = 0.4 + boost * 0.6;
     }
 
     public void moveArm0(double speed) {
-        if (mode != Mode.MANUAL){
-            this.interrupt();
+        if (mode != Mode.MANUAL) {
+//            RobotLog.d("Arm0 move interrupt");
+//            this.interrupt();
             return;
         }
 
@@ -134,8 +165,9 @@ public class ArmClass extends Thread {
     }
 
     public void moveArm1(double speed) {
-        if (mode != Mode.MANUAL){
-            this.interrupt();
+        if (mode != Mode.MANUAL) {
+//            RobotLog.d("Arm1 move interrupt");
+//            this.interrupt();
             return;
         }
         if (zeroArm1.getState() == false) {
@@ -148,13 +180,14 @@ public class ArmClass extends Thread {
     }
 
     public void checkups() {
-        if (zeroArm0.getState() == false) {
-            arm0.setTargetPosition(Math.max(arm0.getCurrentPosition(), arm0.getTargetPosition()));
+        if (zeroArm0.getState() == false && arm0.getTargetPosition() < arm0.getCurrentPosition()) {
+            RobotLog.d("Arm0 checkups hit at: %d", arm0.getCurrentPosition());
+            arm0.setTargetPosition(arm0.getCurrentPosition());
         }
-        if (zeroArm1.getState() == false) {
-            arm1.setTargetPosition(Math.max(arm1.getCurrentPosition(), arm1.getTargetPosition()));
+        if (zeroArm1.getState() == false && arm1.getTargetPosition() < arm1.getCurrentPosition()) {
+            RobotLog.d("Arm1 checkups hit at: %d", arm1.getCurrentPosition());
+            arm1.setTargetPosition(arm1.getCurrentPosition());
         }
-
 // TODO: checkout why the safty bray works when not supposed to.
 //        int diff0 = Math.abs(arm0.getCurrentPosition() - posArm0);
 //        if (diff0 <= 5) {
@@ -172,11 +205,11 @@ public class ArmClass extends Thread {
 //        posArm1 = arm1.getCurrentPosition();
 //
 
-        if (opMode != null) {
-            opMode.telemetry.addData("Arms Switch", "Arm0:(%b), Arm1:(%b)", zeroArm0.getState(), zeroArm1.getState());
-            opMode.telemetry.addData("Arms", "Arm0 (%d), Arm1 (%d)", arm0.getCurrentPosition(), arm1.getCurrentPosition());
-            opMode.telemetry.update();
-        }
+//        if (opMode != null) {
+//            opMode.telemetry.addData("Arms Switch", "Arm0:(%b), Arm1:(%b)", zeroArm0.getState(), zeroArm1.getState());
+//            opMode.telemetry.addData("Arms", "Arm0 (%d), Arm1 (%d)", arm0.getCurrentPosition(), arm1.getCurrentPosition());
+//            opMode.telemetry.update();
+//        }
     }
 
     public void gootoo(int pos0, int pos1) throws InterruptedException {
@@ -185,22 +218,24 @@ public class ArmClass extends Thread {
 
         arm0.setTargetPosition(pos0);
         arm1.setTargetPosition(pos1);
-        while (arm0.isBusy()) {
+
+        RobotLog.d("Arm goto start to: Arm0:(%d)->(%d), Arm1(%d)->(%d)  ", arm0.getCurrentPosition(), arm0.getTargetPosition(), arm1.getCurrentPosition(), arm1.getTargetPosition());
+        while (arm0.isBusy() || arm1.isBusy()) {
             sleep(50);
+            RobotLog.d("Arm goto run at: Arm0:(%d), Arm1(%d)", arm0.getCurrentPosition(), arm1.getCurrentPosition());
             checkups();
         }
-        while (arm1.isBusy()) {
-            sleep(50);
-            checkups();
-        }
+
+        RobotLog.d("Arm goto complete at: Arm0:(%d), Arm1(%d)", arm0.getCurrentPosition(), arm1.getCurrentPosition());
     }
 
     public void pleaseDo(Mode newMode) {
         if (mode != Mode.MANUAL && mode != Mode.IDLE) {
-            interrupt();
+            RobotLog.d("Arm pleaseDo busy doing %s", mode.toString());
+            // interrupt();
             return;
         }
-        RobotLog.d("Arm pleaseDo");
+        RobotLog.d("Arm pleaseDo: %s", newMode.toString());
         mode = newMode;
         if (newMode != Mode.MANUAL || newMode != Mode.IDLE) {
             start();
@@ -217,7 +252,7 @@ public class ArmClass extends Thread {
     @Override
     public void run() {
         try {
-            power = 0.4; // TODO: remove
+            power = 0.8;
             setModeArm(false);
             switch (mode) {
                 case HOME:
@@ -233,20 +268,27 @@ public class ArmClass extends Thread {
                     RobotLog.d("Arm do: PICK");
                     rotateClamp(false);
                     if (driveClass != null) {
-                        RobotLog.d("Arm do: PICK - Rollers");
+                        RobotLog.d("Arm do: PICK - Open Rollers");
                         rollersState = driveClass.getRollersPower();
                         driveClass.rollersRunIn();
                         driveClass.rollers(true);
                     }
-                    gootoo(500, 0);
+                    RobotLog.d("Arm do: PICK - Open clamp");
                     clamp(true);
+                    RobotLog.d("Arm do: PICK - Go above");
+                    gootoo(500, 0);
+                    RobotLog.d("Arm do: PICK - Go down");
                     gootoo(-200, -200);
                     clamp(false);
                     if (driveClass != null) {
-                        if (rollersState == 0)
+                        if (rollersState == 0) {
+                            RobotLog.d("Arm PICK - Roller stop");
                             driveClass.rollersStop();
+                        }
                     }
-                    sleep(1000);
+                    RobotLog.d("Arm do: before sleep");
+                    sleep(700);
+                    RobotLog.d("Arm do: after sleep");
                     gootoo(400, 0);
                     RobotLog.d("Arm do: PICK/");
                     break;
@@ -257,31 +299,48 @@ public class ArmClass extends Thread {
                         gootoo(300, 0);
 
                     switch (currFloor) {
+                        case 0:
                         case 1:
-                            gootoo(305, 435);
+                            RobotLog.d("Arm do: BUILD - floor 1");
+                            gootoo(400, 610);
                             break;
                         case 2:
-                            gootoo(720, 490);
+                            RobotLog.d("Arm do: BUILD - floor 2");
+                            gootoo(930, 10);
+                            gootoo(930, 600);
+                            gootoo(700, 730);
                             break;
                         case 3:
-                            gootoo(1025, 530);
+                            RobotLog.d("Arm do: BUILD - floor 3");
+                            gootoo(1260, 80);
+                            gootoo(1030, 760);
                             break;
                         case 4:
-                            gootoo(1225, 855);
+                            RobotLog.d("Arm do: BUILD - floor 4");
+                            gootoo(1630, 180);
+                            gootoo(1280, 870);
                             break;
                         case 5:
-                            gootoo(1535, 835);
+                            RobotLog.d("Arm do: BUILD - floor 5");
+                            gootoo(1870, 540);
+                            gootoo(1485, 900);
                             break;
                         case 6:
-//                            gootoo(600, 600);
+                            RobotLog.d("Arm do: BUILD - floor 6");
+                            gootoo(3000, 510);
+                            gootoo(3700, 540);
                             break;
                         case 7:
-//                            gootoo(700, 700);
+                            RobotLog.d("Arm do: BUILD - floor 7");
+                            gootoo(3000, 800);
+                            gootoo(3615, 820);
                             break;
                         case 8:
-//                            gootoo(800, 800);
+                            RobotLog.d("Arm do: BUILD - floor 8");
+                            gootoo(3000, 900);
                             break;
                         default:
+                            RobotLog.d("Arm do: BUILD - NO floor");
                             break;
                     }
 
@@ -296,8 +355,9 @@ public class ArmClass extends Thread {
         } catch (Exception e) {
             RobotLog.logStackTrace(e);
         }
-        power = 1; // TODO: remove
+        power = 1;
         setModeArm(true);
+        RobotLog.d("Arm Thread complete");
         mode = Mode.MANUAL;
     }
 
@@ -335,20 +395,18 @@ public class ArmClass extends Thread {
         return zeroArm1.getState();
     }
 
-    public void floorPlus(){
-        if (currFloor >= 8){
+    public void floorPlus() {
+        if (currFloor >= 8) {
             currFloor = 8;
-        }
-        else{
+        } else {
             currFloor++;
         }
     }
 
-    public void floorMinus(){
-        if (currFloor <= 1){
+    public void floorMinus() {
+        if (currFloor <= 1) {
             currFloor = 1;
-        }
-        else{
+        } else {
             currFloor--;
         }
     }

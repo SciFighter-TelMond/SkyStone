@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
+//import java.util.random;    I TOLD YOU SO
 
 import org.firstinspires.ftc.robotcore.external.android.AndroidTextToSpeech;
 
@@ -119,10 +120,11 @@ public class LinearDrive extends LinearOpMode {
                 arm.reset();
             }
 
-            armDoHome.update(gamepad2.x && gamepad2.dpad_down);
-            armDoPick.update(gamepad2.y && gamepad2.dpad_left);
-            armDoBuild.update(gamepad2.y && gamepad2.dpad_right);
-            armFloorUp.update(gamepad2.y && gamepad2.dpad_up);
+            armDoHome.update(   gamepad2.x && gamepad2.dpad_down);
+
+            armDoPick.update(   gamepad2.y && gamepad2.dpad_left);
+            armDoBuild.update(  gamepad2.y && gamepad2.dpad_right);
+            armFloorUp.update(  gamepad2.y && gamepad2.dpad_up);
             armFloorDown.update(gamepad2.y && gamepad2.dpad_down);
 
             if (armDoHome.isClicked()) {
@@ -189,6 +191,7 @@ public class LinearDrive extends LinearOpMode {
 
             //if (hooksState.getState()) telemetry.addData("Hooks", "ON");
             telemetry.update();
+            sleep(5);
         } // end of if (opModeisActive)
         arm.end();
         drive.end();
