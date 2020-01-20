@@ -36,6 +36,7 @@ public class DriveClass {
 
     volatile private Servo l_roller_servo = null;
     volatile private Servo r_roller_servo = null;
+    volatile public Toggle rollerServoState = new Toggle();
 
     volatile private Toggle boostState = new Toggle();
     volatile private Toggle hooksState = new Toggle();
@@ -459,15 +460,21 @@ public class DriveClass {
         return hooksState.getState();
     }
 
+    public boolean getRollersState(){return rollerServoState.getState();}
+
     public void rollers(boolean open) {
-        if (open) {
-            // r_roller.setPower(1);
-            // l_roller.setPower(1);
+        if (open  ) {
+
             r_roller_servo.setPosition(1);
             l_roller_servo.setPosition(0);
-        } else {
+            rollerServoState.set(true);
+
+        }else
+
+        {
             r_roller_servo.setPosition(0);
             l_roller_servo.setPosition(1);
+            rollerServoState.set(false);
         }
     }
 

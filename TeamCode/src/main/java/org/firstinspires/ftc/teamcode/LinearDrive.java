@@ -24,7 +24,7 @@ public class LinearDrive extends LinearOpMode {
     private Toggle hooksState = new Toggle();
     private Toggle rollersRunIn = new Toggle();
     private Toggle rollersRunOut = new Toggle();
-    private Toggle rollerServoState = new Toggle();
+
     private Toggle clamps = new Toggle();
     private Toggle clamps_rotate = new Toggle();
 
@@ -162,9 +162,9 @@ public class LinearDrive extends LinearOpMode {
             // Rollers Control
             // =========================================
             boolean rollerBtl = gamepad1.left_bumper || (gamepad2.x && gamepad2.dpad_up);
-            rollerServoState.update(rollerBtl);
-            if (rollerServoState.isChanged())
-                drive.rollers(rollerServoState.getState());
+            drive.rollerServoState.update(rollerBtl);
+            if (drive.rollerServoState.isChanged())
+                drive.rollers(drive.rollerServoState.getState());
 
             stoneBumperToggle.update(drive.getStoneBumperState());
             rollersRunIn.update(gamepad1.dpad_down);
