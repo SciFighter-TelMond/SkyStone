@@ -12,6 +12,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 
 /**
@@ -56,6 +57,7 @@ public class DriveClass {
     /* local OpMode members. */
     volatile private LinearOpMode opMode = null;
     volatile private HardwareMap hwMap = null;
+
 
     public enum Direction {LEFT, RIGHT, FORWARD, REVERSE};
 
@@ -141,7 +143,11 @@ public class DriveClass {
     }
 
     // ==================================================================================================
-    public void drive(double straight, double side, double turn, double speedTrigger, double turnTrigger) {
+    public void driveTo(double x, double y, double z, Orientation rotation) {
+
+    }
+
+        public void drive(double straight, double side, double turn, double speedTrigger, double turnTrigger) {
 
         double speedBoost = speedTrigger * 0.5 + 0.5;
         double turnBoost = turnTrigger * 0.5 + 0.5;
