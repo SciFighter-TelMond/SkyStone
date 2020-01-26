@@ -615,14 +615,14 @@ public class DriveClass {
     //Autonomous Functions
     //===============================================================================================================================================================================================================================================
 
+    public enum Alliance {BLUE, RED};
 
-
-    public void AUTOfoundationBridge(String team){
+    public void AUTOfoundationBridge(Alliance team,boolean wall){
         int mul = 0;
-        if (team == "blue"){
+        if (team == Alliance.BLUE){
             mul = 1;
         }
-        if (team == "red"){
+        if (team == Alliance.RED){
             mul = -1;
         }
 
@@ -660,7 +660,16 @@ public class DriveClass {
         straight(1.2, Direction.FORWARD, 0.9, 3);
         // Step 6: drive to the side - park under the bridge
         straight(0.4, Direction.REVERSE, 0.5, 2);
-        side(2.4 * mul, Direction.LEFT, 0.9, 3);
+        side(2.1 * mul, Direction.LEFT, 0.9, 3);
+
+        if (wall == false){
+            side(0.3 * mul, Direction.LEFT, 0.9, 3);
+        }
+
+        if (wall == true){
+            straight(0.7, DriveClass.Direction.FORWARD, 0.5, 2);
+            side(0.3 * mul, Direction.LEFT, 0.9, 3);
+        }
     }
 
 
