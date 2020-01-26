@@ -605,6 +605,91 @@ public class DriveClass {
         opMode.telemetry.addData("Red:","%b - H: %03.02f, [R:%1.0f, G:%1.0f, B:%1.0f, A:%1.0f]", blue,hue,r,g,b,a );
         return blue;
     }
+
+
+
+
+
+
+    //===============================================================================================================================================================================================================================================
+    //Autonomous Functions
+    //===============================================================================================================================================================================================================================================
+
+
+
+    public void AUTOfoundationBridge(String team){
+        int mul = 0;
+        if (team == "blue"){
+            mul = 1;
+        }
+        if (team == "red"){
+            mul = -1;
+        }
+
+        side(0.6 * mul, Direction.RIGHT, 0.7, 3);
+        straight(1.3, Direction.REVERSE, 0.7, 4);
+        straight(0.5, Direction.REVERSE, 0.2, 5);
+
+        // sleep(200);
+        // Step 2: should be in front of the foundation, hooks down
+        drive(-0.2,0 * mul,0,0,0);
+        hooksDown();
+        opMode.sleep(500);
+        stop();
+        // Step 3: drag the foundation to the wall
+        straight(1.8, Direction.FORWARD, 0.7, 3);
+
+        // Step 4: set the foundation free
+        hooksUp();
+        opMode.sleep(100);
+        /////////////////////////////////////////////////////////////////////////////////////
+        // Step 5: a)go to the side of the foundation b)push it to the wall c)go in front of the foundation d) move it to the wall
+        //  |
+        // a|    <---|
+        //  |b ^|---->
+        //  V-->|  c
+        //      |
+        //======V==============||||||||||||========================
+        //
+        /////////////////////////////////////////////////////////////////////////////////////
+        side(1.44 * mul, Direction.LEFT, 0.9, 3);
+        straight(1.1, Direction.REVERSE, 0.9, 3);
+        side(0.5 * mul, Direction.RIGHT, 0.9, 3);
+        straight(0.8, Direction.REVERSE, 0.9, 3);
+        side(1.1 * mul, Direction.RIGHT, 0.9, 3);
+        straight(1.2, Direction.FORWARD, 0.9, 3);
+        // Step 6: drive to the side - park under the bridge
+        straight(0.4, Direction.REVERSE, 0.5, 2);
+        side(2.4 * mul, Direction.LEFT, 0.9, 3);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 

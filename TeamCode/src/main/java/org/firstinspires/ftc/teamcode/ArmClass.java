@@ -200,7 +200,7 @@ public class ArmClass extends Thread {
 //            arm1.setTargetPosition(arm1.getCurrentPosition());
 //            opMode.telemetry.addData("BRAKE", "Arm1 diff %d", diff1);
 //        }
-//
+
 //        posArm0 = arm0.getCurrentPosition();
 //        posArm1 = arm1.getCurrentPosition();
 //
@@ -302,28 +302,26 @@ public class ArmClass extends Thread {
                         case 0:
                         case 1:
                             RobotLog.d("Arm do: BUILD - floor 1");
-                            gootoo(400, 610);
+                            gootoo(490, 405);
                             break;
                         case 2:
                             RobotLog.d("Arm do: BUILD - floor 2");
-                            gootoo(930, 10);
-                            gootoo(930, 600);
-                            gootoo(700, 730);
+                            gootoo(830, 500);
                             break;
                         case 3:
                             RobotLog.d("Arm do: BUILD - floor 3");
-                            gootoo(1260, 80);
-                            gootoo(1030, 760);
+                            gootoo(1700, 0);
+                            gootoo(1116, 540);
                             break;
                         case 4:
                             RobotLog.d("Arm do: BUILD - floor 4");
-                            gootoo(1630, 180);
-                            gootoo(1280, 870);
+                            gootoo(2060, 18);
+                            gootoo(1430, 727);
                             break;
                         case 5:
                             RobotLog.d("Arm do: BUILD - floor 5");
-                            gootoo(1870, 540);
-                            gootoo(1485, 900);
+                            gootoo(2300, 400);
+                            gootoo(1600, 900);
                             break;
                         case 6:
                             RobotLog.d("Arm do: BUILD - floor 6");
