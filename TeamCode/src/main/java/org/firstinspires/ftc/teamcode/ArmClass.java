@@ -200,7 +200,7 @@ public class ArmClass extends Thread {
 //            arm1.setTargetPosition(arm1.getCurrentPosition());
 //            opMode.telemetry.addData("BRAKE", "Arm1 diff %d", diff1);
 //        }
-
+//
 //        posArm0 = arm0.getCurrentPosition();
 //        posArm1 = arm1.getCurrentPosition();
 //
@@ -302,9 +302,7 @@ public class ArmClass extends Thread {
                         case 0:
                         case 1:
                             RobotLog.d("Arm do: BUILD - floor 1");
-                            gootoo(835, 460);
-                            sleep(100);
-                            gootoo(300,490);
+                            gootoo(835, 360);
                             break;
                         case 2:
                             RobotLog.d("Arm do: BUILD - floor 2");
