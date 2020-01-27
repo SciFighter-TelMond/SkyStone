@@ -652,23 +652,23 @@ public class DriveClass {
         //======V==============||||||||||||========================
         //
         /////////////////////////////////////////////////////////////////////////////////////
-        side(1.44 * mul, Direction.LEFT, 0.9, 3);
-        straight(1.1, Direction.REVERSE, 0.9, 3);
-        side(0.5 * mul, Direction.RIGHT, 0.9, 3);
+        side(1.6 * mul, Direction.LEFT, 0.7, 3);
+        straight(1.0, Direction.REVERSE, 0.8, 3);
+        side(0.9 * mul, Direction.RIGHT, 0.9, 3);
         straight(0.8, Direction.REVERSE, 0.9, 3);
         side(1.1 * mul, Direction.RIGHT, 0.9, 3);
         straight(1.2, Direction.FORWARD, 0.9, 3);
         // Step 6: drive to the side - park under the bridge
-        straight(0.4, Direction.REVERSE, 0.5, 2);
-        side(2.1 * mul, Direction.LEFT, 0.9, 3);
 
         if (wall == false){
-            side(0.3 * mul, Direction.LEFT, 0.9, 3);
+            straight(0.4, Direction.REVERSE, 0.5, 2);
+            side(2.4 * mul, Direction.LEFT, 0.9, 3);
         }
 
         if (wall == true){
-            straight(0.7, DriveClass.Direction.FORWARD, 0.5, 2);
-            side(0.3 * mul, Direction.LEFT, 0.9, 3);
+            side(1.5 * mul, Direction.LEFT, 0.9, 3);
+            straight(0.9, DriveClass.Direction.FORWARD, 0.5, 2);
+            side(0.9 * mul, Direction.LEFT, 0.9, 3);
         }
     }
 
