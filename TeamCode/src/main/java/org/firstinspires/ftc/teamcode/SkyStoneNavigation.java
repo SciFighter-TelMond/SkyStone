@@ -131,6 +131,7 @@ public class SkyStoneNavigation extends LinearOpMode {
     private static final float bridgeRotY = 59;                                 // Units are degrees
     private static final float bridgeRotZ = 180;
 
+
     // Constants for perimeter targets
     private static final float halfField = 72 * mmPerInch;
     private static final float quadField  = 36 * mmPerInch;
@@ -175,21 +176,21 @@ public class SkyStoneNavigation extends LinearOpMode {
         VuforiaTrackable blueFrontBridge = targetsSkyStone.get(4);
         blueFrontBridge.setName("Blue Front Bridge");
         VuforiaTrackable red1 = targetsSkyStone.get(5);
-        red1.setName("Red Perimeter 1");
+        red1.setName("Red Perimeter 1");//43.5,-60,5
         VuforiaTrackable red2 = targetsSkyStone.get(6);
-        red2.setName("Red Perimeter 2");
+        red2.setName("Red Perimeter 2");//-28, -60,5
         VuforiaTrackable front1 = targetsSkyStone.get(7);
-        front1.setName("Front Perimeter 1");
+        front1.setName("Front Perimeter 1");//-60,-43,5.5
         VuforiaTrackable front2 = targetsSkyStone.get(8);
-        front2.setName("Front Perimeter 2");
+        front2.setName("Front Perimeter 2");//-60, 28.5, 5.5
         VuforiaTrackable blue1 = targetsSkyStone.get(9);
-        blue1.setName("Blue Perimeter 1");
+        blue1.setName("Blue Perimeter 1");//-44.5, 60,6
         VuforiaTrackable blue2 = targetsSkyStone.get(10);
-        blue2.setName("Blue Perimeter 2");
+        blue2.setName("Blue Perimeter 2");//28.5, 60.5, 6
         VuforiaTrackable rear1 = targetsSkyStone.get(11);
-        rear1.setName("Rear Perimeter 1");
+        rear1.setName("Rear Perimeter 1");//60.5, 43.5, 5.5
         VuforiaTrackable rear2 = targetsSkyStone.get(12);
-        rear2.setName("Rear Perimeter 2");
+        rear2.setName("Rear Perimeter 2");//60, -27.5, 6
 
         // For convenience, gather together all the trackable objects in one easily-iterable collection */
         List<VuforiaTrackable> allTrackables = new ArrayList<VuforiaTrackable>();

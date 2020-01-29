@@ -77,7 +77,7 @@ public class Auto_red_loading_skystons extends LinearOpMode {
         try {
 
             //robot.side(0.6, DriveClass.Direction.RIGHT, 1, 3);
-            arm.gootoo(250, 0);
+            arm.gootoo(250, 80);
             arm.rotateClamp(true);
             arm.clamp(true);
             robot.straight(1, DriveClass.Direction.FORWARD, 0.7, 4);
@@ -110,7 +110,8 @@ public class Auto_red_loading_skystons extends LinearOpMode {
             robot.stop();}
 
             // catch STONE
-            arm.gootoo(90, 430);
+            arm.gootoo(150, 430);
+            arm.gootoo(50, 430);
             arm.clamp(false);
             sleep(500);
             arm.gootoo(300, 300);
@@ -128,7 +129,7 @@ public class Auto_red_loading_skystons extends LinearOpMode {
             robot.stop();
 
             // slide RIGHT to put stone
-            robot.side(0.7, DriveClass.Direction.RIGHT,0.5,2);
+            robot.side(2.3, DriveClass.Direction.RIGHT,0.5,2);
             robot.straight(0.2, DriveClass.Direction.FORWARD,0.5,1);
             robot.stop();
 
@@ -137,12 +138,12 @@ public class Auto_red_loading_skystons extends LinearOpMode {
             arm.gootoo(300,0);
 
             arm.clamp(false);
-
+            sleep(500);
             //arm.gootoo(,0);
 
-
+            arm.gootoo(300,0);
             // drive LEFT : beck to line.
-            robot.drive(0,-0.5,0,0,0);
+            robot.drive(0,-2.3,0,0,0);
             timer.reset();
             while (!robot.isRed() && opModeIsActive() && timer.seconds()<2) {
                 //telemetry.update();
