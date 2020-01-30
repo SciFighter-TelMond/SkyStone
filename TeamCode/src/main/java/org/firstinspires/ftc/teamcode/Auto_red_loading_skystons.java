@@ -77,9 +77,12 @@ public class Auto_red_loading_skystons extends LinearOpMode {
         try {
 
             //robot.side(0.6, DriveClass.Direction.RIGHT, 1, 3);
-            arm.gootoo(250, 80);
+            robot.rollers(true);
+            arm.gootoo(515, 0);
+            robot.rollers(false);
             arm.rotateClamp(true);
             arm.clamp(true);
+            arm.gootoo(515, 260);
             robot.straight(1, DriveClass.Direction.FORWARD, 0.7, 4);
 
             // drive straight close to stones
@@ -110,11 +113,11 @@ public class Auto_red_loading_skystons extends LinearOpMode {
             robot.stop();}
 
             // catch STONE
-            arm.gootoo(150, 430);
-            arm.gootoo(50, 430);
+            arm.gootoo(50, 260);
+            //arm.gootoo(50, 430);
             arm.clamp(false);
             sleep(500);
-            arm.gootoo(300, 300);
+            arm.gootoo(445, 260);
 
             // drive backwards
             robot.straight(0.3, DriveClass.Direction.REVERSE,0.5,1);
@@ -129,13 +132,13 @@ public class Auto_red_loading_skystons extends LinearOpMode {
             robot.stop();
 
             // slide RIGHT to put stone
-            robot.side(2.3, DriveClass.Direction.RIGHT,0.5,2);
-            robot.straight(0.2, DriveClass.Direction.FORWARD,0.5,1);
+            robot.side(2.5, DriveClass.Direction.RIGHT,0.5,2);
+           // robot.straight(0.2, DriveClass.Direction.FORWARD,0.5,1);
             robot.stop();
-
+            arm.gootoo(445, 1000);
             arm.clamp(true);
 
-            arm.gootoo(300,0);
+            arm.gootoo(445,260);
 
             arm.clamp(false);
             sleep(500);
