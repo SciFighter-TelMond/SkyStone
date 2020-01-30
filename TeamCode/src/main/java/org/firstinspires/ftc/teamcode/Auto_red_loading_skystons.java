@@ -109,18 +109,17 @@ public class Auto_red_loading_skystons extends LinearOpMode {
             else
             {
             // drive LEFT one block
-            robot.side(0.32, DriveClass.Direction.LEFT, 0.4, 2);
+            robot.side(0.3, DriveClass.Direction.LEFT, 0.4, 2);
             robot.stop();}
 
             // catch STONE
-            arm.gootoo(50, 260);
-            //arm.gootoo(50, 430);
+            arm.gootoo(50, 400);
             arm.clamp(false);
-            sleep(500);
+            sleep(1000);
             arm.gootoo(445, 260);
 
             // drive backwards
-            robot.straight(0.3, DriveClass.Direction.REVERSE,0.5,1);
+            robot.straight(0.2, DriveClass.Direction.REVERSE,0.5,1);
 
             // drive RIGHT : search for red line (under the brig)
             robot.drive(0,0.7,0,0,0);
@@ -132,8 +131,7 @@ public class Auto_red_loading_skystons extends LinearOpMode {
             robot.stop();
 
             // slide RIGHT to put stone
-            robot.side(2.5, DriveClass.Direction.RIGHT,0.5,2);
-           // robot.straight(0.2, DriveClass.Direction.FORWARD,0.5,1);
+            robot.side(2.5, DriveClass.Direction.RIGHT,0.5,5);
             robot.stop();
             arm.gootoo(445, 1000);
             arm.clamp(true);
@@ -142,16 +140,19 @@ public class Auto_red_loading_skystons extends LinearOpMode {
 
             arm.clamp(false);
             sleep(500);
-            //arm.gootoo(,0);
+
 
             arm.gootoo(300,0);
             // drive LEFT : beck to line.
-            robot.drive(0,-2.3,0,0,0);
+            robot.drive(0,-0.7,0,0,0);
             timer.reset();
             while (!robot.isRed() && opModeIsActive() && timer.seconds()<2) {
                 //telemetry.update();
                 sleep(1);
             }
+
+            arm.pleaseDo(ArmClass.Mode.HOME);
+
 
             robot.stop();
             while (opModeIsActive() && (runtime.seconds() < 30)) {
@@ -163,7 +164,6 @@ public class Auto_red_loading_skystons extends LinearOpMode {
         } catch (InterruptedException e) {
             RobotLog.d("Arm Thread interrupted!");
         }
-
         robot.end();
         arm.end();
     }
