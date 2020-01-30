@@ -151,7 +151,10 @@ public class DriveClass {
 
         double speedBoost = speedTrigger * 0.5 + 0.5;
         double turnBoost = turnTrigger * 0.5 + 0.5;
-
+            if (turnTrigger > 0.4 && speedTrigger > 0.4) {
+                speedBoost = 1;
+                turnBoost = 1;
+            }
         double fl_power = (straight + side) * speedBoost + turn * turnBoost;
         double fr_power = (straight - side) * speedBoost - turn * turnBoost;
         double bl_power = (straight - side) * speedBoost + turn * turnBoost;
@@ -164,7 +167,6 @@ public class DriveClass {
             bl_power /= m;
             br_power /= m;
         }
-
         boolean oldMode = fl_Drive.getMode() == DcMotor.RunMode.RUN_TO_POSITION;
         boostState.update(speedTrigger > 0.7 || turnTrigger > 0.85);
         if (boostState.isChanged() || oldMode) {
