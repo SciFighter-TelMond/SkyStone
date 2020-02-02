@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
@@ -59,7 +60,8 @@ public class DriveClass {
     volatile private HardwareMap hwMap = null;
 
 
-    public enum Direction {LEFT, RIGHT, FORWARD, REVERSE};
+    public enum Direction { LEFT, RIGHT, FORWARD, REVERSE };
+    public enum Location { LEFT, RIGHT };
 
     private boolean useBrake;
 
@@ -529,11 +531,27 @@ public class DriveClass {
         return sensorDistanceLeft.getDistance(DistanceUnit.CM);
     }
 
+    public double getSensorDistance(Location location) {
+        if (location == Location.LEFT) {
+            return getSensorDistanceLeft();
+        } else {
+            return getSensorDistanceRight();
+        }
+    }
+
     public boolean isSkyStoneRight() {
         return isSkyStone(sensorColorRight);
     }
     public boolean isSkyStoneLeft(){
         return isSkyStone(sensorColorLeft);
+    }
+
+    public boolean isSkystone(Location location) {
+        if (location == Location.LEFT) {
+            return isSkyStoneLeft();
+        } else {
+            return isSkyStoneRight();
+        }
     }
 
     boolean isSkyStone(ColorSensor sensor) {
@@ -678,6 +696,144 @@ public class DriveClass {
 
 
 
+
+    public void AUTOskystone(Alliance team,Location location,ArmClass arm){
+        ElapsedTime timer = new ElapsedTime();
+        int mul = 0;
+        if (team == Alliance.BLUE){
+            mul = -1;
+        }
+        if (team == Alliance.RED){
+            mul = 1;
+        }
+        try {
+
+            //robot.side(0.6, DriveClass.Direction.RIGHT, 1, 3);
+            rollers(true);
+            arm.gootoo(515, 0);
+            rollers(false);
+            arm.rotateClamp(true);
+            arm.clamp(true);
+            arm.gootoo(515, 300);
+            straight(1.2, DriveClass.Direction.FORWARD, 0.7, 4);
+
+            // drive straight close to stones
+            drive(0.35, 0, 0, 0, 0);
+            timer.reset();
+            while (getSensorDistance(location) > 3  && timer.seconds() < 5) {
+                opMode.sleep(10);
+            }
+            stop();
+
+            // drive LEFT : search for SkyStone
+            drive(0, -0.8, 0, 0, 0);
+            timer.reset();
+            while (!isSkystone(location) && timer.seconds()<10) {
+                opMode.sleep(10);
+            }
+
+            // drive LEFT one block
+            side(0.25 * mul, DriveClass.Direction.LEFT, 0.4, 2);
+            stop();
+
+            // catch STONE
+            arm.gootoo(50, 400);
+            arm.clamp(false); // close clamps
+            opMode.sleep(1000); // wait for clamps to close
+            arm.gootoo(400, 260);
+
+            // drive backwards
+            straight(0.25, DriveClass.Direction.REVERSE,0.5,1);
+
+//            // drive RIGHT : search for red line (under the brig)
+//            robot.drive(0,0.8,0,0,0);
+//            timer.reset();
+//            while (!robot.isRed() && opModeIsActive() && timer.seconds()<8) {
+//                // telemetry.update();
+//                sleep(1);
+//            }
+//            robot.stop();
+
+            // slide RIGHT to put stone
+            side(2.5 * mul, DriveClass.Direction.RIGHT,1,8);
+            // robot.stop();
+
+            // Put down stone.
+            //    arm.gootoo(445, 1000);
+            arm.clamp(true);
+            //     arm.gootoo(445,260);
+            //    arm.gootoo(300,0);
+
+            // ============= Second sky stone ===================
+            side(2.75 * mul, DriveClass.Direction.LEFT,1,8);
+
+            arm.gootoo(515, 300);
+            straight(0.2, DriveClass.Direction.FORWARD, 0.5, 1);
+
+            // drive straight close to stones
+            drive(0.35, 0 * mul, 0, 0, 0);
+            timer.reset();
+            while (getSensorDistance(location) > 3 && timer.seconds() < 5) {
+                opMode.sleep(10);
+            }
+            stop();
+
+            // drive LEFT : search for SkyStone
+            drive(0, -0.8 * mul, 0, 0, 0);
+            timer.reset();
+            while (!isSkystone(location) && timer.seconds()<10) {
+                opMode.sleep(10);
+            }
+
+            // drive LEFT one block
+            side(0.3 * mul, DriveClass.Direction.LEFT, 0.4, 2);
+            //  robot.stop();
+
+            // catch STONE
+            arm.gootoo(50, 400);
+            arm.clamp(false);
+            opMode.sleep(1000);
+            arm.gootoo(400, 260);
+
+            // drive backwards
+            straight(0.3, DriveClass.Direction.REVERSE,0.5,1);
+
+//            // drive RIGHT : search for red line (under the brig)
+//            robot.drive(0,0.7,0,0,0);
+//            timer.reset();
+//            while (!robot.isRed() && opModeIsActive() && timer.seconds()<8) {
+//                // telemetry.update();
+//                sleep(1);
+//            }
+//            robot.stop();
+
+            // slide RIGHT to put stone
+            side(3.7 * mul, DriveClass.Direction.RIGHT,1,8);
+            //    robot.stop();
+
+            // arm.gootoo(445, 1000);
+            arm.clamp(true);
+            //  arm.gootoo(445,260);
+            //   arm.clamp(false);
+            //   arm.gootoo(300,0);
+
+            // drive LEFT : back to line.
+            drive(0,-0.4 * mul,0,0,0);
+            timer.reset();
+            while (!isRed() && timer.seconds()<2) {
+                //telemetry.update();
+                opMode.sleep(1);
+            }
+
+            arm.linearDo(ArmClass.Mode.HOME);
+
+
+            stop();
+
+        } catch (InterruptedException e) {
+            RobotLog.d("Arm Thread interrupted!");
+        }
+    }
 
 
 
