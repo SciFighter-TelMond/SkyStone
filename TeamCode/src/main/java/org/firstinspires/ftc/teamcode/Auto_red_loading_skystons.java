@@ -41,7 +41,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 /**
  */
 
-@Autonomous(name="Red Sky-Stone", group="SciFighterd")// moving the blue foundation. you are in the blue team.
+@Autonomous(name="Red Sky-Stone", group="SciFighters")// moving the blue foundation. you are in the blue team.
 //@Disabled
 public class Auto_red_loading_skystons extends LinearOpMode {
 
@@ -50,7 +50,7 @@ public class Auto_red_loading_skystons extends LinearOpMode {
     private ArmClass arm = new ArmClass(this, robot);
 
     private ElapsedTime runtime = new ElapsedTime();
-    private ElapsedTime timer = new ElapsedTime();
+
 
     @Override
     public void runOpMode() {
@@ -74,95 +74,7 @@ public class Auto_red_loading_skystons extends LinearOpMode {
 
         runtime.reset();
 
-        try {
-
-            //robot.side(0.6, DriveClass.Direction.RIGHT, 1, 3);
-            robot.rollers(true);
-            arm.gootoo(515, 0);
-            robot.rollers(false);
-            arm.rotateClamp(true);
-            arm.clamp(true);
-            arm.gootoo(515, 260);
-            robot.straight(1, DriveClass.Direction.FORWARD, 0.7, 4);
-
-            // drive straight close to stones
-            robot.drive(0.3, 0, 0, 0, 0);
-            timer.reset();
-            while (robot.getSensorDistanceLeft() > 3 && opModeIsActive() && timer.seconds() < 5) {
-                telemetry.addData("Dist  ", robot.getSensorDistanceLeft());
-                telemetry.update();
-                sleep(10);
-            }
-            robot.stop();
-
-            // drive LEFT : search for SkyStone
-            robot.drive(0, -0.8, 0, 0, 0);
-            timer.reset();
-            while (!robot.isSkyStoneLeft() && opModeIsActive() && timer.seconds()<10) {
-                telemetry.update();
-                sleep(10);
-            }
-
-            if(timer.seconds()<1) {
-                robot.side(0.20, DriveClass.Direction.LEFT, 0.4, 2);
-            }
-            else
-            {
-            // drive LEFT one block
-            robot.side(0.32, DriveClass.Direction.LEFT, 0.4, 2);
-            robot.stop();}
-
-            // catch STONE
-            arm.gootoo(50, 260);
-            //arm.gootoo(50, 430);
-            arm.clamp(false);
-            sleep(500);
-            arm.gootoo(445, 260);
-
-            // drive backwards
-            robot.straight(0.3, DriveClass.Direction.REVERSE,0.5,1);
-
-            // drive RIGHT : search for red line (under the brig)
-            robot.drive(0,0.7,0,0,0);
-            timer.reset();
-            while (!robot.isRed() && opModeIsActive() && timer.seconds()<8) {
-                // telemetry.update();
-                sleep(1);
-            }
-            robot.stop();
-
-            // slide RIGHT to put stone
-            robot.side(2.5, DriveClass.Direction.RIGHT,0.5,2);
-           // robot.straight(0.2, DriveClass.Direction.FORWARD,0.5,1);
-            robot.stop();
-            arm.gootoo(445, 1000);
-            arm.clamp(true);
-
-            arm.gootoo(445,260);
-
-            arm.clamp(false);
-            sleep(500);
-            //arm.gootoo(,0);
-
-            arm.gootoo(300,0);
-            // drive LEFT : beck to line.
-            robot.drive(0,-2.3,0,0,0);
-            timer.reset();
-            while (!robot.isRed() && opModeIsActive() && timer.seconds()<2) {
-                //telemetry.update();
-                sleep(1);
-            }
-
-            robot.stop();
-            while (opModeIsActive() && (runtime.seconds() < 30)) {
-                robot.isRed();
-                telemetry.update();
-            }
-
-            robot.stop();
-        } catch (InterruptedException e) {
-            RobotLog.d("Arm Thread interrupted!");
-        }
+        robot.AUTOskystone(DriveClass.Alliance.RED,DriveClass.Location.LEFT,arm);
 
         robot.end();
         arm.end();

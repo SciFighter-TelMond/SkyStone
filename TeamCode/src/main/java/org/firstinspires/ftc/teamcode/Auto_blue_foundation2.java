@@ -57,7 +57,7 @@ import org.firstinspires.ftc.robotcore.external.android.AndroidTextToSpeech;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Blue Foundation 2 park side", group="SciFighterd")// moving the blue foundation. you are in the blue team.
+@Autonomous(name="Blue Foundation 2 park side", group="SciFighters")// moving the blue foundation. you are in the blue team.
 @Disabled
 public class Auto_blue_foundation2 extends LinearOpMode {
 

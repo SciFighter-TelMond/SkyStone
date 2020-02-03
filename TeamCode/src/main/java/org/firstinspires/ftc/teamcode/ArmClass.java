@@ -68,8 +68,8 @@ public class ArmClass extends Thread {
         arm0.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         arm1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
-        arm0.setTargetPositionTolerance(20);
-        arm1.setTargetPositionTolerance(20);
+        arm0.setTargetPositionTolerance(15);
+        arm1.setTargetPositionTolerance(15);
 
 
         //==============================
@@ -83,12 +83,16 @@ public class ArmClass extends Thread {
         RobotLog.d(pidf1.toString()); // p=2.000000 i=0.500000 d=0.000000 f=11.100006
 
         // Arm 0
-        pidf0.p = 4;  pidf0.i = 3; pidf0.d = 0.1;
+        pidf0.p = 4;
+        pidf0.i = 3;
+        pidf0.d = 0.1;
         arm0.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidf0);
         arm0.setPositionPIDFCoefficients(7);
 
         // Arm 1
-        pidf1.p = 4;  pidf1.i = 3; pidf1.d = 0.1;
+        pidf1.p = 4;
+        pidf1.i = 3;
+        pidf1.d = 0.1;
         arm1.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidf1);
         arm1.setPositionPIDFCoefficients(7);
 
@@ -257,8 +261,12 @@ public class ArmClass extends Thread {
             switch (mode) {
                 case HOME:
                     RobotLog.d("Arm do: HOME");
-                    rotateClamp(true);
-                    gootoo(0, 0);
+                    gootoo(300, STAY);
+                    driveClass.rollers(true);
+                    sleep(500);
+                    gootoo(-200, -200);
+                    reset();
+                    driveClass.rollers(false);
                     RobotLog.d("Arm do: HOME/");
                     break;
 
@@ -267,24 +275,22 @@ public class ArmClass extends Thread {
                     double rollersState = 0;
                     RobotLog.d("Arm do: PICK");
                     rotateClamp(false);
-                    if (driveClass != null) {
-                        RobotLog.d("Arm do: PICK - Open Rollers");
-                        rollersState = driveClass.getRollersPower();
-                        driveClass.rollersRunIn();
-                        driveClass.rollers(true);
-                    }
+
                     RobotLog.d("Arm do: PICK - Open clamp");
                     clamp(true);
+                    RobotLog.d("Arm do: PICK - Open Rollers");
+                    rollersState = driveClass.getRollersPower();
+                    driveClass.rollersRunIn();
+                    driveClass.rollers(true);
+
                     RobotLog.d("Arm do: PICK - Go above");
                     gootoo(500, 0);
                     RobotLog.d("Arm do: PICK - Go down");
                     gootoo(-200, -200);
                     clamp(false);
-                    if (driveClass != null) {
-                        if (rollersState == 0) {
-                            RobotLog.d("Arm PICK - Roller stop");
-                            driveClass.rollersStop();
-                        }
+                    if (rollersState == 0) {
+                        RobotLog.d("Arm PICK - Roller stop");
+                        driveClass.rollersStop();
                     }
                     RobotLog.d("Arm do: before sleep");
                     sleep(700);
