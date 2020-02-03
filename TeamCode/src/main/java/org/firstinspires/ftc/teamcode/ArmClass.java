@@ -26,7 +26,7 @@ public class ArmClass extends Thread {
     volatile private double power = 1;
     volatile private double speed_boost = 0.5;
 
-    public enum Mode {IDLE, MANUAL, HOME, PICK, STRAIGHT, BUILD, DROP}
+    public enum Mode {IDLE, MANUAL, HOME, PICK, STRAIGHT, BUILD, DROP, SKY1, SKY2, SKY3}
 
     volatile private Mode mode = Mode.IDLE;
 
@@ -351,6 +351,24 @@ public class ArmClass extends Thread {
                     }
 
                     RobotLog.d("Arm do: BUILD/");
+                    break;
+
+                case SKY1:
+                    driveClass.rollers(true);
+                    gootoo(515, 0);
+                    sleep(500);
+                    driveClass.rollers(false);
+                    rotateClamp(true);
+                    clamp(true);
+                    gootoo(515, 300);
+                    break;
+
+                case SKY2:
+                    gootoo(400, 260);
+                    break;
+
+                case SKY3:
+                    gootoo(515, 300);
                     break;
 
                 default:

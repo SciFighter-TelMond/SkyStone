@@ -751,6 +751,10 @@ public class DriveClass {
     }
 
 
+
+
+
+
     public void AUTOskystone(Alliance team, Location location, ArmClass arm) {
         ElapsedTime timer = new ElapsedTime();
         int mul = 0;
@@ -763,19 +767,14 @@ public class DriveClass {
         try {
 
             //robot.side(0.6, DriveClass.Direction.RIGHT, 1, 3);
-            rollers(true);
-            arm.gootoo(515, 0);
-            rollers(false);
-            arm.rotateClamp(true);
-            arm.clamp(true);
-            arm.gootoo(515, 300);
-            straight(1.2, DriveClass.Direction.FORWARD, 0.7, 4);
+            arm.pleaseDo(ArmClass.Mode.SKY1);
+            straight(1.2, DriveClass.Direction.FORWARD, 1, 4);
 
             // drive straight close to stones
-            drive(0.35, 0, 0, 0, 0);
+            drive(0.4, 0, 0, 0, 0);
             timer.reset();
             while (getSensorDistance(location) > 3 && timer.seconds() < 5) {
-                opMode.sleep(10);
+                opMode.sleep(1);
             }
             stop();
 
@@ -783,18 +782,18 @@ public class DriveClass {
             drive(0, -0.8, 0, 0, 0);
             timer.reset();
             while (!isSkystone(location) && timer.seconds() < 10) {
-                opMode.sleep(10);
+                opMode.sleep(1);
             }
 
             // drive LEFT one block
-            side(0.25 * mul, DriveClass.Direction.LEFT, 0.4, 2);
+            side(0.25 * mul, DriveClass.Direction.LEFT, 0.5, 2);
             stop();
 
             // catch STONE
             arm.gootoo(50, 400);
             arm.clamp(false); // close clamps
-            opMode.sleep(1000); // wait for clamps to close
-            arm.gootoo(400, 260);
+            opMode.sleep(800); // wait for clamps to close
+            arm.pleaseDo(ArmClass.Mode.SKY2);
 
             // drive backwards
             straight(0.25, DriveClass.Direction.REVERSE, 0.5, 1);
@@ -821,14 +820,14 @@ public class DriveClass {
             // ============= Second sky stone ===================
             side(2.75 * mul, DriveClass.Direction.LEFT, 1, 8);
 
-            arm.gootoo(515, 300);
+            arm.pleaseDo(ArmClass.Mode.SKY3);
             straight(0.2, DriveClass.Direction.FORWARD, 0.5, 1);
 
             // drive straight close to stones
-            drive(0.35, 0 * mul, 0, 0, 0);
+            drive(0.4, 0 * mul, 0, 0, 0);
             timer.reset();
             while (getSensorDistance(location) > 3 && timer.seconds() < 5) {
-                opMode.sleep(10);
+                opMode.sleep(1);
             }
             stop();
 
@@ -836,7 +835,7 @@ public class DriveClass {
             drive(0, -0.8 * mul, 0, 0, 0);
             timer.reset();
             while (!isSkystone(location) && timer.seconds() < 10) {
-                opMode.sleep(10);
+                opMode.sleep(1);
             }
 
             // drive LEFT one block
@@ -847,7 +846,7 @@ public class DriveClass {
             arm.gootoo(50, 400);
             arm.clamp(false);
             opMode.sleep(1000);
-            arm.gootoo(400, 260);
+            arm.pleaseDo(ArmClass.Mode.SKY2);
 
             // drive backwards
             straight(0.3, DriveClass.Direction.REVERSE, 0.5, 1);
@@ -872,7 +871,7 @@ public class DriveClass {
             //   arm.gootoo(300,0);
 
             // drive LEFT : back to line.
-            drive(0, -0.4 * mul, 0, 0, 0);
+            drive(0, -0.3 * mul, 0, 0, 0);
             timer.reset();
             while (!isRed() && timer.seconds() < 2) {
                 //telemetry.update();
