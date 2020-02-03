@@ -652,22 +652,22 @@ public class DriveClass {
         return blue;
     }
 
+    void reset(){
+        fl_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        fr_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        bl_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        br_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    }
 
-    public void back(int target) {
-        int fl_cur_pos = fl_Drive.getCurrentPosition();
-        int fr_cur_pos = fr_Drive.getCurrentPosition();
-        int bl_cur_pos = bl_Drive.getCurrentPosition();
-        int br_cur_pos = br_Drive.getCurrentPosition();
+    public void back() {
 
-        int fl_tar_pos = target;//fl_Drive.getTargetPosition();
-        int fr_tar_pos = target;//fr_Drive.getTargetPosition();
-        int bl_tar_pos = target;//bl_Drive.getTargetPosition();
-        int br_tar_pos = target;//br_Drive.getTargetPosition();
+        fl_Drive.setTargetPosition(0);
+        fr_Drive.setTargetPosition(0);
+        bl_Drive.setTargetPosition(0);
+        br_Drive.setTargetPosition(0);
 
-        fl_Drive.setTargetPosition(fl_cur_pos + fl_tar_pos);
-        fr_Drive.setTargetPosition(fr_cur_pos + fr_tar_pos);
-        bl_Drive.setTargetPosition(bl_cur_pos + bl_tar_pos);
-        br_Drive.setTargetPosition(br_cur_pos + br_tar_pos);
+
+
     }
 
 
