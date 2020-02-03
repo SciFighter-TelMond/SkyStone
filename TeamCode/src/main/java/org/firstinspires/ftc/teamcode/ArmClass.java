@@ -68,8 +68,8 @@ public class ArmClass extends Thread {
         arm0.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         arm1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
-        arm0.setTargetPositionTolerance(15);
-        arm1.setTargetPositionTolerance(15);
+        arm0.setTargetPositionTolerance(10);
+        arm1.setTargetPositionTolerance(10);
 
 
         //==============================

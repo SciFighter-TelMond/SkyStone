@@ -4,10 +4,11 @@ import android.graphics.Color;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
@@ -29,12 +30,12 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 public class DriveClass {
 
     /* Public OpMode members. */
-    volatile private DcMotor fl_Drive = null;
-    volatile private DcMotor fr_Drive = null;
-    volatile private DcMotor bl_Drive = null;
-    volatile private DcMotor br_Drive = null;
-    volatile private DcMotor l_roller = null;
-    volatile private DcMotor r_roller = null;
+    volatile private DcMotorEx fl_Drive = null;
+    volatile private DcMotorEx fr_Drive = null;
+    volatile private DcMotorEx bl_Drive = null;
+    volatile private DcMotorEx br_Drive = null;
+    volatile private DcMotorEx l_roller = null;
+    volatile private DcMotorEx r_roller = null;
 
     volatile private Servo l_roller_servo = null;
     volatile private Servo r_roller_servo = null;
@@ -60,13 +61,9 @@ public class DriveClass {
     volatile private HardwareMap hwMap = null;
 
 
-    public enum Direction {LEFT, RIGHT, FORWARD, REVERSE}
+    public enum Direction {LEFT, RIGHT, FORWARD, REVERSE};
 
-    ;
-
-    public enum Location {LEFT, RIGHT}
-
-    ;
+    public enum Location {LEFT, RIGHT};
 
     private boolean useBrake;
 
@@ -85,39 +82,58 @@ public class DriveClass {
     public void init(HardwareMap hardwareMap) {
         // Save reference to Hardware map
 
-        fl_Drive = hardwareMap.get(DcMotor.class, "fl_drive");
-        fr_Drive = hardwareMap.get(DcMotor.class, "fr_drive");
-        bl_Drive = hardwareMap.get(DcMotor.class, "bl_drive");
-        br_Drive = hardwareMap.get(DcMotor.class, "br_drive");
+        fl_Drive = hardwareMap.get(DcMotorEx.class, "fl_drive");
+        fr_Drive = hardwareMap.get(DcMotorEx.class, "fr_drive");
+        bl_Drive = hardwareMap.get(DcMotorEx.class, "bl_drive");
+        br_Drive = hardwareMap.get(DcMotorEx.class, "br_drive");
 
-        l_roller = hardwareMap.get(DcMotor.class, "left_roller");
-        r_roller = hardwareMap.get(DcMotor.class, "right_roller");
+        l_roller = hardwareMap.get(DcMotorEx.class, "left_roller");
+        r_roller = hardwareMap.get(DcMotorEx.class, "right_roller");
 
         // Set Motor directions for driving forward
-        fl_Drive.setDirection(DcMotor.Direction.REVERSE);
-        fr_Drive.setDirection(DcMotor.Direction.FORWARD);
-        bl_Drive.setDirection(DcMotor.Direction.REVERSE);
-        br_Drive.setDirection(DcMotor.Direction.FORWARD);
+        fl_Drive.setDirection(DcMotorEx.Direction.REVERSE);
+        fr_Drive.setDirection(DcMotorEx.Direction.FORWARD);
+        bl_Drive.setDirection(DcMotorEx.Direction.REVERSE);
+        br_Drive.setDirection(DcMotorEx.Direction.FORWARD);
 
-        l_roller.setDirection(DcMotor.Direction.REVERSE);
-        r_roller.setDirection(DcMotor.Direction.FORWARD);
+        l_roller.setDirection(DcMotorEx.Direction.REVERSE);
+        r_roller.setDirection(DcMotorEx.Direction.FORWARD);
 
 
         // Set Driving mode for speed control using the encoders.
-        fl_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        fr_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        bl_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        br_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        fl_Drive.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        fr_Drive.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        bl_Drive.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        br_Drive.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+
+        fl_Drive.setTargetPositionTolerance(10);
+        fr_Drive.setTargetPositionTolerance(10);
+        bl_Drive.setTargetPositionTolerance(10);
+        br_Drive.setTargetPositionTolerance(10);
+
+        PIDFCoefficients pidf = fr_Drive.getPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER);
+
+        pidf.p = 4;
+        pidf.i = 3;
+        pidf.d = 0.1;
+//        fr_Drive.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidf);
+//        fr_Drive.setPositionPIDFCoefficients(7);
+//        fl_Drive.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidf);
+//        fl_Drive.setPositionPIDFCoefficients(7);
+//        br_Drive.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidf);
+//        br_Drive.setPositionPIDFCoefficients(7);
+//        bl_Drive.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidf);
+//        bl_Drive.setPositionPIDFCoefficients(7);
 
         if (useBrake) {
-            fl_Drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            fr_Drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            bl_Drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            br_Drive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+            fl_Drive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+            fr_Drive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+            bl_Drive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+            br_Drive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         }
 
-        l_roller.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        r_roller.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        l_roller.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        r_roller.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
 
         l_roller_servo = hardwareMap.get(Servo.class, "left_roller_servo");
         r_roller_servo = hardwareMap.get(Servo.class, "right_roller_servo");
@@ -175,19 +191,19 @@ public class DriveClass {
             bl_power /= m;
             br_power /= m;
         }
-        boolean oldMode = fl_Drive.getMode() == DcMotor.RunMode.RUN_TO_POSITION;
+        boolean oldMode = fl_Drive.getMode() == DcMotorEx.RunMode.RUN_TO_POSITION;
         boostState.update(speedTrigger > 0.7 || turnTrigger > 0.85);
         if (boostState.isChanged() || oldMode) {
             if (boostState.isPressed()) {
-                fl_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                fr_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                bl_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                br_Drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                fl_Drive.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+                fr_Drive.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+                bl_Drive.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+                br_Drive.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
             } else {
-                fl_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                fr_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                bl_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                br_Drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                fl_Drive.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+                fr_Drive.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+                bl_Drive.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+                br_Drive.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
             }
         }
 
@@ -233,10 +249,10 @@ public class DriveClass {
         bl_Drive.setTargetPosition(bl_tar_pos);
         br_Drive.setTargetPosition(br_tar_pos);
 
-        fl_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        fr_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        bl_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        br_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        fl_Drive.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        fr_Drive.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        bl_Drive.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        br_Drive.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
 
         double drivePower = speed;
         double power = drivePower;
@@ -294,10 +310,10 @@ public class DriveClass {
         bl_Drive.setTargetPosition(bl_tar_pos);
         br_Drive.setTargetPosition(br_tar_pos);
 
-        fl_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        fr_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        bl_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        br_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        fl_Drive.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        fr_Drive.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        bl_Drive.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        br_Drive.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
 
         double drivePower = speed;
         double power = drivePower;
@@ -347,10 +363,10 @@ public class DriveClass {
         bl_Drive.setTargetPosition(bl_tar_pos);
         br_Drive.setTargetPosition(br_tar_pos);
 
-        fl_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        fr_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        bl_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        br_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        fl_Drive.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        fr_Drive.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        bl_Drive.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        br_Drive.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
 
         double drivePower = speed;
         double power = speed;
@@ -392,10 +408,10 @@ public class DriveClass {
 
         ElapsedTime runtime = new ElapsedTime();
         runtime.reset();
-        fl_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        fr_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        bl_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        br_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        fl_Drive.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        fr_Drive.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        bl_Drive.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        br_Drive.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
 
         /* 1 round is 5600 ticks
          * to the right posotive
@@ -415,10 +431,10 @@ public class DriveClass {
         bl_Drive.setTargetPosition(bl_tar_pos);
         br_Drive.setTargetPosition(br_tar_pos);
 
-        fl_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        fr_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        bl_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        br_Drive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        fl_Drive.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        fr_Drive.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        bl_Drive.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+        br_Drive.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
 
         double drivePower = speed;
         double power = speed;
@@ -455,7 +471,7 @@ public class DriveClass {
         bl_Drive.setPower(0);
         br_Drive.setPower(0);
 
-        if (fl_Drive.getMode() == DcMotor.RunMode.RUN_TO_POSITION) {
+        if (fl_Drive.getMode() == DcMotorEx.RunMode.RUN_TO_POSITION) {
             fl_Drive.setTargetPosition(fl_Drive.getCurrentPosition());
             fr_Drive.setTargetPosition(fr_Drive.getCurrentPosition());
             bl_Drive.setTargetPosition(bl_Drive.getCurrentPosition());
@@ -469,10 +485,10 @@ public class DriveClass {
         bl_Drive.setPower(0);
         br_Drive.setPower(0);
 
-        fl_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        fr_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        bl_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        br_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        fl_Drive.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        fr_Drive.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        bl_Drive.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        br_Drive.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
 
         rollersStop();
         hooks.setPosition(0);
@@ -653,10 +669,10 @@ public class DriveClass {
     }
 
     void reset(){
-        fl_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        fr_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        bl_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        br_Drive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        fl_Drive.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        fr_Drive.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        bl_Drive.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        br_Drive.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
     }
 
     public void back() {
