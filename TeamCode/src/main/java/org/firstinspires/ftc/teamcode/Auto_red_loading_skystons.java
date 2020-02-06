@@ -31,12 +31,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.RobotLog;
-
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 /**
  */
@@ -70,7 +65,7 @@ public class Auto_red_loading_skystons extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         arm.begin();
-        arm.setModeArm(false);
+        arm.setArmDriveMode(false);
 
         runtime.reset();
 

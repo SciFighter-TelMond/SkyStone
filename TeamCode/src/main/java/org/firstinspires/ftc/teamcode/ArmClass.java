@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode;
 // import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -115,14 +114,14 @@ public class ArmClass extends Thread {
         arm1.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         arm0.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         arm1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        setModeArm(true);
+        setArmDriveMode(true);
     }
 
     public void clamp(boolean open) {
         if (open) {
-            clamps.setPosition(1);
-        } else {
             clamps.setPosition(0);
+        } else {
+            clamps.setPosition(1);
         }
     }
 
@@ -134,7 +133,7 @@ public class ArmClass extends Thread {
         }
     }
 
-    public void setModeArm(boolean drive) {
+    public void setArmDriveMode(boolean drive) {
         if (drive) {
             arm0.setPower(0);
             arm0.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
@@ -257,7 +256,7 @@ public class ArmClass extends Thread {
     public void run() {
         try {
             power = 0.8;
-            setModeArm(false);
+            setArmDriveMode(false);
             switch (mode) {
                 case HOME:
                     RobotLog.d("Arm do: HOME");
@@ -354,10 +353,7 @@ public class ArmClass extends Thread {
                     break;
 
                 case SKY1:
-                    driveClass.rollers(true);
                     gootoo(515, 0);
-                    sleep(500);
-                    driveClass.rollers(false);
                     rotateClamp(true);
                     clamp(true);
                     gootoo(515, 300);
@@ -380,7 +376,7 @@ public class ArmClass extends Thread {
             RobotLog.logStackTrace(e);
         }
         power = 1;
-        setModeArm(true);
+        setArmDriveMode(true);
         RobotLog.d("Arm Thread complete");
         mode = Mode.MANUAL;
     }
@@ -398,7 +394,7 @@ public class ArmClass extends Thread {
 
     public void resumePower() {
         RobotLog.d("ArmClass: Resume");
-        setModeArm(true);
+        setArmDriveMode(true);
         mode = Mode.MANUAL;
         stopFlag = false;
     }

@@ -113,16 +113,17 @@ public class DriveClass {
 
         PIDFCoefficients pidf = fr_Drive.getPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
-        pidf.p = 4;
-        pidf.i = 3;
+        pidf.p = 5;
+        pidf.i = 5;
         pidf.d = 0.1;
-//        fr_Drive.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidf);
+//        pidf.f = 14;
+        fr_Drive.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidf);
 //        fr_Drive.setPositionPIDFCoefficients(7);
-//        fl_Drive.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidf);
+        fl_Drive.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidf);
 //        fl_Drive.setPositionPIDFCoefficients(7);
-//        br_Drive.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidf);
+        br_Drive.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidf);
 //        br_Drive.setPositionPIDFCoefficients(7);
-//        bl_Drive.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidf);
+        bl_Drive.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidf);
 //        bl_Drive.setPositionPIDFCoefficients(7);
 
         if (useBrake) {
@@ -262,9 +263,9 @@ public class DriveClass {
 
             int distToTarget = fr_tar_pos - fr_Drive.getCurrentPosition();
 
-            int distRagil = ticks - distToTarget;
+            int distFromStart = ticks - distToTarget;
 
-            if (Math.abs(distRagil) < 200 || Math.abs(distToTarget) < 700) {
+            if (Math.abs(distFromStart) < 200 || Math.abs(distToTarget) < 700) {
                 power = drivePower / 2;
             } else {
                 power = drivePower;
@@ -323,9 +324,9 @@ public class DriveClass {
 
             int distToTarget = fr_tar_pos - fr_Drive.getCurrentPosition();
 
-            int distRagil = ticks - distToTarget;
+            int distFromStart = ticks - distToTarget;
 
-            if (Math.abs(distRagil) < 200 || Math.abs(distToTarget) < 700) {
+            if (Math.abs(distFromStart) < 200 || Math.abs(distToTarget) < 700) {
                 power = drivePower / 2;
             } else {
                 power = drivePower;
@@ -356,8 +357,6 @@ public class DriveClass {
         int bl_tar_pos = bl_Drive.getCurrentPosition() - ticks;
         int br_tar_pos = br_Drive.getCurrentPosition() + ticks;
 
-
-
         fl_Drive.setTargetPosition(fl_tar_pos);
         fr_Drive.setTargetPosition(fr_tar_pos);
         bl_Drive.setTargetPosition(bl_tar_pos);
@@ -369,17 +368,17 @@ public class DriveClass {
         br_Drive.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
 
         double drivePower = speed;
-        double power = speed;
+        double power;
 
         while ((fl_Drive.isBusy() /*|| bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy()*/) &&
                 opMode.opModeIsActive() && runTime.seconds() < timeout) {
 
             int distToTarget = fr_tar_pos - fr_Drive.getCurrentPosition();
 
-            int distRagil = ticks - distToTarget;
+            int distFromStart = ticks - distToTarget;
 
-            if (Math.abs(distRagil) < 200 || Math.abs(distToTarget) < 700) {
-                power = drivePower / 2;
+            if (Math.abs(distFromStart) < 500 || Math.abs(distToTarget) < 700) {
+                power = drivePower / 4;
             } else {
                 power = drivePower;
             }
@@ -388,6 +387,7 @@ public class DriveClass {
             fr_Drive.setPower(power);
             bl_Drive.setPower(power);
             br_Drive.setPower(power);
+
             opMode.telemetry.addData("fl", fl_Drive.getCurrentPosition());
             opMode.telemetry.addData("fr", fr_Drive.getCurrentPosition());
             opMode.telemetry.addData("bl", bl_Drive.getCurrentPosition());
@@ -443,9 +443,9 @@ public class DriveClass {
 
             int distToTarget = fr_tar_pos - fr_Drive.getCurrentPosition();
 
-            int distRagil = ticks - distToTarget;
+            int distFromStart = ticks - distToTarget;
 
-            if (Math.abs(distRagil) < 200 || Math.abs(distToTarget) < 700) {
+            if (Math.abs(distFromStart) < 200 || Math.abs(distToTarget) < 700) {
                 power = drivePower / 2;
             } else {
                 power = drivePower;
@@ -768,7 +768,7 @@ public class DriveClass {
 
             //robot.side(0.6, DriveClass.Direction.RIGHT, 1, 3);
             arm.pleaseDo(ArmClass.Mode.SKY1);
-            straight(1.2, DriveClass.Direction.FORWARD, 1, 4);
+            straight(0.95, DriveClass.Direction.FORWARD, 1, 4);
 
             // drive straight close to stones
             drive(0.4, 0, 0, 0, 0);
@@ -787,9 +787,9 @@ public class DriveClass {
 
             // drive LEFT one block
             side(0.25 * mul, DriveClass.Direction.LEFT, 0.5, 2);
-            stop();
 
             // catch STONE
+            arm.setArmDriveMode(false);
             arm.gootoo(50, 400);
             arm.clamp(false); // close clamps
             opMode.sleep(800); // wait for clamps to close
@@ -808,7 +808,7 @@ public class DriveClass {
 //            robot.stop();
 
             // slide RIGHT to put stone
-            side(2.5 * mul, DriveClass.Direction.RIGHT, 1, 8);
+            side(2.5 * mul, DriveClass.Direction.RIGHT, 0.9, 8);
             // robot.stop();
 
             // Put down stone.
@@ -818,7 +818,7 @@ public class DriveClass {
             //    arm.gootoo(300,0);
 
             // ============= Second sky stone ===================
-            side(2.75 * mul, DriveClass.Direction.LEFT, 1, 8);
+            side(2.75 * mul, DriveClass.Direction.LEFT, 0.9, 8);
 
             arm.pleaseDo(ArmClass.Mode.SKY3);
             straight(0.2, DriveClass.Direction.FORWARD, 0.5, 1);
@@ -843,6 +843,7 @@ public class DriveClass {
             //  robot.stop();
 
             // catch STONE
+            arm.setArmDriveMode(false);
             arm.gootoo(50, 400);
             arm.clamp(false);
             opMode.sleep(1000);
@@ -861,11 +862,12 @@ public class DriveClass {
 //            robot.stop();
 
             // slide RIGHT to put stone
-            side(3.7 * mul, DriveClass.Direction.RIGHT, 1, 8);
+            side(3.7 * mul, DriveClass.Direction.RIGHT, 0.9, 8);
             //    robot.stop();
 
             // arm.gootoo(445, 1000);
             arm.clamp(true);
+
             //  arm.gootoo(445,260);
             //   arm.clamp(false);
             //   arm.gootoo(300,0);

@@ -32,7 +32,6 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.RobotLog;
 
 /**
  */
@@ -66,7 +65,7 @@ public class Auto_blue_loading_skystons extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         arm.begin();
-        arm.setModeArm(false);
+        arm.setArmDriveMode(false);
 
         runtime.reset();
 
