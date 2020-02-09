@@ -278,8 +278,6 @@ public class ArmClass extends Thread {
                     RobotLog.d("Arm do: PICK - Open clamp");
                     clamp(true);
                     RobotLog.d("Arm do: PICK - Open Rollers");
-                    rollersState = driveClass.getRollersPower();
-                    driveClass.rollersRunIn();
                     driveClass.rollers(true);
 
                     RobotLog.d("Arm do: PICK - Go above");
@@ -287,14 +285,11 @@ public class ArmClass extends Thread {
                     RobotLog.d("Arm do: PICK - Go down");
                     gootoo(-200, -200);
                     clamp(false);
-                    if (rollersState == 0) {
-                        RobotLog.d("Arm PICK - Roller stop");
-                        driveClass.rollersStop();
-                    }
                     RobotLog.d("Arm do: before sleep");
                     sleep(700);
                     RobotLog.d("Arm do: after sleep");
                     gootoo(400, 0);
+                    driveClass.rollers(false);
                     RobotLog.d("Arm do: PICK/");
                     break;
 
@@ -307,11 +302,13 @@ public class ArmClass extends Thread {
                         case 0:
                         case 1:
                             RobotLog.d("Arm do: BUILD - floor 1");
-                            gootoo(835, 360);
+                            gootoo(830, STAY);
+                            gootoo(830, 560);
+                            gootoo(225, 555);
                             break;
                         case 2:
                             RobotLog.d("Arm do: BUILD - floor 2");
-                            gootoo(930, 10);
+                            gootoo(930, STAY);
                             gootoo(930, 600);
                             gootoo(700, 730);
                             break;
@@ -356,7 +353,7 @@ public class ArmClass extends Thread {
                     gootoo(515, 0);
                     rotateClamp(true);
                     clamp(true);
-                    gootoo(515, 300);
+                    gootoo(515, 360);
                     break;
 
                 case SKY2:
@@ -364,7 +361,7 @@ public class ArmClass extends Thread {
                     break;
 
                 case SKY3:
-                    gootoo(515, 300);
+                    gootoo(515, 360);
                     break;
 
                 default:

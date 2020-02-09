@@ -114,7 +114,7 @@ public class DriveClass {
         PIDFCoefficients pidf = fr_Drive.getPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
         pidf.p = 5;
-        pidf.i = 5;
+        pidf.i = 3;
         pidf.d = 0.1;
 //        pidf.f = 14;
         fr_Drive.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidf);
@@ -146,7 +146,6 @@ public class DriveClass {
         hooksState.update(false);
 
         capstone = hardwareMap.get(Servo.class, "capstone");
-
 
         // get a reference to our digitalTouch object.
         leftBumper = hardwareMap.get(DigitalChannel.class, "left_bumper");
@@ -261,11 +260,11 @@ public class DriveClass {
         while ((fl_Drive.isBusy() /*|| bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy()*/) &&
                 opMode.opModeIsActive() && runTime.seconds() < timeout) {
 
-            int distToTarget = fr_tar_pos - fr_Drive.getCurrentPosition();
+            int distToTarget = Math.abs(fr_tar_pos - fr_Drive.getCurrentPosition());
 
-            int distFromStart = ticks - distToTarget;
+            int distFromStart = Math.abs(ticks - distToTarget);
 
-            if (Math.abs(distFromStart) < 200 || Math.abs(distToTarget) < 700) {
+            if ((distFromStart < 200) || (distToTarget < 700)) {
                 power = drivePower / 2;
             } else {
                 power = drivePower;
@@ -287,9 +286,8 @@ public class DriveClass {
                     br_Drive.setTargetPosition(br_Drive.getCurrentPosition());
                 }
             }
-            opMode.sleep(20);
+            opMode.sleep(5);
         }
-
     }
 
     public void straight_ignoreBumper(double target_meter, Direction direction, double speed, int timeout) {
@@ -322,11 +320,11 @@ public class DriveClass {
         while ((fl_Drive.isBusy() /*|| bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy()*/) &&
                 opMode.opModeIsActive() && runTime.seconds() < timeout) {
 
-            int distToTarget = fr_tar_pos - fr_Drive.getCurrentPosition();
+            int distToTarget = Math.abs(fr_tar_pos - fr_Drive.getCurrentPosition());
 
-            int distFromStart = ticks - distToTarget;
+            int distFromStart = Math.abs(ticks - distToTarget);
 
-            if (Math.abs(distFromStart) < 200 || Math.abs(distToTarget) < 700) {
+            if ((distFromStart < 200) || (distToTarget < 700)) {
                 power = drivePower / 2;
             } else {
                 power = drivePower;
@@ -337,10 +335,8 @@ public class DriveClass {
             bl_Drive.setPower(power);
             br_Drive.setPower(power);
 
-
-            opMode.sleep(100);
+            opMode.sleep(5);
         }
-
     }
 
     public void side(double target_meter, Direction direction, double speed, int timeout) {
@@ -373,12 +369,14 @@ public class DriveClass {
         while ((fl_Drive.isBusy() /*|| bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy()*/) &&
                 opMode.opModeIsActive() && runTime.seconds() < timeout) {
 
-            int distToTarget = fr_tar_pos - fr_Drive.getCurrentPosition();
+            int distToTarget = Math.abs(fr_tar_pos - fr_Drive.getCurrentPosition());
 
-            int distFromStart = ticks - distToTarget;
+            int distFromStart = Math.abs(ticks - distToTarget);
 
-            if (Math.abs(distFromStart) < 500 || Math.abs(distToTarget) < 700) {
-                power = drivePower / 4;
+            if (distFromStart < 300)  {
+                power = drivePower * distFromStart/300 * 0.8 + 0.2;
+            } else if (distToTarget < 700) {
+                power = 0.2;
             } else {
                 power = drivePower;
             }
@@ -388,13 +386,7 @@ public class DriveClass {
             bl_Drive.setPower(power);
             br_Drive.setPower(power);
 
-            opMode.telemetry.addData("fl", fl_Drive.getCurrentPosition());
-            opMode.telemetry.addData("fr", fr_Drive.getCurrentPosition());
-            opMode.telemetry.addData("bl", bl_Drive.getCurrentPosition());
-            opMode.telemetry.addData("br", br_Drive.getCurrentPosition());
-            opMode.telemetry.update();
-
-            opMode.sleep(20);
+            opMode.sleep(5);
         }
     }
 
@@ -441,11 +433,11 @@ public class DriveClass {
 
         while ((fl_Drive.isBusy() /*|| bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy()*/) && opMode.opModeIsActive() && runtime.seconds() < timeout) {
 
-            int distToTarget = fr_tar_pos - fr_Drive.getCurrentPosition();
+            int distToTarget = Math.abs(fr_tar_pos - fr_Drive.getCurrentPosition());
 
-            int distFromStart = ticks - distToTarget;
+            int distFromStart = Math.abs(ticks - distToTarget);
 
-            if (Math.abs(distFromStart) < 200 || Math.abs(distToTarget) < 700) {
+            if ((distFromStart < 200) || (distToTarget < 700)) {
                 power = drivePower / 2;
             } else {
                 power = drivePower;
@@ -455,13 +447,8 @@ public class DriveClass {
             fr_Drive.setPower(power);
             bl_Drive.setPower(power);
             br_Drive.setPower(power);
-            opMode.telemetry.addData("fl", fl_Drive.getCurrentPosition());
-            opMode.telemetry.addData("fr", fr_Drive.getCurrentPosition());
-            opMode.telemetry.addData("bl", bl_Drive.getCurrentPosition());
-            opMode.telemetry.addData("br", br_Drive.getCurrentPosition());
-            opMode.telemetry.update();
 
-            opMode.sleep(20);
+            opMode.sleep(5);
         }
     }
 
@@ -580,19 +567,11 @@ public class DriveClass {
         }
     }
 
-    public boolean isSkyStoneRight() {
-        return isSkyStone(sensorColorRight);
-    }
-
-    public boolean isSkyStoneLeft() {
-        return isSkyStone(sensorColorLeft);
-    }
-
     public boolean isSkystone(Location location) {
         if (location == Location.LEFT) {
-            return isSkyStoneLeft();
+            return isSkyStone(sensorColorLeft);
         } else {
-            return isSkyStoneRight();
+            return isSkyStone(sensorColorRight);
         }
     }
 
@@ -612,7 +591,10 @@ public class DriveClass {
 
         float hue = hsvValues[0];
         boolean skystone = hue > 110 && a > 600;
-        opMode.telemetry.addData("Sky:", "%b - H: %03.02f, [R:%1.0f, G:%1.0f, B:%1.0f, A:%1.0f]", skystone, hue, r, g, b, a);
+        // opMode.telemetry.addData("Sky:", "%b - H: %03.02f, [R:%1.0f, G:%1.0f, B:%1.0f, A:%1.0f]", skystone, hue, r, g, b, a);
+        if (skystone) {
+            RobotLog.d("Skystone:", hue, a);
+        }
         return skystone;
     }
 
@@ -643,7 +625,7 @@ public class DriveClass {
 
         float hue = hsvValues[0];
         boolean red = Math.abs(hue) < 80;
-        opMode.telemetry.addData("Red:", "%b - H: %03.02f, [R:%1.0f, G:%1.0f, B:%1.0f, A:%1.0f]", red, hue, r, g, b, a);
+        //opMode.telemetry.addData("Red:", "%b - H: %03.02f, [R:%1.0f, G:%1.0f, B:%1.0f, A:%1.0f]", red, hue, r, g, b, a);
         return red;
     }
 
@@ -664,7 +646,7 @@ public class DriveClass {
 
         float hue = hsvValues[0];
         boolean blue = hue > 220 && hue < 260;
-        opMode.telemetry.addData("Red:", "%b - H: %03.02f, [R:%1.0f, G:%1.0f, B:%1.0f, A:%1.0f]", blue, hue, r, g, b, a);
+        // opMode.telemetry.addData("Red:", "%b - H: %03.02f, [R:%1.0f, G:%1.0f, B:%1.0f, A:%1.0f]", blue, hue, r, g, b, a);
         return blue;
     }
 
@@ -691,9 +673,7 @@ public class DriveClass {
     //Autonomous Functions
     //===============================================================================================================================================================================================================================================
 
-    public enum Alliance {BLUE, RED}
-
-    ;
+    public enum Alliance {BLUE, RED};
 
     public void AUTOfoundationBridge(Alliance team, boolean wall) {
         int mul = 0;
@@ -752,9 +732,6 @@ public class DriveClass {
 
 
 
-
-
-
     public void AUTOskystone(Alliance team, Location location, ArmClass arm) {
         ElapsedTime timer = new ElapsedTime();
         int mul = 0;
@@ -771,15 +748,15 @@ public class DriveClass {
             straight(0.95, DriveClass.Direction.FORWARD, 1, 4);
 
             // drive straight close to stones
-            drive(0.4, 0, 0, 0, 0);
+            drive(0.3, 0, 0, 0, 0);
             timer.reset();
-            while (getSensorDistance(location) > 3 && timer.seconds() < 5) {
+            while (getSensorDistance(location) > 3 && timer.seconds() < 3) {
                 opMode.sleep(1);
             }
             stop();
 
             // drive LEFT : search for SkyStone
-            drive(0, -0.8, 0, 0, 0);
+            drive(0, -0.8 * mul, 0, 0, 0);
             timer.reset();
             while (!isSkystone(location) && timer.seconds() < 10) {
                 opMode.sleep(1);
@@ -798,15 +775,6 @@ public class DriveClass {
             // drive backwards
             straight(0.25, DriveClass.Direction.REVERSE, 0.5, 1);
 
-//            // drive RIGHT : search for red line (under the brig)
-//            robot.drive(0,0.8,0,0,0);
-//            timer.reset();
-//            while (!robot.isRed() && opModeIsActive() && timer.seconds()<8) {
-//                // telemetry.update();
-//                sleep(1);
-//            }
-//            robot.stop();
-
             // slide RIGHT to put stone
             side(2.5 * mul, DriveClass.Direction.RIGHT, 0.9, 8);
             // robot.stop();
@@ -818,15 +786,15 @@ public class DriveClass {
             //    arm.gootoo(300,0);
 
             // ============= Second sky stone ===================
-            side(2.75 * mul, DriveClass.Direction.LEFT, 0.9, 8);
+            side(3.2 * mul, DriveClass.Direction.LEFT, 0.9, 8);
 
             arm.pleaseDo(ArmClass.Mode.SKY3);
             straight(0.2, DriveClass.Direction.FORWARD, 0.5, 1);
 
             // drive straight close to stones
-            drive(0.4, 0 * mul, 0, 0, 0);
+            drive(0.3, 0, 0, 0, 0);
             timer.reset();
-            while (getSensorDistance(location) > 3 && timer.seconds() < 5) {
+            while (getSensorDistance(location) > 3 && timer.seconds() < 3) {
                 opMode.sleep(1);
             }
             stop();
@@ -850,27 +818,19 @@ public class DriveClass {
             arm.pleaseDo(ArmClass.Mode.SKY2);
 
             // drive backwards
-            straight(0.3, DriveClass.Direction.REVERSE, 0.5, 1);
-
-//            // drive RIGHT : search for red line (under the brig)
-//            robot.drive(0,0.7,0,0,0);
-//            timer.reset();
-//            while (!robot.isRed() && opModeIsActive() && timer.seconds()<8) {
-//                // telemetry.update();
-//                sleep(1);
-//            }
-//            robot.stop();
+            straight(0.25, DriveClass.Direction.REVERSE, 0.5, 1);
 
             // slide RIGHT to put stone
-            side(3.7 * mul, DriveClass.Direction.RIGHT, 0.9, 8);
+            side(3.8 * mul, DriveClass.Direction.RIGHT, 0.9, 8);
             //    robot.stop();
 
-            // arm.gootoo(445, 1000);
             arm.clamp(true);
+            arm.setArmDriveMode(false);
+            arm.gootoo(ArmClass.STAY,0);
+            arm.clamp(false);
 
-            //  arm.gootoo(445,260);
-            //   arm.clamp(false);
-            //   arm.gootoo(300,0);
+            side(-0.3 * mul, DriveClass.Direction.RIGHT, 0.7, 8);
+            arm.linearDo(ArmClass.Mode.HOME);
 
             // drive LEFT : back to line.
             drive(0, -0.3 * mul, 0, 0, 0);
@@ -879,9 +839,6 @@ public class DriveClass {
                 //telemetry.update();
                 opMode.sleep(1);
             }
-
-            arm.linearDo(ArmClass.Mode.HOME);
-
 
             stop();
 
