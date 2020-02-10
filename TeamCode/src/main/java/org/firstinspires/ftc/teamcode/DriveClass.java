@@ -61,9 +61,10 @@ public class DriveClass {
     volatile private HardwareMap hwMap = null;
 
 
-    public enum Direction {LEFT, RIGHT, FORWARD, REVERSE};
+    public enum Direction { LEFT, RIGHT, FORWARD, REVERSE }
 
-    public enum Location {LEFT, RIGHT};
+    public enum Location { LEFT, RIGHT }
+
 
     private boolean useBrake;
 
@@ -264,8 +265,10 @@ public class DriveClass {
 
             int distFromStart = Math.abs(ticks - distToTarget);
 
-            if ((distFromStart < 200) || (distToTarget < 700)) {
-                power = drivePower / 2;
+            if (distFromStart < 300) {
+                power = drivePower * distFromStart / 300 * 0.8 + 0.2;
+            } else if (distToTarget < 700) {
+                power = 0.2;
             } else {
                 power = drivePower;
             }
@@ -324,8 +327,10 @@ public class DriveClass {
 
             int distFromStart = Math.abs(ticks - distToTarget);
 
-            if ((distFromStart < 200) || (distToTarget < 700)) {
-                power = drivePower / 2;
+            if (distFromStart < 300) {
+                power = drivePower * distFromStart / 300 * 0.8 + 0.2;
+            } else if (distToTarget < 700) {
+                power = 0.2;
             } else {
                 power = drivePower;
             }
@@ -373,8 +378,8 @@ public class DriveClass {
 
             int distFromStart = Math.abs(ticks - distToTarget);
 
-            if (distFromStart < 300)  {
-                power = drivePower * distFromStart/300 * 0.8 + 0.2;
+            if (distFromStart < 300) {
+                power = drivePower * distFromStart / 300 * 0.8 + 0.2;
             } else if (distToTarget < 700) {
                 power = 0.2;
             } else {
@@ -453,6 +458,7 @@ public class DriveClass {
     }
 
     public void stop() {
+        RobotLog.d("DriveClass:Stop()");
         fl_Drive.setPower(0);
         fr_Drive.setPower(0);
         bl_Drive.setPower(0);
@@ -467,6 +473,7 @@ public class DriveClass {
     }
 
     public void end() {
+        RobotLog.d("DriveClass:End()");
         fl_Drive.setPower(0);
         fr_Drive.setPower(0);
         bl_Drive.setPower(0);
@@ -560,11 +567,15 @@ public class DriveClass {
     }
 
     public double getSensorDistance(Location location) {
+        double result;
         if (location == Location.LEFT) {
-            return getSensorDistanceLeft();
+            result = getSensorDistanceLeft();
+            RobotLog.d("DriveClass: Left SensorDistance: %f", result);
         } else {
-            return getSensorDistanceRight();
+            result = getSensorDistanceRight();
+            RobotLog.d("DriveClass: Right SensorDistance: %f", result);
         }
+        return result;
     }
 
     public boolean isSkystone(Location location) {
@@ -650,7 +661,7 @@ public class DriveClass {
         return blue;
     }
 
-    void reset(){
+    void reset() {
         fl_Drive.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         fr_Drive.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         bl_Drive.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
@@ -665,7 +676,6 @@ public class DriveClass {
         br_Drive.setTargetPosition(0);
 
 
-
     }
 
 
@@ -673,7 +683,7 @@ public class DriveClass {
     //Autonomous Functions
     //===============================================================================================================================================================================================================================================
 
-    public enum Alliance {BLUE, RED};
+    public enum Alliance { BLUE, RED }
 
     public void AUTOfoundationBridge(Alliance team, boolean wall) {
         int mul = 0;
@@ -731,7 +741,6 @@ public class DriveClass {
     }
 
 
-
     public void AUTOskystone(Alliance team, Location location, ArmClass arm) {
         ElapsedTime timer = new ElapsedTime();
         int mul = 0;
@@ -748,17 +757,19 @@ public class DriveClass {
             straight(0.95, DriveClass.Direction.FORWARD, 1, 4);
 
             // drive straight close to stones
-            drive(0.3, 0, 0, 0, 0);
+            drive(0.25, 0, 0, 0, 0);
             timer.reset();
-            while (getSensorDistance(location) > 3 && timer.seconds() < 3) {
+            while (getSensorDistance(location) > 3 && timer.seconds() < 3 && opMode.opModeIsActive()) {
                 opMode.sleep(1);
             }
             stop();
 
             // drive LEFT : search for SkyStone
-            drive(0, -0.8 * mul, 0, 0, 0);
+            drive(0, -0.2 * mul, 0, 0, 0);
+            opMode.sleep(200);
+            drive(0, -0.7 * mul, 0, 0, 0);
             timer.reset();
-            while (!isSkystone(location) && timer.seconds() < 10) {
+            while (!isSkystone(location) && timer.seconds() < 10  && opMode.opModeIsActive()) {
                 opMode.sleep(1);
             }
 
@@ -770,7 +781,7 @@ public class DriveClass {
             arm.gootoo(50, 400);
             arm.clamp(false); // close clamps
             opMode.sleep(800); // wait for clamps to close
-            arm.pleaseDo(ArmClass.Mode.SKY2);
+            arm.pleaseDo(ArmClass.Mode.SKY2); // move arm back
 
             // drive backwards
             straight(0.25, DriveClass.Direction.REVERSE, 0.5, 1);
@@ -782,32 +793,36 @@ public class DriveClass {
             // Put down stone.
             //    arm.gootoo(445, 1000);
             arm.clamp(true);
-            //     arm.gootoo(445,260);
-            //    arm.gootoo(300,0);
+            arm.setArmDriveMode(false);
+            arm.gootoo(ArmClass.STAY,0);
+            arm.clamp(false);
 
             // ============= Second sky stone ===================
             side(3.2 * mul, DriveClass.Direction.LEFT, 0.9, 8);
 
-            arm.pleaseDo(ArmClass.Mode.SKY3);
+            arm.clamp(true);
+            arm.pleaseDo(ArmClass.Mode.SKY3); // move arm forward ready to catch
             straight(0.2, DriveClass.Direction.FORWARD, 0.5, 1);
 
             // drive straight close to stones
             drive(0.3, 0, 0, 0, 0);
             timer.reset();
-            while (getSensorDistance(location) > 3 && timer.seconds() < 3) {
+            while (getSensorDistance(location) > 3 && timer.seconds() < 3 && opMode.opModeIsActive()) {
                 opMode.sleep(1);
             }
             stop();
 
             // drive LEFT : search for SkyStone
-            drive(0, -0.8 * mul, 0, 0, 0);
+            drive(0, -0.2 * mul, 0, 0, 0);
+            opMode.sleep(200);
+            drive(0, -0.7 * mul, 0, 0, 0);
             timer.reset();
-            while (!isSkystone(location) && timer.seconds() < 10) {
+            while (!isSkystone(location) && timer.seconds() < 10 && opMode.opModeIsActive()) {
                 opMode.sleep(1);
             }
 
             // drive LEFT one block
-            side(0.3 * mul, DriveClass.Direction.LEFT, 0.4, 2);
+            side(0.25 * mul, DriveClass.Direction.LEFT, 0.4, 2);
             //  robot.stop();
 
             // catch STONE
@@ -826,16 +841,16 @@ public class DriveClass {
 
             arm.clamp(true);
             arm.setArmDriveMode(false);
-            arm.gootoo(ArmClass.STAY,0);
+            arm.gootoo(ArmClass.STAY, 0);
             arm.clamp(false);
 
-            side(-0.3 * mul, DriveClass.Direction.RIGHT, 0.7, 8);
+            side(-0.4 * mul, DriveClass.Direction.RIGHT, 0.7, 8);
             arm.linearDo(ArmClass.Mode.HOME);
 
             // drive LEFT : back to line.
             drive(0, -0.3 * mul, 0, 0, 0);
             timer.reset();
-            while (!isRed() && timer.seconds() < 2) {
+            while (!isRed() && timer.seconds() < 2  && opMode.opModeIsActive()) {
                 //telemetry.update();
                 opMode.sleep(1);
             }

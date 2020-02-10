@@ -64,6 +64,7 @@ public class Auto_blue_loading_skystons extends LinearOpMode {
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
+
         arm.begin();
         arm.setArmDriveMode(false);
 
@@ -71,8 +72,8 @@ public class Auto_blue_loading_skystons extends LinearOpMode {
 
         robot.AUTOskystone(DriveClass.Alliance.BLUE, DriveClass.Location.RIGHT,arm);
 
-        robot.end();
         arm.end();
+        robot.end();
     }
 
 }

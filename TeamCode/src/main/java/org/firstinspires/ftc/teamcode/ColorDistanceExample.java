@@ -88,6 +88,8 @@ public class ColorDistanceExample extends LinearOpMode {
     ColorSensor sensorColor;
     DistanceSensor sensorDistance;
 
+    DistanceSensor sensorDistance2;
+
     @Override
     public void runOpMode() {
 
@@ -96,6 +98,7 @@ public class ColorDistanceExample extends LinearOpMode {
 
         // get a reference to the distance sensor that shares the same name.
         sensorDistance = hardwareMap.get(DistanceSensor.class, "color_right");
+        sensorDistance2 = hardwareMap.get(DistanceSensor.class,"color_left");
 
         // hsvValues is an array that will hold the hue, saturation, and value information.
         float hsvValues[] = {0F, 0F, 0F};
@@ -127,13 +130,15 @@ public class ColorDistanceExample extends LinearOpMode {
                     hsvValues);
 
             // send the info back to driver station using telemetry function.
-            telemetry.addData("Distance (cm)",
+            telemetry.addData("Distance Right (cm)",
                     String.format(Locale.US, "%.02f", sensorDistance.getDistance(DistanceUnit.CM)));
-            telemetry.addData("Alpha", sensorColor.alpha());
-            telemetry.addData("Red  ", sensorColor.red());
-            telemetry.addData("Green", sensorColor.green());
-            telemetry.addData("Blue ", sensorColor.blue());
-            telemetry.addData("Hue", hsvValues[0]);
+            telemetry.addData("Distance Left (cm)",
+                    String.format(Locale.US, "%.02f", sensorDistance2.getDistance(DistanceUnit.CM)));
+//            telemetry.addData("Alpha", sensorColor.alpha());
+//            telemetry.addData("Red  ", sensorColor.red());
+//            telemetry.addData("Green", sensorColor.green());
+//            telemetry.addData("Blue ", sensorColor.blue());
+//            telemetry.addData("Hue", hsvValues[0]);
 
             // change the background color to match the color detected by the RGB sensor.
             // pass a reference to the hue, saturation, and value array as an argument

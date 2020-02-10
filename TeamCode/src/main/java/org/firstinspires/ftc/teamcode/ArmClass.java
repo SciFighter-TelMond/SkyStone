@@ -263,7 +263,7 @@ public class ArmClass extends Thread {
                     gootoo(300, STAY);
                     driveClass.rollers(true);
                     sleep(500);
-                    gootoo(-200, -200);
+                    gootoo(-500, -500);
                     reset();
                     driveClass.rollers(false);
                     RobotLog.d("Arm do: HOME/");
@@ -349,18 +349,18 @@ public class ArmClass extends Thread {
                     RobotLog.d("Arm do: BUILD/");
                     break;
 
-                case SKY1:
+                case SKY1: // open arm to start position
                     gootoo(515, 0);
                     rotateClamp(true);
                     clamp(true);
                     gootoo(515, 360);
                     break;
 
-                case SKY2:
+                case SKY2: // after catch move arm back
                     gootoo(400, 260);
                     break;
 
-                case SKY3:
+                case SKY3: // get ready to catch
                     gootoo(515, 360);
                     break;
 
@@ -379,13 +379,13 @@ public class ArmClass extends Thread {
     }
 
     public void end() {
-        RobotLog.d("ArmClass: begin");
+        RobotLog.d("ArmClass:End()");
         stopFlag = true;
         interrupt();
         arm0.setPower(0);
         arm1.setPower(0);
-        arm0.setTargetPosition(arm0.getCurrentPosition());
-        arm1.setTargetPosition(arm1.getCurrentPosition());
+        arm0.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        arm1.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         mode = Mode.IDLE;
     }
 
