@@ -268,7 +268,7 @@ public class DriveClass {
             if (distFromStart < 300) {
                 power = drivePower * distFromStart / 300 * 0.8 + 0.2;
             } else if (distToTarget < 700) {
-                power = 0.2;
+                power = drivePower/3;
             } else {
                 power = drivePower;
             }
@@ -559,7 +559,7 @@ public class DriveClass {
     }
 
     public double getSensorDistanceRight() {
-        return sensorDistanceRight.getDistance(DistanceUnit.CM);
+        return sensorDistanceRight.getDistance(DistanceUnit.CM) - 2;
     }
 
     public double getSensorDistanceLeft() {
@@ -720,26 +720,35 @@ public class DriveClass {
         //======V==============||||||||||||========================
         //
         /////////////////////////////////////////////////////////////////////////////////////
-        side(1.6 * mul, Direction.LEFT, 0.7, 3);
-        straight(1.0, Direction.REVERSE, 0.8, 3);
-        side(0.9 * mul, Direction.RIGHT, 0.9, 3);
-        straight(0.8, Direction.REVERSE, 0.9, 3);
+        side(1.8 * mul, Direction.LEFT, 0.7, 3);
+        straight(0.8, Direction.REVERSE, 0.8, 3);
+        side(0.6 * mul, Direction.RIGHT, 0.9, 3);
+        straight(1.0, Direction.REVERSE, 0.9, 3);
         side(1.1 * mul, Direction.RIGHT, 0.9, 3);
         straight(1.2, Direction.FORWARD, 0.9, 3);
         // Step 6: drive to the side - park under the bridge
 
         if (wall == false) {
-            straight(0.4, Direction.REVERSE, 0.5, 2);
-            side(2.4 * mul, Direction.LEFT, 0.9, 3);
+            straight(0.2, Direction.REVERSE, 0.5, 2);
+            side(2.8 * mul, Direction.LEFT, 0.9, 3);
         }
 
         if (wall == true) {
-            side(1.5 * mul, Direction.LEFT, 0.9, 3);
-            straight(0.9, DriveClass.Direction.FORWARD, 0.5, 2);
-            side(0.9 * mul, Direction.LEFT, 0.9, 3);
+            side(1.8 * mul, Direction.LEFT, 0.9, 3);
+            straight(1.2, DriveClass.Direction.FORWARD, 0.5, 2);
+            side(1.2 * mul, Direction.LEFT, 0.9, 3);
         }
     }
 
+    public void searchSkystone(Location location,int mul) {
+        ElapsedTime timer = new ElapsedTime();
+        // drive LEFT : search for SkyStone
+        drive(0, -0.7 * mul, 0, 0, 0);
+        timer.reset();
+        while (!isSkystone(location) && timer.seconds() < 10  && opMode.opModeIsActive()) {
+            opMode.sleep(1);
+        }
+    }
 
     public void AUTOskystone(Alliance team, Location location, ArmClass arm) {
         ElapsedTime timer = new ElapsedTime();
@@ -764,14 +773,8 @@ public class DriveClass {
             }
             stop();
 
-            // drive LEFT : search for SkyStone
-            drive(0, -0.2 * mul, 0, 0, 0);
-            opMode.sleep(200);
-            drive(0, -0.7 * mul, 0, 0, 0);
-            timer.reset();
-            while (!isSkystone(location) && timer.seconds() < 10  && opMode.opModeIsActive()) {
-                opMode.sleep(1);
-            }
+
+            searchSkystone(location,mul);
 
             // drive LEFT one block
             side(0.25 * mul, DriveClass.Direction.LEFT, 0.5, 2);
@@ -813,13 +816,7 @@ public class DriveClass {
             stop();
 
             // drive LEFT : search for SkyStone
-            drive(0, -0.2 * mul, 0, 0, 0);
-            opMode.sleep(200);
-            drive(0, -0.7 * mul, 0, 0, 0);
-            timer.reset();
-            while (!isSkystone(location) && timer.seconds() < 10 && opMode.opModeIsActive()) {
-                opMode.sleep(1);
-            }
+            searchSkystone(location,mul);
 
             // drive LEFT one block
             side(0.25 * mul, DriveClass.Direction.LEFT, 0.4, 2);
