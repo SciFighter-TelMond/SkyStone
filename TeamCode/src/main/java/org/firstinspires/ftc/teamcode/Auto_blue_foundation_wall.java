@@ -29,8 +29,6 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import android.speech.tts.TextToSpeech;
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -88,7 +86,7 @@ public class Auto_blue_foundation_wall extends LinearOpMode {
          * the front of the robot is to the wall, the hooks directed to the middle of the field.
          * please start close to the building site*/
         // Step 1:  Drive forward (actually back) and a bit to the left (actually to the right)
-        robot.AUTOfoundationBridge(DriveClass.Alliance.BLUE, true);
+        robot.AUTO_foundation(DriveClass.Alliance.BLUE, true);
         // Step 6:  stop
         robot.stop();
         //sleep(1000);

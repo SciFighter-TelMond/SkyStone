@@ -267,7 +267,7 @@ public class DriveClass {
 
             if (distFromStart < 300) {
                 power = drivePower * distFromStart / 300 * 0.8 + 0.2;
-            } else if (distToTarget < 700) {
+            } else if (distToTarget < 500) {
                 power = drivePower/3;
             } else {
                 power = drivePower;
@@ -329,7 +329,7 @@ public class DriveClass {
 
             if (distFromStart < 300) {
                 power = drivePower * distFromStart / 300 * 0.8 + 0.2;
-            } else if (distToTarget < 700) {
+            } else if (distToTarget < 500) {
                 power = 0.2;
             } else {
                 power = drivePower;
@@ -380,7 +380,7 @@ public class DriveClass {
 
             if (distFromStart < 300) {
                 power = drivePower * distFromStart / 300 * 0.8 + 0.2;
-            } else if (distToTarget < 700) {
+            } else if (distToTarget < 500) {
                 power = 0.2;
             } else {
                 power = drivePower;
@@ -442,7 +442,7 @@ public class DriveClass {
 
             int distFromStart = Math.abs(ticks - distToTarget);
 
-            if ((distFromStart < 200) || (distToTarget < 700)) {
+            if ((distFromStart < 200) || (distToTarget < 500)) {
                 power = drivePower / 2;
             } else {
                 power = drivePower;
@@ -559,7 +559,7 @@ public class DriveClass {
     }
 
     public double getSensorDistanceRight() {
-        return sensorDistanceRight.getDistance(DistanceUnit.CM) - 2;
+        return sensorDistanceRight.getDistance(DistanceUnit.CM) - 3;
     }
 
     public double getSensorDistanceLeft() {
@@ -604,7 +604,7 @@ public class DriveClass {
         boolean skystone = hue > 110 && a > 600;
         // opMode.telemetry.addData("Sky:", "%b - H: %03.02f, [R:%1.0f, G:%1.0f, B:%1.0f, A:%1.0f]", skystone, hue, r, g, b, a);
         if (skystone) {
-            RobotLog.d("Skystone:", hue, a);
+            RobotLog.d("Skystone found - hue:%f, alpha:%f", hue, a);
         }
         return skystone;
     }
@@ -619,6 +619,14 @@ public class DriveClass {
         }
     }
 
+    public boolean isLine(Alliance alliance) {
+        if (alliance == Alliance.RED) {
+            return isRed();
+        } else {
+            return isBlue();
+        }
+    }
+
     public boolean isRed() {
         ColorSensor sensor = sensorColorDown;
         double r = sensor.red();
@@ -629,14 +637,14 @@ public class DriveClass {
         float hsvValues[] = {0F, 0F, 0F};
         final int SCALE_FACTOR = 255;
 
-        Color.RGBToHSV((int) (sensor.red() * SCALE_FACTOR),
-                (int) (sensor.green() * SCALE_FACTOR),
-                (int) (sensor.blue() * SCALE_FACTOR),
-                hsvValues);
+        Color.RGBToHSV( (int) (r * SCALE_FACTOR),
+                        (int) (g * SCALE_FACTOR),
+                        (int) (b * SCALE_FACTOR),
+                        hsvValues);
 
         float hue = hsvValues[0];
         boolean red = Math.abs(hue) < 80;
-        //opMode.telemetry.addData("Red:", "%b - H: %03.02f, [R:%1.0f, G:%1.0f, B:%1.0f, A:%1.0f]", red, hue, r, g, b, a);
+        RobotLog.d("Red:", "%b - H: %03.02f, [R:%1.0f, G:%1.0f, B:%1.0f, A:%1.0f]", red, hue, r, g, b, a);
         return red;
     }
 
@@ -650,14 +658,14 @@ public class DriveClass {
         float hsvValues[] = {0F, 0F, 0F};
         final int SCALE_FACTOR = 255;
 
-        Color.RGBToHSV((int) (sensor.red() * SCALE_FACTOR),
-                (int) (sensor.green() * SCALE_FACTOR),
-                (int) (sensor.blue() * SCALE_FACTOR),
-                hsvValues);
+        Color.RGBToHSV( (int) (r * SCALE_FACTOR),
+                        (int) (g * SCALE_FACTOR),
+                        (int) (b * SCALE_FACTOR),
+                        hsvValues);
 
         float hue = hsvValues[0];
         boolean blue = hue > 220 && hue < 260;
-        // opMode.telemetry.addData("Red:", "%b - H: %03.02f, [R:%1.0f, G:%1.0f, B:%1.0f, A:%1.0f]", blue, hue, r, g, b, a);
+        RobotLog.d("isBlue:", "%b - H: %03.02f, [R:%1.0f, G:%1.0f, B:%1.0f, A:%1.0f]", blue, hue, r, g, b, a);
         return blue;
     }
 
@@ -669,13 +677,10 @@ public class DriveClass {
     }
 
     public void back() {
-
         fl_Drive.setTargetPosition(0);
         fr_Drive.setTargetPosition(0);
         bl_Drive.setTargetPosition(0);
         br_Drive.setTargetPosition(0);
-
-
     }
 
 
@@ -685,7 +690,7 @@ public class DriveClass {
 
     public enum Alliance { BLUE, RED }
 
-    public void AUTOfoundationBridge(Alliance team, boolean wall) {
+    public void AUTO_foundation(Alliance team, boolean wall) {
         int mul = 0;
         if (team == Alliance.BLUE) {
             mul = 1;
@@ -720,59 +725,85 @@ public class DriveClass {
         //======V==============||||||||||||========================
         //
         /////////////////////////////////////////////////////////////////////////////////////
-        side(1.8 * mul, Direction.LEFT, 0.7, 3);
+        side(1.8 * mul, Direction.LEFT,  0.7, 3); // slide out
         straight(0.8, Direction.REVERSE, 0.8, 3);
-        side(0.6 * mul, Direction.RIGHT, 0.9, 3);
+        side(0.8 * mul, Direction.RIGHT, 0.9, 3); // Push foundation to side wall
         straight(1.0, Direction.REVERSE, 0.9, 3);
-        side(1.1 * mul, Direction.RIGHT, 0.9, 3);
-        straight(1.2, Direction.FORWARD, 0.9, 3);
+        side(1.2 * mul, Direction.RIGHT, 0.9, 3);
+        straight(1.2, Direction.FORWARD, 0.9, 3); // Push foundation to wall
         // Step 6: drive to the side - park under the bridge
 
-        if (wall == false) {
-            straight(0.2, Direction.REVERSE, 0.5, 2);
-            side(2.8 * mul, Direction.LEFT, 0.9, 3);
+        if (wall == false) { // park cloth to Bridge
+            straight(0.3, Direction.REVERSE, 0.5, 2);
+            side(2.2 * mul, Direction.LEFT, 0.9, 3);
         }
 
-        if (wall == true) {
+        if (wall == true) { // park cloth to Wall
             side(1.8 * mul, Direction.LEFT, 0.9, 3);
             straight(1.2, DriveClass.Direction.FORWARD, 0.5, 2);
-            side(1.2 * mul, Direction.LEFT, 0.9, 3);
+            side(0.6 * mul, Direction.LEFT, 0.9, 3);
         }
+
+        driveToLine(team, false);
     }
 
     public void searchSkystone(Location location,int mul) {
         ElapsedTime timer = new ElapsedTime();
         // drive LEFT : search for SkyStone
-        drive(0, -0.7 * mul, 0, 0, 0);
+        drive(0, -0.2 * mul, 0, 0, 0);
+
         timer.reset();
+        double speed = 0.2;
         while (!isSkystone(location) && timer.seconds() < 10  && opMode.opModeIsActive()) {
+            drive(0, -speed * mul, 0, 0, 0);
+            opMode.sleep(1);
+            speed += 0.002;
+            if (speed<0.8){
+                speed=0.8;
+            }
+        }
+    }
+
+    public void driveToLine(Alliance team, boolean skystone) {
+        // drive LEFT : back to line.
+        int mul = (team == Alliance.RED) ? 1 : -1;
+        if (skystone) mul *= -1;
+
+        ElapsedTime timer = new ElapsedTime();
+        drive(0, 0.3 * mul, 0, 0, 0);
+        timer.reset();
+        while (!isLine(team) && timer.seconds() < 3  && opMode.opModeIsActive()) {
+            //telemetry.update();
             opMode.sleep(1);
         }
     }
 
-    public void AUTOskystone(Alliance team, Location location, ArmClass arm) {
+    public void AUTO_skystone(Alliance team, ArmClass arm) {
         ElapsedTime timer = new ElapsedTime();
-        int mul = 0;
+        int mul;
+        Location location;
+
         if (team == Alliance.BLUE) {
             mul = -1;
-        }
-        if (team == Alliance.RED) {
+            location = Location.RIGHT;
+        } else { // Alliance.BLUE
             mul = 1;
+            location = Location.LEFT;
         }
-        try {
 
+        try {
+            RobotLog.d("First Skystone");
             //robot.side(0.6, DriveClass.Direction.RIGHT, 1, 3);
             arm.pleaseDo(ArmClass.Mode.SKY1);
-            straight(0.95, DriveClass.Direction.FORWARD, 1, 4);
+            straight(1.1, DriveClass.Direction.FORWARD, 1, 4);
 
             // drive straight close to stones
-            drive(0.25, 0, 0, 0, 0);
+            drive(0.2, 0, 0, 0, 0);
             timer.reset();
             while (getSensorDistance(location) > 3 && timer.seconds() < 3 && opMode.opModeIsActive()) {
                 opMode.sleep(1);
             }
             stop();
-
 
             searchSkystone(location,mul);
 
@@ -793,14 +824,14 @@ public class DriveClass {
             side(2.5 * mul, DriveClass.Direction.RIGHT, 0.9, 8);
             // robot.stop();
 
-            // Put down stone.
-            //    arm.gootoo(445, 1000);
+            // Dropdown stone.
             arm.clamp(true);
             arm.setArmDriveMode(false);
             arm.gootoo(ArmClass.STAY,0);
             arm.clamp(false);
 
-            // ============= Second sky stone ===================
+            // ============= Second Skystone ===================
+            RobotLog.d("Second Skystone");
             side(3.2 * mul, DriveClass.Direction.LEFT, 0.9, 8);
 
             arm.clamp(true);
@@ -808,7 +839,7 @@ public class DriveClass {
             straight(0.2, DriveClass.Direction.FORWARD, 0.5, 1);
 
             // drive straight close to stones
-            drive(0.3, 0, 0, 0, 0);
+            drive(0.2, 0, 0, 0, 0);
             timer.reset();
             while (getSensorDistance(location) > 3 && timer.seconds() < 3 && opMode.opModeIsActive()) {
                 opMode.sleep(1);
@@ -844,22 +875,14 @@ public class DriveClass {
             side(-0.4 * mul, DriveClass.Direction.RIGHT, 0.7, 8);
             arm.linearDo(ArmClass.Mode.HOME);
 
-            // drive LEFT : back to line.
-            drive(0, -0.3 * mul, 0, 0, 0);
-            timer.reset();
-            while (!isRed() && timer.seconds() < 2  && opMode.opModeIsActive()) {
-                //telemetry.update();
-                opMode.sleep(1);
-            }
-
+            driveToLine(team, true);
             stop();
 
         } catch (InterruptedException e) {
             RobotLog.d("Arm Thread interrupted!");
+            stop();
         }
     }
-
-
 }
 
 

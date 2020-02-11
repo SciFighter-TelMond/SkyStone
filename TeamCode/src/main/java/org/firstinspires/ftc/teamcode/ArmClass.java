@@ -222,14 +222,14 @@ public class ArmClass extends Thread {
         arm0.setTargetPosition(pos0);
         arm1.setTargetPosition(pos1);
 
-        RobotLog.d("Arm goto start to: Arm0:(%d)->(%d), Arm1(%d)->(%d)  ", arm0.getCurrentPosition(), arm0.getTargetPosition(), arm1.getCurrentPosition(), arm1.getTargetPosition());
+        //RobotLog.d("Arm goto start to: Arm0:(%d)->(%d), Arm1(%d)->(%d)  ", arm0.getCurrentPosition(), arm0.getTargetPosition(), arm1.getCurrentPosition(), arm1.getTargetPosition());
         while (arm0.isBusy() || arm1.isBusy()) {
             sleep(50);
-            RobotLog.d("Arm goto run at: Arm0:(%d), Arm1(%d)", arm0.getCurrentPosition(), arm1.getCurrentPosition());
+            //RobotLog.d("Arm goto run at: Arm0:(%d), Arm1(%d)", arm0.getCurrentPosition(), arm1.getCurrentPosition());
             checkups();
         }
 
-        RobotLog.d("Arm goto complete at: Arm0:(%d), Arm1(%d)", arm0.getCurrentPosition(), arm1.getCurrentPosition());
+        //RobotLog.d("Arm goto complete at: Arm0:(%d), Arm1(%d)", arm0.getCurrentPosition(), arm1.getCurrentPosition());
     }
 
     public void pleaseDo(Mode newMode) {

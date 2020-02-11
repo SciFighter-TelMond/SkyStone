@@ -70,7 +70,7 @@ public class Auto_blue_loading_skystons extends LinearOpMode {
 
         runtime.reset();
 
-        robot.AUTOskystone(DriveClass.Alliance.BLUE, DriveClass.Location.RIGHT,arm);
+        robot.AUTO_skystone(DriveClass.Alliance.BLUE, arm);
 
         arm.end();
         robot.end();
