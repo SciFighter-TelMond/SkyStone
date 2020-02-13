@@ -192,18 +192,18 @@ public class ArmClass extends Thread {
             RobotLog.d("Arm1 checkups hit at: %d", arm1.getCurrentPosition());
             arm1.setTargetPosition(arm1.getCurrentPosition());
         }
-// TODO: checkout why the safty bray works when not supposed to.
-//        int diff0 = Math.abs(arm0.getCurrentPosition() - posArm0);
-//        if (diff0 <= 5) {
-//            arm0.setTargetPosition(arm0.getCurrentPosition());
-//            opMode.telemetry.addData("BRAKE", "Arm0 diff %d", diff0);
-//        }
-//        //
-//        int diff1 = Math.abs(arm1.getCurrentPosition() - posArm1);
-//        if (diff1 <= 5) {
-//            arm1.setTargetPosition(arm1.getCurrentPosition());
-//            opMode.telemetry.addData("BRAKE", "Arm1 diff %d", diff1);
-//        }
+        //TODO: checkout why the safty bray works when not supposed to.
+        int diff0 = Math.abs(arm0.getCurrentPosition() - posArm0);
+        if (diff0 <= 5) {
+            arm0.setTargetPosition(arm0.getCurrentPosition());
+            opMode.telemetry.addData("BRAKE", "Arm0 diff %d", diff0);
+        }
+        //
+        int diff1 = Math.abs(arm1.getCurrentPosition() - posArm1);
+        if (diff1 <= 5) {
+            arm1.setTargetPosition(arm1.getCurrentPosition());
+            opMode.telemetry.addData("BRAKE", "Arm1 diff %d", diff1);
+        }
 //
 //        posArm0 = arm0.getCurrentPosition();
 //        posArm1 = arm1.getCurrentPosition();
@@ -377,7 +377,7 @@ public class ArmClass extends Thread {
                     break;
 
                 case SKY2: // after catch move arm back
-                    gootoo(400, 260);
+                    gootoo(400, 240);
                     break;
 
                 case SKY3: // get ready to catch

@@ -643,7 +643,7 @@ public class DriveClass {
                         hsvValues);
 
         float hue = hsvValues[0];
-        boolean red = Math.abs(hue) < 80;
+        boolean red = Math.abs(hue) < 85;
         RobotLog.d("Red: %b - H: %03.02f, [R:%1.0f, G:%1.0f, B:%1.0f, A:%1.0f]", red, hue, r, g, b, a);
         return red;
     }
