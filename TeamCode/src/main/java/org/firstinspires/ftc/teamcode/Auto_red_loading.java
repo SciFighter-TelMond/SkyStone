@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -55,7 +56,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @Autonomous(name="Red Loading", group="SciFighters")// moving the blue foundation. you are in the blue team.
-//@Disabled
+@Disabled
 public class Auto_red_loading extends LinearOpMode {
 
     /* Declare OpMode members. */

@@ -94,7 +94,7 @@ public class ColorDistanceExample extends LinearOpMode {
     public void runOpMode() {
 
         // get a reference to the color sensor.
-        sensorColor = hardwareMap.get(ColorSensor.class, "color_right");
+        sensorColor = hardwareMap.get(ColorSensor.class, "color_down");
 
         // get a reference to the distance sensor that shares the same name.
         sensorDistance = hardwareMap.get(DistanceSensor.class, "color_right");

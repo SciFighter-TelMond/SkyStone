@@ -54,7 +54,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Blue Foundation Short - hooks front", group="SciFighters")// moving the blue foundation. you are in the blue team.
+@Autonomous(name="Blue Foundation Short", group="SciFighters")// moving the blue foundation. you are in the blue team.
 //@Disabled
 public class Auto_blue_foundation_short extends LinearOpMode {
 
@@ -100,7 +100,7 @@ public class Auto_blue_foundation_short extends LinearOpMode {
         robot.hooksUp();
         sleep(100);
 
-        robot.side(2.4, DriveClass.Direction.LEFT, 0.9, 3);
+       // robot.side(2.4, DriveClass.Direction.LEFT, 0.9, 3);
 //        while (opModeIsActive() && (runtime.seconds() < 30)) {
 //            telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
 //            telemetry.update();

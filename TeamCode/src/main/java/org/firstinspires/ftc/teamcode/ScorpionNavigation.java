@@ -81,7 +81,7 @@ import java.util.List;
  */
 
 @TeleOp(name="Scorpion: Vuforia Navigation", group ="SciFighterd")
-//@Disabled
+@Disabled
 public class ScorpionNavigation extends LinearOpMode {
 
     public static final String TAG = "Vuforia Navigation Sample";

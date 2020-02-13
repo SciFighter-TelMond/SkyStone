@@ -99,7 +99,7 @@ public class Auto_red_foundation_short extends LinearOpMode {
         // Step 4: set the foundation free
         robot.hooksUp();
         sleep(100);
-        robot.side(2.25, DriveClass.Direction.RIGHT, 0.9, 3);
+        //robot.side(2.25, DriveClass.Direction.RIGHT, 0.9, 3);
 //        while (opModeIsActive() && (runtime.seconds() < 30)) {
 //            telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
 //            telemetry.update();

@@ -114,18 +114,18 @@ public class DriveClass {
 
         PIDFCoefficients pidf = fr_Drive.getPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
-        pidf.p = 5;
-        pidf.i = 3;
-        pidf.d = 0.1;
-//        pidf.f = 14;
-        fr_Drive.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidf);
-//        fr_Drive.setPositionPIDFCoefficients(7);
-        fl_Drive.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidf);
-//        fl_Drive.setPositionPIDFCoefficients(7);
-        br_Drive.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidf);
-//        br_Drive.setPositionPIDFCoefficients(7);
-        bl_Drive.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidf);
-//        bl_Drive.setPositionPIDFCoefficients(7);
+//        pidf.p = 5;
+//        pidf.i = 3;
+//        pidf.d = 0.1;
+////        pidf.f = 14;
+//        fr_Drive.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidf);
+////        fr_Drive.setPositionPIDFCoefficients(7);
+//        fl_Drive.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidf);
+////        fl_Drive.setPositionPIDFCoefficients(7);
+//        br_Drive.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidf);
+////        br_Drive.setPositionPIDFCoefficients(7);
+//        bl_Drive.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidf);
+////        bl_Drive.setPositionPIDFCoefficients(7);
 
         if (useBrake) {
             fl_Drive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
@@ -378,8 +378,8 @@ public class DriveClass {
 
             int distFromStart = Math.abs(ticks - distToTarget);
 
-            if (distFromStart < 300) {
-                power = drivePower * distFromStart / 300 * 0.8 + 0.2;
+            if (distFromStart < 500) {
+                power = drivePower * distFromStart / 500 * 0.8 + 0.2;
             } else if (distToTarget < 500) {
                 power = 0.2;
             } else {
@@ -559,7 +559,7 @@ public class DriveClass {
     }
 
     public double getSensorDistanceRight() {
-        return sensorDistanceRight.getDistance(DistanceUnit.CM) - 3;
+        return sensorDistanceRight.getDistance(DistanceUnit.CM);
     }
 
     public double getSensorDistanceLeft() {
@@ -572,7 +572,7 @@ public class DriveClass {
             result = getSensorDistanceLeft();
             RobotLog.d("DriveClass: Left SensorDistance: %f", result);
         } else {
-            result = getSensorDistanceRight();
+            result = getSensorDistanceRight() - 4;
             RobotLog.d("DriveClass: Right SensorDistance: %f", result);
         }
         return result;
@@ -644,7 +644,7 @@ public class DriveClass {
 
         float hue = hsvValues[0];
         boolean red = Math.abs(hue) < 80;
-        RobotLog.d("Red:", "%b - H: %03.02f, [R:%1.0f, G:%1.0f, B:%1.0f, A:%1.0f]", red, hue, r, g, b, a);
+        RobotLog.d("Red: %b - H: %03.02f, [R:%1.0f, G:%1.0f, B:%1.0f, A:%1.0f]", red, hue, r, g, b, a);
         return red;
     }
 
@@ -664,8 +664,8 @@ public class DriveClass {
                         hsvValues);
 
         float hue = hsvValues[0];
-        boolean blue = hue > 220 && hue < 260;
-        RobotLog.d("isBlue:", "%b - H: %03.02f, [R:%1.0f, G:%1.0f, B:%1.0f, A:%1.0f]", blue, hue, r, g, b, a);
+        boolean blue = hue > 160 && hue < 260;
+        RobotLog.d("isBlue: %b - H: %03.02f, [R:%1.0f, G:%1.0f, B:%1.0f, A:%1.0f]", blue, hue, r, g, b, a);
         return blue;
     }
 
@@ -778,7 +778,7 @@ public class DriveClass {
         }
     }
 
-    public void AUTO_skystone(Alliance team, ArmClass arm) {
+    public void AUTO_skystone(Alliance team, ArmClass arm, boolean foundation) {
         ElapsedTime timer = new ElapsedTime();
         int mul;
         Location location;
@@ -795,7 +795,7 @@ public class DriveClass {
             RobotLog.d("First Skystone");
             //robot.side(0.6, DriveClass.Direction.RIGHT, 1, 3);
             arm.pleaseDo(ArmClass.Mode.SKY1);
-            straight(1.1, DriveClass.Direction.FORWARD, 1, 4);
+            straight(0.9, DriveClass.Direction.FORWARD, 1, 4);
 
             // drive straight close to stones
             drive(0.2, 0, 0, 0, 0);
@@ -812,13 +812,13 @@ public class DriveClass {
 
             // catch STONE
             arm.setArmDriveMode(false);
-            arm.gootoo(50, 400);
+            arm.gootoo(50, 400,1);
             arm.clamp(false); // close clamps
             opMode.sleep(800); // wait for clamps to close
             arm.pleaseDo(ArmClass.Mode.SKY2); // move arm back
 
             // drive backwards
-            straight(0.25, DriveClass.Direction.REVERSE, 0.5, 1);
+            straight(0.2, DriveClass.Direction.REVERSE, 0.5, 1);
 
             // slide RIGHT to put stone
             side(2.5 * mul, DriveClass.Direction.RIGHT, 0.9, 8);
@@ -855,13 +855,13 @@ public class DriveClass {
 
             // catch STONE
             arm.setArmDriveMode(false);
-            arm.gootoo(50, 400);
+            arm.gootoo(50, 400,1.5);
             arm.clamp(false);
             opMode.sleep(1000);
             arm.pleaseDo(ArmClass.Mode.SKY2);
 
             // drive backwards
-            straight(0.25, DriveClass.Direction.REVERSE, 0.5, 1);
+            straight(0.2, DriveClass.Direction.REVERSE, 0.5, 1);
 
             // slide RIGHT to put stone
             side(3.8 * mul, DriveClass.Direction.RIGHT, 0.9, 8);
@@ -869,11 +869,12 @@ public class DriveClass {
 
             arm.clamp(true);
             arm.setArmDriveMode(false);
-            arm.gootoo(ArmClass.STAY, 0);
+            arm.gootoo(ArmClass.STAY, 0,1);
             arm.clamp(false);
 
-            side(-0.4 * mul, DriveClass.Direction.RIGHT, 0.7, 8);
             arm.linearDo(ArmClass.Mode.HOME);
+            side(-0.7 * mul, DriveClass.Direction.RIGHT, 0.7, 8);
+
 
             driveToLine(team, true);
             stop();

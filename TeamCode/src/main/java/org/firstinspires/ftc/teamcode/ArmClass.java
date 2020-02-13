@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
 public class ArmClass extends Thread {
@@ -224,6 +225,25 @@ public class ArmClass extends Thread {
 
         //RobotLog.d("Arm goto start to: Arm0:(%d)->(%d), Arm1(%d)->(%d)  ", arm0.getCurrentPosition(), arm0.getTargetPosition(), arm1.getCurrentPosition(), arm1.getTargetPosition());
         while (arm0.isBusy() || arm1.isBusy()) {
+            sleep(50);
+            //RobotLog.d("Arm goto run at: Arm0:(%d), Arm1(%d)", arm0.getCurrentPosition(), arm1.getCurrentPosition());
+            checkups();
+        }
+
+        //RobotLog.d("Arm goto complete at: Arm0:(%d), Arm1(%d)", arm0.getCurrentPosition(), arm1.getCurrentPosition());
+    }
+
+    public void gootoo(int pos0, int pos1, double timeout) throws InterruptedException {
+        ElapsedTime runTime = new ElapsedTime();
+        runTime.reset();
+        if (pos0 == STAY) pos0 = arm0.getCurrentPosition();
+        if (pos1 == STAY) pos1 = arm1.getCurrentPosition();
+
+        arm0.setTargetPosition(pos0);
+        arm1.setTargetPosition(pos1);
+
+        //RobotLog.d("Arm goto start to: Arm0:(%d)->(%d), Arm1(%d)->(%d)  ", arm0.getCurrentPosition(), arm0.getTargetPosition(), arm1.getCurrentPosition(), arm1.getTargetPosition());
+        while ((arm0.isBusy() || arm1.isBusy()) && runTime.seconds() < timeout) {
             sleep(50);
             //RobotLog.d("Arm goto run at: Arm0:(%d), Arm1(%d)", arm0.getCurrentPosition(), arm1.getCurrentPosition());
             checkups();
