@@ -68,8 +68,8 @@ public class ArmClass extends Thread {
         arm0.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         arm1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
-        arm0.setTargetPositionTolerance(10);
-        arm1.setTargetPositionTolerance(10);
+        arm0.setTargetPositionTolerance(15);
+        arm1.setTargetPositionTolerance(15);
 
 
         //==============================
@@ -83,15 +83,15 @@ public class ArmClass extends Thread {
         RobotLog.d(pidf1.toString()); // p=2.000000 i=0.500000 d=0.000000 f=11.100006
 
         // Arm 0
-        pidf0.p = 4;
-        pidf0.i = 3;
+        pidf0.p = 5;
+        pidf0.i = 5;
         pidf0.d = 0.1;
         arm0.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidf0);
         arm0.setPositionPIDFCoefficients(7);
 
         // Arm 1
-        pidf1.p = 4;
-        pidf1.i = 3;
+        pidf1.p = 5;
+        pidf1.i = 5;
         pidf1.d = 0.1;
         arm1.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidf1);
         arm1.setPositionPIDFCoefficients(7);
@@ -280,7 +280,10 @@ public class ArmClass extends Thread {
             switch (mode) {
                 case HOME:
                     RobotLog.d("Arm do: HOME");
-                    gootoo(300, STAY);
+                    if (arm1.getCurrentPosition() > 400)
+                        gootoo(300,0);
+                    else
+                        gootoo(300, STAY);
                     driveClass.rollers(true);
                     sleep(500);
                     gootoo(-500, -500);
@@ -377,7 +380,7 @@ public class ArmClass extends Thread {
                     break;
 
                 case SKY2: // after catch move arm back
-                    gootoo(400, 240);
+                    gootoo(500, 200);
                     break;
 
                 case SKY3: // get ready to catch

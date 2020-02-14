@@ -107,10 +107,10 @@ public class DriveClass {
         bl_Drive.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         br_Drive.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
-        fl_Drive.setTargetPositionTolerance(10);
-        fr_Drive.setTargetPositionTolerance(10);
-        bl_Drive.setTargetPositionTolerance(10);
-        br_Drive.setTargetPositionTolerance(10);
+        fl_Drive.setTargetPositionTolerance(15);
+        fr_Drive.setTargetPositionTolerance(15);
+        bl_Drive.setTargetPositionTolerance(15);
+        br_Drive.setTargetPositionTolerance(15);
 
         PIDFCoefficients pidf = fr_Drive.getPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
@@ -227,7 +227,6 @@ public class DriveClass {
         fr_Drive.setPower(fr_power);
         bl_Drive.setPower(bl_power);
         br_Drive.setPower(br_power);
-
     }
 
     public void straight(double target_meter, Direction direction, double speed, int timeout) {
@@ -405,10 +404,6 @@ public class DriveClass {
 
         ElapsedTime runtime = new ElapsedTime();
         runtime.reset();
-        fl_Drive.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        fr_Drive.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        bl_Drive.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        br_Drive.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
 
         /* 1 round is 5600 ticks
          * to the right posotive
@@ -601,11 +596,11 @@ public class DriveClass {
                 hsvValues);
 
         float hue = hsvValues[0];
-        boolean skystone = hue > 110 && a > 600;
+        boolean skystone = hue > 110 && a > 500;
         // opMode.telemetry.addData("Sky:", "%b - H: %03.02f, [R:%1.0f, G:%1.0f, B:%1.0f, A:%1.0f]", skystone, hue, r, g, b, a);
-        if (skystone) {
-            RobotLog.d("Skystone found - hue:%f, alpha:%f", hue, a);
-        }
+
+        RobotLog.d("Skystone found: %b - hue:%f, alpha:%f",skystone, hue, a);
+
         return skystone;
     }
 
@@ -754,7 +749,7 @@ public class DriveClass {
 
         timer.reset();
         double speed = 0.2;
-        while (!isSkystone(location) && timer.seconds() < 10  && opMode.opModeIsActive()) {
+        while (!isSkystone(location) && timer.seconds() < 4  && opMode.opModeIsActive()) {
             drive(0, -speed * mul, 0, 0, 0);
             opMode.sleep(1);
             speed += 0.002;
@@ -798,7 +793,7 @@ public class DriveClass {
             straight(0.9, DriveClass.Direction.FORWARD, 1, 4);
 
             // drive straight close to stones
-            drive(0.2, 0, 0, 0, 0);
+            drive(0.3, 0, 0, 0, 0);
             timer.reset();
             while (getSensorDistance(location) > 3 && timer.seconds() < 3 && opMode.opModeIsActive()) {
                 opMode.sleep(1);
@@ -808,7 +803,7 @@ public class DriveClass {
             searchSkystone(location,mul);
 
             // drive LEFT one block
-            side(0.25 * mul, DriveClass.Direction.LEFT, 0.5, 2);
+            side(0.24 * mul, DriveClass.Direction.LEFT, 0.5, 2);
 
             // catch STONE
             arm.setArmDriveMode(false);
@@ -818,28 +813,32 @@ public class DriveClass {
             arm.pleaseDo(ArmClass.Mode.SKY2); // move arm back
 
             // drive backwards
-            straight(0.2, DriveClass.Direction.REVERSE, 0.5, 1);
+            straight(0.2, DriveClass.Direction.REVERSE, 1, 1);
 
             // slide RIGHT to put stone
-            side(2.5 * mul, DriveClass.Direction.RIGHT, 0.9, 8);
+            side(2.8 * mul, DriveClass.Direction.RIGHT, 0.95, 8);
             // robot.stop();
 
             // Dropdown stone.
-            arm.clamp(true);
             arm.setArmDriveMode(false);
+            arm.gootoo(ArmClass.STAY,700);
+            arm.clamp(true);
+            opMode.sleep(200);
             arm.gootoo(ArmClass.STAY,0);
             arm.clamp(false);
 
-            // ============= Second Skystone ===================
+            // ============= Second Skystone ==============================================================================================================================
             RobotLog.d("Second Skystone");
-            side(3.2 * mul, DriveClass.Direction.LEFT, 0.9, 8);
+            side(3.3 * mul, DriveClass.Direction.LEFT, 0.95, 8);
 
             arm.clamp(true);
             arm.pleaseDo(ArmClass.Mode.SKY3); // move arm forward ready to catch
-            straight(0.2, DriveClass.Direction.FORWARD, 0.5, 1);
+            //straight(0.2, DriveClass.Direction.FORWARD, 0.5, 1);
+            stop();
 
             // drive straight close to stones
-            drive(0.2, 0, 0, 0, 0);
+
+            drive(0.3, 0, 0, 0, 0);
             timer.reset();
             while (getSensorDistance(location) > 3 && timer.seconds() < 3 && opMode.opModeIsActive()) {
                 opMode.sleep(1);
@@ -850,7 +849,7 @@ public class DriveClass {
             searchSkystone(location,mul);
 
             // drive LEFT one block
-            side(0.25 * mul, DriveClass.Direction.LEFT, 0.4, 2);
+            side(0.24 * mul, DriveClass.Direction.LEFT, 0.4, 2);
             //  robot.stop();
 
             // catch STONE
@@ -861,22 +860,42 @@ public class DriveClass {
             arm.pleaseDo(ArmClass.Mode.SKY2);
 
             // drive backwards
-            straight(0.2, DriveClass.Direction.REVERSE, 0.5, 1);
+            straight(0.25, DriveClass.Direction.REVERSE, 1, 1);
 
-            // slide RIGHT to put stone
-            side(3.8 * mul, DriveClass.Direction.RIGHT, 0.9, 8);
-            //    robot.stop();
+            if(foundation == true){
 
-            arm.clamp(true);
-            arm.setArmDriveMode(false);
-            arm.gootoo(ArmClass.STAY, 0,1);
-            arm.clamp(false);
+                side(5 * mul, DriveClass.Direction.RIGHT, 0.95, 8);
+                straight(0.3, Direction.FORWARD,1,3);
+                arm.setArmDriveMode(false);
+                arm.gootoo(700,900);
+                arm.clamp(true);
+                straight(0.5, Direction.REVERSE,1,3);
+                arm.pleaseDo(ArmClass.Mode.HOME);
+                arm.clamp(false);
+                rotate(0.5,Direction.LEFT,1,3);
+                straight(0.5, Direction.REVERSE,1,3);
+                hooksDown();
+                straight(0.3, Direction.REVERSE,1,3);
+                straight(1.2, Direction.FORWARD,1,5);
+                rotate(0.25,Direction.LEFT,1,3);
+                hooksUp();
+            }
+            else {
+                // slide RIGHT to put stone
+                side(3.8 * mul, DriveClass.Direction.RIGHT, 0.9, 8);
+                //    robot.stop();
 
-            arm.linearDo(ArmClass.Mode.HOME);
-            side(-0.7 * mul, DriveClass.Direction.RIGHT, 0.7, 8);
+                arm.clamp(true);
+                arm.setArmDriveMode(false);
+                arm.gootoo(ArmClass.STAY, 0, 1);
+                arm.clamp(false);
+
+                arm.linearDo(ArmClass.Mode.HOME);
+                side(-0.7 * mul, DriveClass.Direction.RIGHT, 0.7, 8);
 
 
-            driveToLine(team, true);
+                driveToLine(team, true);
+            }
             stop();
 
         } catch (InterruptedException e) {

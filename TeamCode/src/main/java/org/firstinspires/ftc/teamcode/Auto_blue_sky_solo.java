@@ -34,35 +34,18 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
- * This file illustrates the concept of driving a path based on time.
- * It uses the common Pushbot hardware class to define the drive on the robot.
- * The code is structured as a LinearOpMode
- *
- * The code assumes that you do NOT have encoders on the wheels,
- *   otherwise you would use: PushbotAutoDriveByEncoder;
- *
- *   The desired path in this example is:
- *   - Drive forward for 3 seconds
- *   - Spin right for 1.3 seconds
- *   - Drive Backwards for 1 Second
- *   - Stop and close the claw.
- *
- *  The code is written in a simple form with no optimizations.
- *  However, there are several ways that this type of sequence could be streamlined,
- *
- * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="TEST", group="SciFighters")// moving the blue foundation. you are in the blue team.
+@Autonomous(name="Blue SkyStone - Solo", group="SciFighters")// moving the blue foundation. you are in the blue team.
 //@Disabled
-public class Auto_test extends LinearOpMode {
+public class Auto_blue_sky_solo extends LinearOpMode {
 
     /* Declare OpMode members. */
-    private DriveClass         robot   = new DriveClass(this);   // Use a Pushbot's hardware
-    private ElapsedTime     runtime = new ElapsedTime();
+    private DriveClass robot = new DriveClass(this);   // Use a Pushbot's hardware
+    private ArmClass arm = new ArmClass(this, robot);
 
-
+    private ElapsedTime runtime = new ElapsedTime();
+    private ElapsedTime timer = new ElapsedTime();
 
     @Override
     public void runOpMode() {
@@ -71,6 +54,8 @@ public class Auto_test extends LinearOpMode {
          * Initialize the drive system variables.
          * The init() method of the hardware class does all the work here
          */
+
+        arm.init(hardwareMap);
         robot.init(hardwareMap);
 
         // Send telemetry message to signify robot waiting;
@@ -80,15 +65,15 @@ public class Auto_test extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
+        arm.begin();
+        arm.setArmDriveMode(false);
 
         runtime.reset();
-        /*starting point: building area, the bridge is on the right,
-         * the front of the robot is to the wall, the hooks directed to the middle of the field.
-         * please start close to the building site*/
-        // Step 1:  Drive forward (actually back) and a bit to the left (actually to the right)
-        robot.rotate(1, DriveClass.Direction.RIGHT, 1, 3);
-        // Step 6:  stop
-        robot.stop();
-        //sleep(1000);
+
+        robot.AUTO_skystone(DriveClass.Alliance.BLUE, arm,true);
+
+        arm.end();
+        robot.end();
     }
+
 }
