@@ -198,21 +198,21 @@ public class IterativeDrive extends OpMode {
         }
 
         if (gamepad2.left_bumper) {
-            telemetry.addData("left bumper true: clamp open", true);
+            telemetry.addData("left bumper true: openClamps open", true);
             telemetry.update();
-            arm.clamp(true);
+            arm.openClamps(true);
         }
         if (gamepad2.right_bumper) {
-            telemetry.addData("left bumper false: clamp close", false);
+            telemetry.addData("left bumper false: openClamps close", false);
             telemetry.update();
-            arm.clamp(false);
+            arm.openClamps(false);
         }
 
         if (gamepad2.left_trigger > 0.5) {
-            arm.rotateClamp(true);
+            arm.rotateClamps(true);
         }
         if (gamepad2.right_trigger > 0.5) {
-            arm.rotateClamp(false);
+            arm.rotateClamps(false);
         }
 
         // =========================================

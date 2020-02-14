@@ -5,8 +5,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
-import org.firstinspires.ftc.robotcore.external.android.AndroidTextToSpeech;
-
 /**
  * FTC - SCI-Fighters
  * Mechanom Drive 3
@@ -150,11 +148,11 @@ public class LinearDrive extends LinearOpMode {
 
             clamps.update(gamepad2.left_bumper);
             if (clamps.isChanged())
-                arm.clamp(clamps.getState());
+                arm.openClamps(clamps.getState());
 
             clamps_rotate.update(gamepad2.right_bumper);
             if (clamps_rotate.isChanged())
-                arm.rotateClamp(clamps_rotate.getState());
+                arm.rotateClamps(clamps_rotate.getState());
 
             arm.setBoost(gamepad2.right_trigger + gamepad2.left_trigger);
 

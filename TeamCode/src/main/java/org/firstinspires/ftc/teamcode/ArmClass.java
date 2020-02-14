@@ -26,7 +26,7 @@ public class ArmClass extends Thread {
     volatile private double power = 1;
     volatile private double speed_boost = 0.5;
 
-    public enum Mode {IDLE, MANUAL, HOME, PICK, STRAIGHT, BUILD, DROP, SKY1, SKY2, SKY3}
+    public enum Mode {IDLE, MANUAL, HOME, PICK, STRAIGHT, BUILD, DROP, SKY1_STRETCH, SKY2_FOLD, SKY3_READY, SKY4_DROP_BACK }
 
     volatile private Mode mode = Mode.IDLE;
 
@@ -118,7 +118,7 @@ public class ArmClass extends Thread {
         setArmDriveMode(true);
     }
 
-    public void clamp(boolean open) {
+    public void openClamps(boolean open) {
         if (open) {
             clamps.setPosition(0);
         } else {
@@ -126,7 +126,7 @@ public class ArmClass extends Thread {
         }
     }
 
-    public void rotateClamp(boolean rot) {
+    public void rotateClamps(boolean rot) {
         if (rot) {
             clampsRotate.setPosition(1);
         } else {
@@ -196,13 +196,13 @@ public class ArmClass extends Thread {
         int diff0 = Math.abs(arm0.getCurrentPosition() - posArm0);
         if (diff0 <= 5) {
             arm0.setTargetPosition(arm0.getCurrentPosition());
-            opMode.telemetry.addData("BRAKE", "Arm0 diff %d", diff0);
+            RobotLog.d("SAFETY BRAKE: Arm0 diff %d", diff0);
         }
         //
         int diff1 = Math.abs(arm1.getCurrentPosition() - posArm1);
         if (diff1 <= 5) {
             arm1.setTargetPosition(arm1.getCurrentPosition());
-            opMode.telemetry.addData("BRAKE", "Arm1 diff %d", diff1);
+            RobotLog.d("SAFETY BRAKE: Arm1 diff %d", diff1);
         }
 //
 //        posArm0 = arm0.getCurrentPosition();
@@ -280,10 +280,9 @@ public class ArmClass extends Thread {
             switch (mode) {
                 case HOME:
                     RobotLog.d("Arm do: HOME");
-                    if (arm1.getCurrentPosition() > 400)
-                        gootoo(300,0);
-                    else
-                        gootoo(300, STAY);
+                    gootoo(500,0);
+                    rotateClamps(false);
+                    openClamps(false);
                     driveClass.rollers(true);
                     sleep(500);
                     gootoo(-500, -500);
@@ -296,10 +295,10 @@ public class ArmClass extends Thread {
                     // peak up a cube and get back to drive position.
                     double rollersState = 0;
                     RobotLog.d("Arm do: PICK");
-                    rotateClamp(false);
+                    rotateClamps(false);
 
-                    RobotLog.d("Arm do: PICK - Open clamp");
-                    clamp(true);
+                    RobotLog.d("Arm do: PICK - Open openClamps");
+                    openClamps(true);
                     RobotLog.d("Arm do: PICK - Open Rollers");
                     driveClass.rollers(true);
 
@@ -307,7 +306,7 @@ public class ArmClass extends Thread {
                     gootoo(500, 0);
                     RobotLog.d("Arm do: PICK - Go down");
                     gootoo(-200, -200);
-                    clamp(false);
+                    openClamps(false);
                     RobotLog.d("Arm do: before sleep");
                     sleep(700);
                     RobotLog.d("Arm do: after sleep");
@@ -372,19 +371,27 @@ public class ArmClass extends Thread {
                     RobotLog.d("Arm do: BUILD/");
                     break;
 
-                case SKY1: // open arm to start position
-                    gootoo(515, 0);
-                    rotateClamp(true);
-                    clamp(true);
+                case SKY1_STRETCH: // stretch arm to start position
+                    gootoo(600, 0);
+                    rotateClamps(true);
+                    openClamps(true);
                     gootoo(515, 360);
                     break;
 
-                case SKY2: // after catch move arm back
-                    gootoo(500, 200);
+                case SKY2_FOLD: // after catch move arm back
+                    gootoo(550, 200);
                     break;
 
-                case SKY3: // get ready to catch
+                case SKY3_READY: // get ready to catch
                     gootoo(515, 360);
+                    break;
+
+                case SKY4_DROP_BACK: // get ready to catch
+                    gootoo(1000, 500);
+                    gootoo(1600, 200);
+                    openClamps(true);
+                    sleep(500);
+                    linearDo(Mode.HOME);
                     break;
 
                 default:

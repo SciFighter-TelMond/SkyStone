@@ -694,7 +694,7 @@ public class DriveClass {
             mul = -1;
         }
 
-        side(0.6 * mul, Direction.RIGHT, 0.7, 3);
+        side(0.8 * mul, Direction.RIGHT, 0.7, 3);
         straight(1.3, Direction.REVERSE, 0.7, 4);
         straight(0.5, Direction.REVERSE, 0.2, 5);
 
@@ -789,7 +789,7 @@ public class DriveClass {
         try {
             RobotLog.d("First Skystone");
             //robot.side(0.6, DriveClass.Direction.RIGHT, 1, 3);
-            arm.pleaseDo(ArmClass.Mode.SKY1);
+            arm.pleaseDo(ArmClass.Mode.SKY1_STRETCH);
             straight(0.9, DriveClass.Direction.FORWARD, 1, 4);
 
             // drive straight close to stones
@@ -808,9 +808,9 @@ public class DriveClass {
             // catch STONE
             arm.setArmDriveMode(false);
             arm.gootoo(50, 400,1);
-            arm.clamp(false); // close clamps
+            arm.openClamps(false); // close clamps
             opMode.sleep(800); // wait for clamps to close
-            arm.pleaseDo(ArmClass.Mode.SKY2); // move arm back
+            arm.pleaseDo(ArmClass.Mode.SKY2_FOLD); // move arm back
 
             // drive backwards
             straight(0.2, DriveClass.Direction.REVERSE, 1, 1);
@@ -822,17 +822,17 @@ public class DriveClass {
             // Dropdown stone.
             arm.setArmDriveMode(false);
             arm.gootoo(ArmClass.STAY,700);
-            arm.clamp(true);
+            arm.openClamps(true);
             opMode.sleep(200);
             arm.gootoo(ArmClass.STAY,0);
-            arm.clamp(false);
+            arm.openClamps(false);
 
             // ============= Second Skystone ==============================================================================================================================
             RobotLog.d("Second Skystone");
             side(3.3 * mul, DriveClass.Direction.LEFT, 0.95, 8);
 
-            arm.clamp(true);
-            arm.pleaseDo(ArmClass.Mode.SKY3); // move arm forward ready to catch
+            arm.openClamps(true);
+            arm.pleaseDo(ArmClass.Mode.SKY3_READY); // move arm forward ready to catch
             //straight(0.2, DriveClass.Direction.FORWARD, 0.5, 1);
             stop();
 
@@ -855,40 +855,45 @@ public class DriveClass {
             // catch STONE
             arm.setArmDriveMode(false);
             arm.gootoo(50, 400,1.5);
-            arm.clamp(false);
+            arm.openClamps(false);
             opMode.sleep(1000);
-            arm.pleaseDo(ArmClass.Mode.SKY2);
+            arm.pleaseDo(ArmClass.Mode.SKY2_FOLD);
 
             // drive backwards
             straight(0.25, DriveClass.Direction.REVERSE, 1, 1);
 
-            if(foundation == true){
+            if(foundation == true) {
 
-                side(5 * mul, DriveClass.Direction.RIGHT, 0.95, 8);
-                straight(0.3, Direction.FORWARD,1,3);
-                arm.setArmDriveMode(false);
-                arm.gootoo(700,900);
-                arm.clamp(true);
-                straight(0.5, Direction.REVERSE,1,3);
-                arm.pleaseDo(ArmClass.Mode.HOME);
-                arm.clamp(false);
-                rotate(0.5,Direction.LEFT,1,3);
-                straight(0.5, Direction.REVERSE,1,3);
-                hooksDown();
-                straight(0.3, Direction.REVERSE,1,3);
-                straight(1.2, Direction.FORWARD,1,5);
-                rotate(0.25,Direction.LEFT,1,3);
-                hooksUp();
+                side(5 * mul, DriveClass.Direction.RIGHT, 0.95, 8);  // slide toward foundation line
+
+                rotate(0.5,Direction.LEFT,1,3);             // rotate 180
+                straight(0.5, Direction.REVERSE,1,3);   // drive to foundation
+                hooksDown();                                                        // catch the foundation
+                straight_ignoreBumper(0.3, Direction.REVERSE, 0.2, 1 ); // slow drive to hook the foundation.
+                arm.pleaseDo(ArmClass.Mode.SKY4_DROP_BACK);                         // drop the stone backwards and HOME the arm.
+                straight(0.5, Direction.FORWARD,1,3);    // move forward half way toward wall.
+                rotate(0.25, Direction.LEFT,1,3);            // rotate foundation to building zone.
+                hooksUp();                                                           // release hooks
+                opMode.sleep(200);                                       // wait for hooks to open
+                straight(1.2, Direction.FORWARD,1,5);     // drive towards bridge
+
+                // drive FORWARD to line - park on line under the bridge.
+                timer.reset();
+                drive(0.4, 0, 0, 0, 0);
+                while (!isLine(team) && timer.seconds() < 3  && opMode.opModeIsActive()) {
+                    //telemetry.update();
+                    opMode.sleep(1);
+                }
             }
             else {
                 // slide RIGHT to put stone
                 side(3.8 * mul, DriveClass.Direction.RIGHT, 0.9, 8);
                 //    robot.stop();
 
-                arm.clamp(true);
+                arm.openClamps(true);
                 arm.setArmDriveMode(false);
                 arm.gootoo(ArmClass.STAY, 0, 1);
-                arm.clamp(false);
+                arm.openClamps(false);
 
                 arm.linearDo(ArmClass.Mode.HOME);
                 side(-0.7 * mul, DriveClass.Direction.RIGHT, 0.7, 8);
