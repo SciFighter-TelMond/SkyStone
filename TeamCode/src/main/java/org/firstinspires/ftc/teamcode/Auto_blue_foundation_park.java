@@ -30,7 +30,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -55,12 +54,12 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Red Loading", group="SciFighters")// moving the blue foundation. you are in the blue team.
-@Disabled
-public class Auto_red_loading extends LinearOpMode {
+@Autonomous(name="Blue Foundation PARK", group="SciFighters")// moving the blue foundation. you are in the blue team.
+//@Disabled
+public class Auto_blue_foundation_park extends LinearOpMode {
 
     /* Declare OpMode members. */
-    private DriveClass      robot   = new DriveClass(this);   // Use a Pushbot's hardware
+    private DriveClass         robot   = new DriveClass(this);   // Use a Pushbot's hardware
     private ElapsedTime     runtime = new ElapsedTime();
 
 
@@ -83,33 +82,7 @@ public class Auto_red_loading extends LinearOpMode {
 
 
         runtime.reset();
-        /*starting point: building area, the bridge is on the left,
-         * the front of the robot is to the wall, the hooks directed to the middle of the field.
-         * please start close to the building site*/
-        // Step 1:  Drive forward (actually back) and a bit to the right (actually to the left)
-        robot.rollers(true);
-        robot.rollersRunIn();
-        // robot.side(0.6, DriveClass.Direction.LEFT, 1, 3);
-        robot.straight(1.7, DriveClass.Direction.FORWARD, 0.4, 5);
-        robot.straight(0.2, DriveClass.Direction.REVERSE, 0.4, 5);
-        robot.straight(0.2, DriveClass.Direction.FORWARD, 0.4, 5);
-        robot.rollers(false);
-        robot.rollersRunIn();
-        robot.straight(0.6, DriveClass.Direction.REVERSE, 0.4, 5);
-
-        robot.rotate(0.26, DriveClass.Direction.RIGHT, 0.5, 5);
-        robot.rollersStop();
-        robot.straight(2.3, DriveClass.Direction.FORWARD, 0.6, 5);
-        robot.rollersRunOut();
-        robot.straight(0.9, DriveClass.Direction.REVERSE, 0.6, 5);
-        robot.side(0.2, DriveClass.Direction.LEFT, 0.6, 3);
-
-//        while (opModeIsActive() && (runtime.seconds() < 30)) {
-//            telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
-//            telemetry.update();
-//        }
-
-        // Step 6:  stop
+        robot.AUTO_foundation(DriveClass.Alliance.BLUE, DriveClass.FoundationType.PARK_ONLY);
         robot.stop();
         //sleep(1000);
     }

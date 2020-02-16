@@ -87,7 +87,7 @@ public class Auto_red_foundation_bridge extends LinearOpMode {
          * please start close to the building site*/
         // Step 1:  Drive forward (actually back) and a bit to the right (actually to the left)
 
-        robot.AUTO_foundation(DriveClass.Alliance.RED,false);
+        robot.AUTO_foundation(DriveClass.Alliance.RED, DriveClass.FoundationType.BRIDGE);
 
 
         // Step 6:  stop

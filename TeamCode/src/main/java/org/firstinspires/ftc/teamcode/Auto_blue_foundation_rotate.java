@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -55,7 +56,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @Autonomous(name="Blue Foundation - rotate", group="SciFighters")// moving the blue foundation. you are in the blue team.
-//@Disabled
+@Disabled
 public class Auto_blue_foundation_rotate extends LinearOpMode {
 
     /* Declare OpMode members. */
@@ -86,24 +87,24 @@ public class Auto_blue_foundation_rotate extends LinearOpMode {
          * the front of the robot is to the wall, the hooks directed to the middle of the field.
          * please start close to the building site*/
         // Step 1:  Drive forward (actually back) and a bit to the left (actually to the right)
-        robot.side(0.3, DriveClass.Direction.RIGHT, 1, 3);
-        robot.straight(1.7, DriveClass.Direction.REVERSE, 0.4, 3);
+        robot.strafe(0.3, DriveClass.Direction.RIGHT, 1, 3, 0);
+        robot.straight(1.7, DriveClass.Direction.REVERSE, 0.4, 3, 0,true);
 
         sleep(200);
         // Step 2: should be in front of the foundation, hooks down
         robot.hooksDown();
         sleep(400);
         // Step 3: drag the foundation to the wall
-        robot.straight(0.5, DriveClass.Direction.FORWARD, 1, 3);
+        robot.straight(0.5, DriveClass.Direction.FORWARD, 1, 3, 0,true);
         robot.rotate(0.82, DriveClass.Direction.RIGHT, 0.7, 5);
-        robot.straight_ignoreBumper(1.3, DriveClass.Direction.REVERSE, 0.7, 3);
-        robot.side(0.5, DriveClass.Direction.LEFT, 0.7, 3);
+        robot.straight(1.3, DriveClass.Direction.REVERSE, 0.7, 3, 90, false); // push foundations
+        robot.strafe(0.5, DriveClass.Direction.LEFT, 0.7, 3, 0);
 
 
         // Step 4: set the foundation free
         robot.hooksUp();
         sleep(100);
-        robot.side(2.3, DriveClass.Direction.RIGHT, 0.7, 3);
+        robot.strafe(2.3, DriveClass.Direction.RIGHT, 0.7, 3, 0);
            while (opModeIsActive() && (runtime.seconds() < 30)) {
             telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
             telemetry.update();

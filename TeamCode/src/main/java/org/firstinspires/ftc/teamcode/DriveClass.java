@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import android.graphics.Color;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -13,8 +14,13 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
 
 /**
@@ -60,11 +66,12 @@ public class DriveClass {
     volatile private LinearOpMode opMode = null;
     volatile private HardwareMap hwMap = null;
 
+    // The Gyro IMU sensor object
+    BNO055IMU imu;
 
     public enum Direction { LEFT, RIGHT, FORWARD, REVERSE }
 
     public enum Location { LEFT, RIGHT }
-
 
     private boolean useBrake;
 
@@ -166,16 +173,40 @@ public class DriveClass {
         sensorColorLeft = hardwareMap.get(ColorSensor.class, "color_left");
         sensorDistanceLeft = hardwareMap.get(DistanceSensor.class, "color_left");
         sensorColorDown = hardwareMap.get(ColorSensor.class, "color_down");
+
+        // Set up the parameters with which we will use our IMU. Note that integration
+        // algorithm here just reports accelerations to the logcat log; it doesn't actually
+        // provide positional information.
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+        parameters.loggingEnabled      = true;
+        parameters.loggingTag          = "IMU";
+        // parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+
+        // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
+        // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
+        // and named "imu".
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
+    }
+
+    public void begin() {
+        // Start the logging of measured acceleration
+        imu.startAccelerationIntegration(new Position(), new Velocity(), 10);
     }
 
     public boolean getStoneBumperState() {
         return stoneBumper.getState();
     }
 
-    // ==================================================================================================
-    public void driveTo(double x, double y, double z, Orientation rotation) {
-
+    public float readGyroHeading() {
+        Orientation angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        return angles.firstAngle;
     }
+
+    // ==================================================================================================
 
     public void drive(double straight, double side, double turn, double speedTrigger, double turnTrigger) {
 
@@ -234,7 +265,7 @@ public class DriveClass {
         br_Drive.setPower(br_power);
     }
 
-    public void straight(double target_meter, Direction direction, double speed, int timeout) {
+    public void straight(double target_meter, Direction direction, double speed, int timeout, double heading, boolean stopOnBumpers) {
         ElapsedTime runTime = new ElapsedTime();
         runTime.reset();
 
@@ -259,8 +290,7 @@ public class DriveClass {
         bl_Drive.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
         br_Drive.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
 
-        double drivePower = speed;
-        double power = drivePower;
+        double power;
 
         while ((fl_Drive.isBusy() /*|| bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy()*/) &&
                 opMode.opModeIsActive() && runTime.seconds() < timeout) {
@@ -270,19 +300,24 @@ public class DriveClass {
             int distFromStart = Math.abs(ticks - distToTarget);
 
             if (distFromStart < 300) {
-                power = drivePower * distFromStart / 300 * 0.8 + 0.2;
+                power = speed * distFromStart / 300 * 0.8 + 0.2;
             } else if (distToTarget < 300) {
-                power = drivePower/3;
+                power = speed/3;
             } else {
-                power = drivePower;
+                power = speed;
             }
+
+            double headingGyro = readGyroHeading();
+            double headingError = heading - headingGyro;
+            double headingCorrection = headingError * 0.01;
+            // TODO: use headingCorrection.
 
             fl_Drive.setPower(power);
             fr_Drive.setPower(power);
             bl_Drive.setPower(power);
             br_Drive.setPower(power);
 
-            if (direction == Direction.REVERSE) {
+            if (stopOnBumpers && direction == Direction.REVERSE) {
                 if (leftBumper.getState() == false) {
                     fl_Drive.setTargetPosition(fl_Drive.getCurrentPosition());
                     bl_Drive.setTargetPosition(bl_Drive.getCurrentPosition());
@@ -297,58 +332,7 @@ public class DriveClass {
         }
     }
 
-    public void straight_ignoreBumper(double target_meter, Direction direction, double speed, int timeout) {
-        ElapsedTime runTime = new ElapsedTime();
-        runTime.reset();
-        int dir = 1;
-        if (direction == Direction.REVERSE)
-            dir = -1;
-        int ticks = (int) (1400 * target_meter) * dir;
-
-        int fl_tar_pos = fl_Drive.getCurrentPosition() + ticks;
-        int fr_tar_pos = fr_Drive.getCurrentPosition() + ticks;
-        int bl_tar_pos = bl_Drive.getCurrentPosition() + ticks;
-        int br_tar_pos = br_Drive.getCurrentPosition() + ticks;
-
-
-        fl_Drive.setTargetPosition(fl_tar_pos);
-        fr_Drive.setTargetPosition(fr_tar_pos);
-        bl_Drive.setTargetPosition(bl_tar_pos);
-        br_Drive.setTargetPosition(br_tar_pos);
-
-        fl_Drive.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        fr_Drive.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        bl_Drive.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        br_Drive.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-
-        double drivePower = speed;
-        double power = drivePower;
-
-        while ((fl_Drive.isBusy() /*|| bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy()*/) &&
-                opMode.opModeIsActive() && runTime.seconds() < timeout) {
-
-            int distToTarget = Math.abs(fr_tar_pos - fr_Drive.getCurrentPosition());
-
-            int distFromStart = Math.abs(ticks - distToTarget);
-
-            if (distFromStart < 300) {
-                power = drivePower * distFromStart / 300 * 0.8 + 0.2;
-            } else if (distToTarget < 300) {
-                power = drivePower/3;
-            } else {
-                power = drivePower;
-            }
-
-            fl_Drive.setPower(power);
-            fr_Drive.setPower(power);
-            bl_Drive.setPower(power);
-            br_Drive.setPower(power);
-
-            opMode.sleep(5);
-        }
-    }
-
-    public void side(double target_meter, Direction direction, double speed, int timeout) {
+    public void strafe(double target_meter, Direction direction, double speed, int timeout, double heading) {
         ElapsedTime runTime = new ElapsedTime();
         runTime.reset();
 
@@ -390,10 +374,14 @@ public class DriveClass {
                 power = speed;
             }
 
-            fl_Drive.setPower(power);
-            fr_Drive.setPower(power);
-            bl_Drive.setPower(power);
-            br_Drive.setPower(power);
+            double headingGyro = readGyroHeading();
+            double headingError = heading - headingGyro;
+            double headingCorrection = headingError * 0.01;
+
+            fl_Drive.setPower(power - headingCorrection);
+            fr_Drive.setPower(power - headingCorrection);
+            bl_Drive.setPower(power + headingCorrection);
+            br_Drive.setPower(power + headingCorrection);
 
             opMode.sleep(5);
         }
@@ -567,15 +555,16 @@ public class DriveClass {
     }
 
     public double getSensorDistance(Location location) {
-        double result;
+        double dist;
         if (location == Location.LEFT) {
-            result = getSensorDistanceLeft();
-            RobotLog.d("DriveClass: Left SensorDistance: %f", result);
+            dist = getSensorDistanceLeft();
+            RobotLog.d("DriveClass: Left SensorDistance: %f", dist);
         } else {
-            result = getSensorDistanceRight() - 4; // TODO: the sensor is missed calibrate
-            RobotLog.d("DriveClass: Right SensorDistance: %f", result);
+            dist = getSensorDistanceRight(); // TODO: the sensor is missed calibrate
+            RobotLog.d("DriveClass: Right SensorDistance: %f", dist);
+            dist -= 4;
         }
-        return result;
+        return dist;
     }
 
     public boolean isSkystone(Location location) {
@@ -595,9 +584,9 @@ public class DriveClass {
         float hsvValues[] = {0F, 0F, 0F};
         final int SCALE_FACTOR = 255;
 
-        Color.RGBToHSV( (int) (sensor.red()   * SCALE_FACTOR),
-                        (int) (sensor.green() * SCALE_FACTOR),
-                        (int) (sensor.blue()  * SCALE_FACTOR),
+        Color.RGBToHSV( (int) (r * SCALE_FACTOR),
+                        (int) (g * SCALE_FACTOR),
+                        (int) (b * SCALE_FACTOR),
                         hsvValues);
 
         float hue = hsvValues[0];
@@ -690,8 +679,11 @@ public class DriveClass {
     //===============================================================================================================================================================================================================================================
 
     public enum Alliance { BLUE, RED }
+    public enum FoundationType { WALL, BRIDGE, SHORT, PARK_ONLY }
 
-    public void AUTO_foundation(Alliance team, boolean wall) {
+    public void AUTO_foundation(Alliance team, FoundationType foundationType) {
+        ElapsedTime timer = new ElapsedTime();
+        timer.reset();
         int mul = 0;
         if (team == Alliance.BLUE) {
             mul = 1;
@@ -700,51 +692,60 @@ public class DriveClass {
             mul = -1;
         }
 
-        side(0.7 * mul, Direction.RIGHT, 0.7, 3);
-        straight(1.3, Direction.REVERSE, 0.7, 4);
-        straight(0.5, Direction.REVERSE, 0.2, 5);
-
-        // sleep(200);
-        // Step 2: should be in front of the foundation, hooks down
-        drive(-0.2, 0 * mul, 0, 0, 0);
-        hooksDown();
-        opMode.sleep(500);
-        stop();
-        // Step 3: drag the foundation to the wall
-        straight(1.8, Direction.FORWARD, 0.7, 3);
-
-        // Step 4: set the foundation free
-        hooksUp();
-        opMode.sleep(100);
-        /////////////////////////////////////////////////////////////////////////////////////
-        // Step 5: a)go to the side of the foundation b)push it to the wall c)go in front of the foundation d) move it to the wall
-        //  |
-        // a|    <---|
-        //  |b ^|---->
-        //  V-->|  c
-        //      |
-        //======V==============||||||||||||========================
-        //
-        /////////////////////////////////////////////////////////////////////////////////////
-        side(1.8 * mul, Direction.LEFT,  0.7, 3); // slide out
-        straight(0.8, Direction.REVERSE, 0.8, 3);
-        side(0.8 * mul, Direction.RIGHT, 0.9, 3); // Push foundation to side wall
-        straight(1.1, Direction.REVERSE, 0.9, 3);
-        side(1.2 * mul, Direction.RIGHT, 0.9, 3);
-        straight(1.1, Direction.FORWARD, 0.9, 3); // Push foundation to wall
-        // Step 6: drive to the side - park under the bridge
-
-        if (wall == false) { // park cloth to Bridge
-            straight(0.35, Direction.REVERSE, 0.5, 2);
-            side(2.2 * mul, Direction.LEFT, 0.9, 3);
+        if (foundationType == FoundationType.PARK_ONLY) {
+            while (timer.seconds() < 20) {
+                opMode.sleep(100);
+            }
+            strafe(1.5 * mul, Direction.LEFT, 0.7, 3, 0);
         }
+        else {
+            strafe(0.7 * mul, Direction.RIGHT, 0.7, 3, 0);
+            straight(1.3, Direction.REVERSE, 0.7, 4, 0, true);
+            driveToFoundation();
+            // sleep(200);
+            // Step 2: should be in front of the foundation, hooks down
+            drive(-0.2, 0 * mul, 0, 0, 0);
+            hooksDown();
+            opMode.sleep(500);
+            stop();
+            // Step 3: drag the foundation to the wall
+            straight(1.8, Direction.FORWARD, 0.7, 3, 0, false);
 
-        if (wall == true) { // park cloth to Wall
-            side(1.8 * mul, Direction.LEFT, 0.9, 3);
-            straight(1.2, DriveClass.Direction.FORWARD, 0.5, 2);
-            side(0.6 * mul, Direction.LEFT, 0.9, 3);
+            // Step 4: set the foundation free
+            hooksUp();
+            opMode.sleep(100);
+            /////////////////////////////////////////////////////////////////////////////////////
+            // Step 5: a)go to the strafe of the foundation b)push it to the wall c)go in front of the foundation d) move it to the wall
+            //  |
+            // a|    <---|
+            //  |b ^|---->
+            //  V-->|  c
+            //      |
+            //======V==============||||||||||||========================
+            //
+            /////////////////////////////////////////////////////////////////////////////////////
+            strafe(1.8 * mul, Direction.LEFT, 0.7, 3, 0); // slide out
+
+            if (foundationType != FoundationType.SHORT) {
+                straight(0.8, Direction.REVERSE, 0.8, 3, 0, false);
+                strafe(0.8 * mul, Direction.RIGHT, 0.9, 3, 0); // Push foundation to strafe wall
+                straight(1.1, Direction.REVERSE, 0.9, 3, 0, false);
+                strafe(1.2 * mul, Direction.RIGHT, 0.9, 3, 0);
+                straight(1.1, Direction.FORWARD, 0.9, 3, 0, false); // Push foundation to wall
+                // Step 6: drive to the strafe - park under the bridge
+
+                if (foundationType == FoundationType.BRIDGE) { // park cloth to Bridge
+                    straight(0.35, Direction.REVERSE, 0.5, 2, 0, false);
+                    strafe(2.2 * mul, Direction.LEFT, 0.9, 3, 0);
+                }
+
+                if (foundationType == FoundationType.WALL) { // park cloth to Wall
+                    strafe(1.8 * mul, Direction.LEFT, 0.9, 3, 0);
+                    straight(1.2, DriveClass.Direction.FORWARD, 0.5, 2, 0, false);
+                    strafe(0.6 * mul, Direction.LEFT, 0.9, 3, 0);
+                }
+            }
         }
-
         driveToLine(team, false);
     }
 
@@ -797,6 +798,7 @@ public class DriveClass {
         ElapsedTime total_timer = new ElapsedTime();
         total_timer.reset();
         ElapsedTime timer = new ElapsedTime();
+        double startTick = fl_Drive.getCurrentPosition();
         double maxSpeed = 0.8;
         double accTime = 0.4;
         double speed = 0.2;
@@ -832,8 +834,9 @@ public class DriveClass {
         }
         stop();
         double sec = total_timer.seconds();
-        RobotLog.d("Skystone found after %f sec",sec);
-        return sec;
+        double dist = Math.abs(fl_Drive.getCurrentPosition() - startPos) * 1400;
+        RobotLog.d("Skystone found after %f sec, dist: %f",sec, dist);
+        return dist;
     }
 
     private void driveToLine(Alliance team, boolean skystone) {
@@ -855,7 +858,7 @@ public class DriveClass {
         while( (leftBumper.getState() == false) && (rightBumper.getState() == false) && opMode.opModeIsActive() ) {
             opMode.sleep(2);
         }
-        drive(-0.3, 0, 0, 0, 0);
+        drive(-0.2, 0, 0, 0, 0);
         while( (leftBumper.getState() == true) && (rightBumper.getState() == true) && opMode.opModeIsActive() ) {
             opMode.sleep(2);
         }
@@ -876,77 +879,73 @@ public class DriveClass {
 
         try {
             RobotLog.d("First Skystone");
-            //robot.side(0.6, DriveClass.Direction.RIGHT, 1, 3);
+            //robot.strafe(0.6, DriveClass.Direction.RIGHT, 1, 3, 0);
             arm.pleaseDo(ArmClass.Mode.SKY1_STRETCH);
-            straight(0.9, DriveClass.Direction.FORWARD, 1, 4);
+            straight(0.9, DriveClass.Direction.FORWARD, 1, 4, 0,false);
 
             // find skystone
-            double stoneDist = approachStones(location);     // drive straight close to stones
-            double catchTime = searchSkystone(location,mul); // drive LEFT : search for SkyStone
+            approachStones(location);     // drive straight close to stones
+            double stoneDist = searchSkystone(location,mul); // drive LEFT : search for SkyStone
 
             // pickup STONE
             arm.setArmDriveMode(false);
-            arm.gootoo(55, 400,1);
             arm.openClamps(false); // close clamps
-            opMode.sleep(600); // wait for clamps to close
+            arm.gootoo(55, 400,0.4);
+            opMode.sleep(300); // wait for clamps to close
             arm.pleaseDo(ArmClass.Mode.SKY2_FOLD); // move arm back
 
             // drive backwards
-            straight(0.3, DriveClass.Direction.REVERSE, 1, 1);
+            straight(0.3, DriveClass.Direction.REVERSE, 1, 1, 0,false);
 
             // slide RIGHT to put stone
-            side(2.8 * mul, DriveClass.Direction.RIGHT, 0.95, 8);
+            strafe((2.2 + stoneDist) * mul, DriveClass.Direction.RIGHT, 1, 8, 0);
             // robot.stop();
 
             // Dropdown stone.
             arm.pleaseDo(ArmClass.Mode.SKY4_DROP);
-            opMode.sleep(800);
+            opMode.sleep(500);
 
             // ============= Second Skystone ==============================================================================================================================
             RobotLog.d("Second Skystone");
-            side(3.3 * mul, DriveClass.Direction.LEFT, 0.95, 8);
+            strafe(3.3 * mul, DriveClass.Direction.LEFT, 1, 8, 0); // TODO: stoneDist
 
             arm.openClamps(true);
             arm.pleaseDo(ArmClass.Mode.SKY3_READY); // move arm forward ready to catch
-            //straight(0.2, DriveClass.Direction.FORWARD, 0.5, 1);
-            stop();
 
             // find skystone
-            stoneDist = approachStones(location);     // drive straight close to stones
-            catchTime = searchSkystone(location,mul); // drive LEFT : search for SkyStone
+            approachStones(location);     // drive straight close to stones
+            searchSkystone(location,mul); // drive LEFT : search for SkyStone
 
             // pickup STONE
             arm.setArmDriveMode(false);
-            arm.gootoo(55, 400,0.5);
             arm.openClamps(false);
-            opMode.sleep(600);
+            arm.gootoo(55, 400,0.4);
+            opMode.sleep(300);
             arm.pleaseDo(ArmClass.Mode.SKY2_FOLD);
 
             // drive backwards
-            straight(0.3, DriveClass.Direction.REVERSE, 1, 1);
-            opMode.sleep(50);
+            straight(0.3, DriveClass.Direction.REVERSE, 1, 1, 0,false);
 
             if(foundation == true) { // SOLO
 
-                side(5 * mul, DriveClass.Direction.RIGHT, 0.95, 8);  // slide toward foundation line
+                strafe(5 * mul, Direction.LEFT, 1, 8, 0); // TODO: stoneDist // slide toward foundation line
 
                 rotate(0.5 * mul, Direction.RIGHT,1,3);      // rotate 180
-                straight(0.4, Direction.REVERSE,1,3);    // drive to foundation
+                straight(0.4, Direction.REVERSE,1,3, 180, true);    // drive to foundation
                 driveToFoundation();
                 hooksDown();                                                         // catch the foundation
-                straight_ignoreBumper(0.4, Direction.REVERSE, 0.2, 1 ); // slow drive to hook the foundation.
+                straight(0.4, Direction.REVERSE, 0.2, 1, 180, false ); // slow drive to hook the foundation.
                 arm.pleaseDo(ArmClass.Mode.SKY5_DROP_BACK);                          // drop the stone backwards and HOME the arm.
-                rotate(0.1 * mul, Direction.RIGHT,1,3);       // rotate foundation to building zone.
-                straight(1, Direction.FORWARD,1,3);       // move forward half way toward wall.
-                rotate(0.35 * mul, Direction.RIGHT,1,3);      // rotate foundation to building zone.
-                hooksUp();                                                           // release hooks
-                opMode.sleep(200);
-                // side(0.2 * mul, DriveClass.Direction.RIGHT, 0.95, 8);  // slide toward foundation line
-//                while (opMode.opModeIsActive()) opMode.sleep(10); // wait to finish
-//                opMode.sleep(200);                                       // wait for hooks to open
-//                straight(1.2, Direction.FORWARD,1,5);     // drive towards bridge
+
+                rotate(0.1 * mul, Direction.RIGHT,1,3);       // rotate just a little to gain angle.
+                double heading = readGyroHeading();
+                straight(0.8, Direction.FORWARD,1,3, heading, false);       // move forward half way toward wall.
+                rotate(0.30 * mul, Direction.RIGHT,1,3);      // rotate foundation to building zone.
+                hooksUp();                                                           // release foundation.
+                opMode.sleep(150);                                       // wait for hooks to open
 
                 // Parking - drive FORWARD towards bridge line to park - search the line and park.
+                straight(0.5, Direction.FORWARD,1,3, 90 * mul, false);       // move forward half way toward wall.
                 timer.reset();
                 drive(1, 0, 0, 0, 0);
                 while (!isLine(team) && timer.seconds() < 3  && opMode.opModeIsActive()) {
@@ -954,9 +953,8 @@ public class DriveClass {
                 }
             }
             else { // BRIDGE
-                // slide RIGHT to put stone
-                side(3.8 * mul, DriveClass.Direction.RIGHT, 0.9, 8);
-                //    robot.stop();
+                // slide RIGHT to put stone after bridge
+                strafe(3.8 * mul, DriveClass.Direction.RIGHT, 0.9, 8, 0); // TODO: stoneDist
 
                 arm.openClamps(true);
                 arm.setArmDriveMode(false);
@@ -964,7 +962,7 @@ public class DriveClass {
                 arm.openClamps(false);
 
                 arm.linearDo(ArmClass.Mode.HOME);
-                side(-0.7 * mul, DriveClass.Direction.RIGHT, 0.7, 8);
+                strafe(-0.7 * mul, DriveClass.Direction.RIGHT, 0.7, 8, 0);
                 opMode.sleep(50);
 
                 driveToLine(team, true);

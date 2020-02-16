@@ -33,6 +33,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import java.sql.Driver;
+
 /**
  * This file illustrates the concept of driving a path based on time.
  * It uses the common Pushbot hardware class to define the drive on the robot.
@@ -82,31 +84,7 @@ public class Auto_blue_foundation_short extends LinearOpMode {
 
 
         runtime.reset();
-        /*starting point: building area, the bridge is on the right,
-         * the front of the robot is to the wall, the hooks directed to the middle of the field.
-         * please start close to the building site*/
-        // Step 1:  Drive forward (actually back) and a bit to the left (actually to the right)
-        robot.side(0.6, DriveClass.Direction.RIGHT, 1, 3);
-        robot.straight(2, DriveClass.Direction.REVERSE, 0.3, 4);
-
-        sleep(200);
-        // Step 2: should be in front of the foundation, hooks down
-        robot.hooksDown();
-        sleep(500);
-        // Step 3: drag the foundation to the wall
-        robot.straight(1.7, DriveClass.Direction.FORWARD, 0.7, 3);
-
-        // Step 4: set the foundation free
-        robot.hooksUp();
-        sleep(100);
-
-       // robot.side(2.4, DriveClass.Direction.LEFT, 0.9, 3);
-//        while (opModeIsActive() && (runtime.seconds() < 30)) {
-//            telemetry.addData("Path", "Leg 1: %2.5f S Elapsed", runtime.seconds());
-//            telemetry.update();
-//        }
-
-        // Step 6:  stop
+        robot.AUTO_foundation(DriveClass.Alliance.BLUE, DriveClass.FoundationType.SHORT);
         robot.stop();
         //sleep(1000);
     }

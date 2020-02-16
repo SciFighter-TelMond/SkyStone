@@ -30,7 +30,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -81,10 +80,10 @@ public class SideTest extends LinearOpMode {
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-
-        robot.side(4, DriveClass.Direction.RIGHT, 1, 3);
-        sleep(3000);
-        robot.side(4, DriveClass.Direction.LEFT, 1, 3);
+        for (int i=0; i<10; i++) {
+            robot.strafe(4, DriveClass.Direction.RIGHT, 1, 3, 0);
+            robot.strafe(4, DriveClass.Direction.LEFT, 1, 3, 0);
+        }
         robot.stop();
     }
 }

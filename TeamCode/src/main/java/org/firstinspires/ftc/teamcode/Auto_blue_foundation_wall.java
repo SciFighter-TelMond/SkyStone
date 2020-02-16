@@ -86,7 +86,7 @@ public class Auto_blue_foundation_wall extends LinearOpMode {
          * the front of the robot is to the wall, the hooks directed to the middle of the field.
          * please start close to the building site*/
         // Step 1:  Drive forward (actually back) and a bit to the left (actually to the right)
-        robot.AUTO_foundation(DriveClass.Alliance.BLUE, true);
+        robot.AUTO_foundation(DriveClass.Alliance.BLUE, DriveClass.FoundationType.WALL);
         // Step 6:  stop
         robot.stop();
         //sleep(1000);

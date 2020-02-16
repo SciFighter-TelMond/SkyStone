@@ -299,14 +299,13 @@ public class ArmClass extends Thread {
 
                     RobotLog.d("Arm do: PICK - Open openClamps");
                     openClamps(true);
-                    RobotLog.d("Arm do: PICK - Open Rollers");
-                    driveClass.rollers(true);
-
                     RobotLog.d("Arm do: PICK - Go above");
                     gootoo(500, 0);
                     RobotLog.d("Arm do: PICK - Go down");
                     gootoo(-200, -200);
                     openClamps(false);
+                    RobotLog.d("Arm do: PICK - Open Rollers");
+                    driveClass.rollers(true);
                     RobotLog.d("Arm do: before sleep");
                     sleep(700);
                     RobotLog.d("Arm do: after sleep");
@@ -388,6 +387,7 @@ public class ArmClass extends Thread {
 
                 case SKY4_DROP:
                     timer.reset();
+                    rotateClamps(true);
                     gootoo(ArmClass.STAY,800, 0.5);
                     sleep(50);
                     openClamps(true);
