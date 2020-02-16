@@ -36,7 +36,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 /**
  */
 
-@Autonomous(name="Blue SkyStone - Solo", group="SciFighters")// moving the blue foundation. you are in the blue team.
+@Autonomous(name="Blue SkyStone - SOLO", group="SciFighters")// moving the blue foundation. you are in the blue team.
 //@Disabled
 public class Auto_blue_sky_solo extends LinearOpMode {
 

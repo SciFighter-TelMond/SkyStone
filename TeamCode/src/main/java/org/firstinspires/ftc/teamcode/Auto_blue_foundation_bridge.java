@@ -54,7 +54,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name = "Blue Foundation Bridge - hooks front", group = "SciFighters")
+@Autonomous(name = "Blue Foundation Bridge", group = "SciFighters")
 // moving the blue foundation. you are in the blue team.
 //@Disabled
 public class Auto_blue_foundation_bridge extends LinearOpMode {
