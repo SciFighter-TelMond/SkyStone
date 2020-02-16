@@ -76,14 +76,18 @@ public class Auto_blue_foundation_short extends LinearOpMode {
         robot.init(hardwareMap);
 
         // Send telemetry message to signify robot waiting;
-        telemetry.addData("Status", "Ready to run");    //
+        telemetry.addData("Status", "Init");    //
         telemetry.update();
+
+        robot.init_GyroIMU();
+        telemetry.addData("Status", "Gyro IMU Ready");    //
+        telemetry.update();
+
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
-
-
         runtime.reset();
+
         robot.AUTO_foundation(DriveClass.Alliance.BLUE, DriveClass.FoundationType.SHORT);
         robot.stop();
         //sleep(1000);

@@ -77,12 +77,17 @@ public class SideTest extends LinearOpMode {
         telemetry.addData("Status", "Ready to run");    //
         telemetry.update();
 
+        robot.init_GyroIMU();
+        telemetry.addData("Status", "Gyro IMU Ready");    //
+        telemetry.update();
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         for (int i=0; i<10; i++) {
-            robot.strafe(4, DriveClass.Direction.RIGHT, 1, 3, 0);
-            robot.strafe(4, DriveClass.Direction.LEFT, 1, 3, 0);
+            robot.strafe(4, DriveClass.Direction.RIGHT, 1, 10, 0);
+            robot.straight(1, DriveClass.Direction.FORWARD, 1, 10, 0, false);
+            robot.strafe(4, DriveClass.Direction.LEFT, 1, 10, 0);
+            robot.straight(1, DriveClass.Direction.REVERSE, 1, 10, 0, false);
         }
         robot.stop();
     }

@@ -5,6 +5,7 @@ import android.graphics.Color;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -14,6 +15,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
+import org.firstinspires.ftc.robotcore.external.Func;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -174,6 +176,13 @@ public class DriveClass {
         sensorDistanceLeft = hardwareMap.get(DistanceSensor.class, "color_left");
         sensorColorDown = hardwareMap.get(ColorSensor.class, "color_down");
 
+        // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
+        // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
+        // and named "imu".
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+    }
+
+    public void init_GyroIMU() {
         // Set up the parameters with which we will use our IMU. Note that integration
         // algorithm here just reports accelerations to the logcat log; it doesn't actually
         // provide positional information.
@@ -185,25 +194,38 @@ public class DriveClass {
         parameters.loggingTag          = "IMU";
         // parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
-        // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
-        // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
-        // and named "imu".
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
-    }
-
-    public void begin() {
         // Start the logging of measured acceleration
-        imu.startAccelerationIntegration(new Position(), new Velocity(), 10);
+        // TODO: imu.startAccelerationIntegration(new Position(), new Velocity(), 10);
+
+
+        while (imu.isSystemCalibrated() && !opMode.isStopRequested()) {
+            opMode.sleep(100);
+        }
+
+        opMode.telemetry.addData("IMU status", imu.getSystemStatus().toShortString());
+        opMode.telemetry.addData("IMU calib", imu.getCalibrationStatus().toString());
+
+        RobotLog.d("IMU status: %s", imu.getSystemStatus().toShortString());
+        RobotLog.d("IMU calib: %s", imu.getCalibrationStatus().toString());
     }
 
     public boolean getStoneBumperState() {
         return stoneBumper.getState();
     }
 
-    public float readGyroHeading() {
+    public double readGyroHeading(double heading) {
         Orientation angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-        return angles.firstAngle;
+        double angle =  angles.firstAngle;
+        double deltaAngle = heading - angle;
+        if (deltaAngle < -180)
+            deltaAngle += 360;
+        else if (deltaAngle > 180)
+            deltaAngle -= 360;
+
+        double globalAngle = heading + deltaAngle;
+
+        return globalAngle;
     }
 
     // ==================================================================================================
@@ -307,15 +329,15 @@ public class DriveClass {
                 power = speed;
             }
 
-            double headingGyro = readGyroHeading();
+            double headingGyro = readGyroHeading(heading);
             double headingError = heading - headingGyro;
             double headingCorrection = headingError * 0.01;
-            // TODO: use headingCorrection.
 
-            fl_Drive.setPower(power);
-            fr_Drive.setPower(power);
-            bl_Drive.setPower(power);
-            br_Drive.setPower(power);
+            fl_Drive.setPower(power - headingCorrection);
+            fr_Drive.setPower(power + headingCorrection);
+            bl_Drive.setPower(power - headingCorrection);
+            br_Drive.setPower(power + headingCorrection);
+            RobotLog.d("straight: heading: %f, corr: %f", headingGyro, headingCorrection );
 
             if (stopOnBumpers && direction == Direction.REVERSE) {
                 if (leftBumper.getState() == false) {
@@ -374,9 +396,10 @@ public class DriveClass {
                 power = speed;
             }
 
-            double headingGyro = readGyroHeading();
+            double headingGyro = readGyroHeading(heading);
             double headingError = heading - headingGyro;
             double headingCorrection = headingError * 0.01;
+            RobotLog.d("strafe: heading: %f, corr: %f", headingGyro, headingCorrection );
 
             fl_Drive.setPower(power - headingCorrection);
             fr_Drive.setPower(power - headingCorrection);
@@ -442,6 +465,44 @@ public class DriveClass {
             br_Drive.setPower(power);
 
             opMode.sleep(5);
+        }
+    }
+
+    public void rotateTo(double targetAngle, double speed, double timeout, double tollerance) {
+
+        ElapsedTime runtime = new ElapsedTime();
+        runtime.reset();
+
+        double currAngle = readGyroHeading(targetAngle);
+        double deltaAngle = targetAngle - currAngle;
+
+        /* 1 round is 5600 ticks
+         * to the right posotive
+         * to the left negative*/
+        double rounds = deltaAngle / 360 ;
+        rotate(rounds, Direction.RIGHT, speed, timeout );
+
+        fl_Drive.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        fr_Drive.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        bl_Drive.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        br_Drive.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+
+        double power = speed;
+
+        currAngle = readGyroHeading(targetAngle);
+        deltaAngle = targetAngle - currAngle;
+        while ( (Math.abs(deltaAngle) < tollerance) && opMode.opModeIsActive() && runtime.seconds() < timeout) {
+
+            power = speed * deltaAngle * 0.1;
+            fl_Drive.setPower(-power);
+            fr_Drive.setPower(+power);
+            bl_Drive.setPower(-power);
+            br_Drive.setPower(+power);
+
+            opMode.sleep(5);
+
+            currAngle  = readGyroHeading(targetAngle);
+            deltaAngle = targetAngle - currAngle;
         }
     }
 
@@ -872,7 +933,7 @@ public class DriveClass {
         if (team == Alliance.BLUE) {
             mul = -1;
             location = Location.RIGHT;
-        } else { // Alliance.BLUE
+        } else { // Alliance.RED
             mul = 1;
             location = Location.LEFT;
         }
@@ -930,17 +991,18 @@ public class DriveClass {
 
                 strafe(5 * mul, Direction.LEFT, 1, 8, 0); // TODO: stoneDist // slide toward foundation line
 
-                rotate(0.5 * mul, Direction.RIGHT,1,3);      // rotate 180
+                rotateTo(180 * mul,1,3, 1);      // rotate 180
                 straight(0.4, Direction.REVERSE,1,3, 180, true);    // drive to foundation
                 driveToFoundation();
                 hooksDown();                                                         // catch the foundation
                 straight(0.4, Direction.REVERSE, 0.2, 1, 180, false ); // slow drive to hook the foundation.
                 arm.pleaseDo(ArmClass.Mode.SKY5_DROP_BACK);                          // drop the stone backwards and HOME the arm.
 
-                rotate(0.1 * mul, Direction.RIGHT,1,3);       // rotate just a little to gain angle.
-                double heading = readGyroHeading();
+                double ang = 0.1 * mul * 360 ;
+                rotateTo(ang,1,3, 1);       // rotate just a little to gain angle.
+                double heading = readGyroHeading(180);
                 straight(0.8, Direction.FORWARD,1,3, heading, false);       // move forward half way toward wall.
-                rotate(0.30 * mul, Direction.RIGHT,1,3);      // rotate foundation to building zone.
+                rotateTo(90 * mul,1,3, 1);      // rotate foundation to building zone.
                 hooksUp();                                                           // release foundation.
                 opMode.sleep(150);                                       // wait for hooks to open
 
