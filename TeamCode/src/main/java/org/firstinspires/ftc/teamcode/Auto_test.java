@@ -54,7 +54,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="TEST", group="SciFighters")// moving the blue foundation. you are in the blue team.
+@Autonomous(name="AUTO - TEST", group="SciFighters")// moving the blue foundation. you are in the blue team.
 //@Disabled
 public class Auto_test extends LinearOpMode {
 
@@ -86,7 +86,8 @@ public class Auto_test extends LinearOpMode {
          * the front of the robot is to the wall, the hooks directed to the middle of the field.
          * please start close to the building site*/
         // Step 1:  Drive forward (actually back) and a bit to the left (actually to the right)
-        robot.rotate(1, DriveClass.Direction.RIGHT, 1, 3);
+        robot.approachStones(DriveClass.Location.LEFT);
+        robot.straightenUp();
         // Step 6:  stop
         robot.stop();
         //sleep(1000);

@@ -26,7 +26,7 @@ public class ArmClass extends Thread {
     volatile private double power = 1;
     volatile private double speed_boost = 0.5;
 
-    public enum Mode {IDLE, MANUAL, HOME, PICK, STRAIGHT, BUILD, DROP, SKY1_STRETCH, SKY2_FOLD, SKY3_READY, SKY4_DROP_BACK }
+    public enum Mode {IDLE, MANUAL, HOME, PICK, STRAIGHT, BUILD, DROP, SKY1_STRETCH, SKY2_FOLD, SKY3_READY, SKY4_DROP,  SKY5_DROP_BACK}
 
     volatile private Mode mode = Mode.IDLE;
 
@@ -192,23 +192,22 @@ public class ArmClass extends Thread {
             RobotLog.d("Arm1 checkups hit at: %d", arm1.getCurrentPosition());
             arm1.setTargetPosition(arm1.getCurrentPosition());
         }
-        //TODO: checkout why the safty bray works when not supposed to.
-        int diff0 = Math.abs(arm0.getCurrentPosition() - posArm0);
-        if (diff0 <= 5) {
-            arm0.setTargetPosition(arm0.getCurrentPosition());
-            RobotLog.d("SAFETY BRAKE: Arm0 diff %d", diff0);
-        }
-        //
-        int diff1 = Math.abs(arm1.getCurrentPosition() - posArm1);
-        if (diff1 <= 5) {
-            arm1.setTargetPosition(arm1.getCurrentPosition());
-            RobotLog.d("SAFETY BRAKE: Arm1 diff %d", diff1);
-        }
+//        //TODO: checkout why the safety bray works when not supposed to.
+//        int diff0 = Math.abs(arm0.getCurrentPosition() - posArm0);
+//        if (diff0 <= 5) {
+//            arm0.setTargetPosition(arm0.getCurrentPosition());
+//            RobotLog.d("SAFETY BRAKE: Arm0 diff %d at %d", diff0, arm0.getCurrentPosition());
+//        }
+//        //
+//        int diff1 = Math.abs(arm1.getCurrentPosition() - posArm1);
+//        if (diff1 <= 5) {
+//            arm1.setTargetPosition(arm1.getCurrentPosition());
+//            RobotLog.d("SAFETY BRAKE: Arm1 diff %d at %d", diff1, arm1.getCurrentPosition());
+//        }
 //
 //        posArm0 = arm0.getCurrentPosition();
 //        posArm1 = arm1.getCurrentPosition();
 //
-
 //        if (opMode != null) {
 //            opMode.telemetry.addData("Arms Switch", "Arm0:(%b), Arm1:(%b)", zeroArm0.getState(), zeroArm1.getState());
 //            opMode.telemetry.addData("Arms", "Arm0 (%d), Arm1 (%d)", arm0.getCurrentPosition(), arm1.getCurrentPosition());
@@ -274,8 +273,9 @@ public class ArmClass extends Thread {
 
     @Override
     public void run() {
+        ElapsedTime timer = new ElapsedTime();
         try {
-            power = 0.8;
+            power = 0.95;
             setArmDriveMode(false);
             switch (mode) {
                 case HOME:
@@ -379,19 +379,32 @@ public class ArmClass extends Thread {
                     break;
 
                 case SKY2_FOLD: // after catch move arm back
-                    gootoo(550, 200);
+                    gootoo(550, 100);
                     break;
 
                 case SKY3_READY: // get ready to catch
                     gootoo(515, 360);
                     break;
 
-                case SKY4_DROP_BACK: // get ready to catch
-                    gootoo(1000, 500);
-                    gootoo(1600, 200);
+                case SKY4_DROP:
+                    timer.reset();
+                    gootoo(ArmClass.STAY,800, 0.5);
+                    sleep(50);
+                    openClamps(true);
+                    sleep(250);
+                    openClamps(false);
+                    gootoo(ArmClass.STAY,0);
+                    RobotLog.d("SKY4_DROP time: %f", timer.seconds());
+                    break;
+
+                case SKY5_DROP_BACK: // get ready to catch
+                    RobotLog.d("Arm do: SKY5_DROP_BACK");
+                    //gootoo(2000, 100);
+                    gootoo(5200, 20);
                     openClamps(true);
                     sleep(500);
                     linearDo(Mode.HOME);
+                    RobotLog.d("Arm do: SKY5_DROP_BACK/");
                     break;
 
                 default:
