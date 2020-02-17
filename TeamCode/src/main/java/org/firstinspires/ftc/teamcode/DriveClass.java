@@ -217,17 +217,17 @@ public class DriveClass {
         return stoneBumper.getState();
     }
 
-    public double readGyroHeading(double heading) {
+    public double readGyroHeading(double targetAngle) {
         Orientation angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
-        double angle =  angles.firstAngle;
-        double deltaAngle = heading - angle;
+        double angle = -angles.firstAngle;
+        double deltaAngle = targetAngle - angle;
         if (deltaAngle < -180)
             deltaAngle += 360;
         else if (deltaAngle > 180)
             deltaAngle -= 360;
 
-        double globalAngle = heading - deltaAngle;
+        double globalAngle = targetAngle - deltaAngle;
 
         return globalAngle;
     }
@@ -497,17 +497,19 @@ public class DriveClass {
         RobotLog.d("%f2.4 ] rotateTo: power: %f, target: %f, gyro: %f, corr: %f", timer.seconds(), power, targetAngle, currAngle, deltaAngle );
         while ( (Math.abs(deltaAngle) > tollerance) && opMode.opModeIsActive() && timer.seconds() < timeout) {
 
-            power = Math.min(0.2, speed * deltaAngle * 0.01);
+            double error = deltaAngle;
+            double gain = 0.01;
+            power =  Math.min(speed, Math.max(0.0, Math.abs(error) * gain)) * Math.signum(error);
             fl_Drive.setPower(+power);
             fr_Drive.setPower(-power);
             bl_Drive.setPower(+power);
             br_Drive.setPower(-power);
 
-            opMode.sleep(5);
+            opMode.sleep(1);
 
             currAngle  = readGyroHeading(targetAngle);
             deltaAngle = targetAngle - currAngle;
-            RobotLog.d("%f2.4 ] rotateTo: power: %f, target: %f, gyro: %f, corr: %f", timer.seconds(), power, targetAngle, currAngle, deltaAngle );
+            RobotLog.d("%f2.4 ] rotateTo: power: %f, target: %f, curr: %f, delta: %f,", timer.seconds(), power, targetAngle, currAngle, deltaAngle );
         }
         stop();
     }
