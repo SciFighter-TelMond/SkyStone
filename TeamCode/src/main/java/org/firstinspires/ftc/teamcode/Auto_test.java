@@ -73,12 +73,11 @@ public class Auto_test extends LinearOpMode {
          */
         robot.init(hardwareMap);
 
-        // Send telemetry message to signify robot waiting;
-        telemetry.addData("Status", "Ready to run");    //
-        telemetry.update();
+        robot.init_GyroIMU();
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
+        telemetry.update();
 
 
         runtime.reset();

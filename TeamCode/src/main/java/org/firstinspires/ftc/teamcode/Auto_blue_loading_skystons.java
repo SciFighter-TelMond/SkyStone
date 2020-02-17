@@ -63,12 +63,10 @@ public class Auto_blue_loading_skystons extends LinearOpMode {
         telemetry.update();
 
         robot.init_GyroIMU();
-        telemetry.addData("Status", "Gyro IMU Ready");    //
-        telemetry.update();
-
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
+        telemetry.update();
 
         arm.begin();
         arm.setArmDriveMode(false);

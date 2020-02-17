@@ -63,7 +63,6 @@ public class Auto_red_sky_solo extends LinearOpMode {
         telemetry.update();
 
         robot.init_GyroIMU();
-        telemetry.addData("Status", "Gyro IMU Ready");    //
         telemetry.update();
 
         // Wait for the game to start (driver presses PLAY)

@@ -78,12 +78,10 @@ public class Auto_blue_foundation_park extends LinearOpMode {
         telemetry.update();
 
         robot.init_GyroIMU();
-        telemetry.addData("Status", "Gyro IMU Ready");    //
-        telemetry.update();
-
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
+        telemetry.update();
 
         runtime.reset();
         robot.AUTO_foundation(DriveClass.Alliance.BLUE, DriveClass.FoundationType.PARK_ONLY);

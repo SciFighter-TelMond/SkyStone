@@ -14,6 +14,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
+import org.firstinspires.ftc.robotcore.external.Func;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -183,7 +184,7 @@ public class DriveClass {
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+        parameters.calibrationDataFile = "AdafruitIMUCalibration.json"; // "BNO055IMUCalibration.json"; // see the calibration sample opmode
         parameters.loggingEnabled      = false;
         // parameters.loggingTag          = "IMU";
         // parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
@@ -192,13 +193,21 @@ public class DriveClass {
         // Start the logging of measured acceleration
         // imu.startAccelerationIntegration(new Position(), new Velocity(), 10);
 
+        opMode.telemetry.addLine()
+                .addData("IMU:", new Func<String>()     { @Override public String value() { return imu.getSystemStatus().toShortString(); }})
+                .addData("Cal:", new Func<String>()     { @Override public String value() { return imu.getCalibrationStatus().toString(); }})
+                .addData("Heading:", new Func<String>() { @Override public String value() { return Float.toString(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle); }});
 
-        while (imu.isSystemCalibrated() && !opMode.isStopRequested()) {
+
+        while (imu.isGyroCalibrated() && !opMode.isStopRequested()) {
             opMode.sleep(100);
         }
+        if (imu.isGyroCalibrated())
+            opMode.telemetry.addData("Status", "Gyro IMU Ready");
+        else
+            opMode.telemetry.addData("Status", "Gyro IMU FAILED !!!!!!!!!!!!!!");
 
-        opMode.telemetry.addData("IMU status", imu.getSystemStatus().toShortString());
-        opMode.telemetry.addData("IMU calib", imu.getCalibrationStatus().toString());
+        opMode.telemetry.update();
 
         RobotLog.d("IMU status: %s", imu.getSystemStatus().toShortString());
         RobotLog.d("IMU calib: %s", imu.getCalibrationStatus().toString());

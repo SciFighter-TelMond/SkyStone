@@ -79,11 +79,9 @@ public class Auto_red_foundation_wall extends LinearOpMode {
 
 
         robot.init_GyroIMU();
-        telemetry.addData("Status", "Gyro IMU Ready");    //
-        telemetry.update();
-
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
+        telemetry.update();
 
         runtime.reset();
         /*starting point: building area, the bridge is on the left,
