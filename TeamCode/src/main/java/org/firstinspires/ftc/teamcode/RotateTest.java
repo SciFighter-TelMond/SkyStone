@@ -30,7 +30,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -55,9 +54,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Red Foundation Short", group="SciFighters")// moving the blue foundation. you are in the blue team.
+@Autonomous(name="Rotate Test", group="SciFighters")// moving the blue foundation. you are in the blue team.
 //@Disabled
-public class Auto_red_foundation_short extends LinearOpMode {
+public class RotateTest extends LinearOpMode {
 
     /* Declare OpMode members. */
     private DriveClass        robot = new DriveClass(this);   // Use a Pushbot's hardware
@@ -75,20 +74,31 @@ public class Auto_red_foundation_short extends LinearOpMode {
         robot.init(hardwareMap);
 
         // Send telemetry message to signify robot waiting;
-        telemetry.addData("Status", "Init");    //
+        telemetry.addData("Status", "Ready to run");    //
         telemetry.update();
 
         robot.init_GyroIMU();
         telemetry.addData("Status", "Gyro IMU Ready");    //
         telemetry.update();
 
-
         // Wait for the game to start (driver presses PLAY)
-        waitForStart();
 
-        runtime.reset();
-        robot.AUTO_foundation(DriveClass.Alliance.RED, DriveClass.FoundationType.SHORT);
+        double speed = 0.9;
+        waitForStart();
+        for (int i=0; i<2; i++) {
+            robot.rotateTo(90, 1,10,1);
+            sleep(500);
+            robot.rotateTo(180, 1,10,1);
+            sleep(500);
+            robot.rotateTo(90, 1,10,1);
+            sleep(500);
+            robot.rotateTo(180, 1,10,1);
+            sleep(500);
+            robot.rotateTo(-90, 1,10,1);
+            sleep(500);
+            robot.rotateTo(0, 1,10,1);
+            sleep(500);
+        }
         robot.stop();
-        //sleep(1000);
     }
 }

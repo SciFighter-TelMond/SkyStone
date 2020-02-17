@@ -59,7 +59,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class Auto_test extends LinearOpMode {
 
     /* Declare OpMode members. */
-    private DriveClass         robot   = new DriveClass(this);   // Use a Pushbot's hardware
+    private DriveClass        robot = new DriveClass(this);   // Use a Pushbot's hardware
     private ElapsedTime     runtime = new ElapsedTime();
 
 
@@ -86,8 +86,7 @@ public class Auto_test extends LinearOpMode {
          * the front of the robot is to the wall, the hooks directed to the middle of the field.
          * please start close to the building site*/
         // Step 1:  Drive forward (actually back) and a bit to the left (actually to the right)
-        robot.approachStones(DriveClass.Location.LEFT);
-        robot.straightenUp();
+        robot.approachStones(DriveClass.Location.RIGHT);
         // Step 6:  stop
         robot.stop();
         //sleep(1000);

@@ -371,10 +371,10 @@ public class ArmClass extends Thread {
                     break;
 
                 case SKY1_STRETCH: // stretch arm to start position
-                    gootoo(600, 0);
+                    gootoo(900, 0);
                     rotateClamps(true);
                     openClamps(true);
-                    gootoo(515, 360);
+                    gootoo(515, 380);
                     break;
 
                 case SKY2_FOLD: // after catch move arm back
@@ -382,16 +382,15 @@ public class ArmClass extends Thread {
                     break;
 
                 case SKY3_READY: // get ready to catch
-                    gootoo(515, 360);
+                    gootoo(515, 380);
                     break;
 
                 case SKY4_DROP:
                     timer.reset();
-                    rotateClamps(true);
                     gootoo(ArmClass.STAY,800, 0.5);
                     sleep(50);
                     openClamps(true);
-                    sleep(250);
+                    sleep(300);
                     openClamps(false);
                     gootoo(ArmClass.STAY,0);
                     RobotLog.d("SKY4_DROP time: %f", timer.seconds());
@@ -399,7 +398,7 @@ public class ArmClass extends Thread {
 
                 case SKY5_DROP_BACK: // get ready to catch
                     RobotLog.d("Arm do: SKY5_DROP_BACK");
-                    //gootoo(2000, 100);
+                    rotateClamps(false);
                     gootoo(5200, 20);
                     openClamps(true);
                     sleep(500);

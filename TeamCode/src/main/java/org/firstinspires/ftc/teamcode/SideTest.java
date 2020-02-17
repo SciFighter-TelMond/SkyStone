@@ -59,7 +59,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class SideTest extends LinearOpMode {
 
     /* Declare OpMode members. */
-    private DriveClass         robot   = new DriveClass(this);   // Use a Pushbot's hardware
+    private DriveClass        robot = new DriveClass(this);   // Use a Pushbot's hardware
     private ElapsedTime     runtime = new ElapsedTime();
 
 
@@ -82,12 +82,18 @@ public class SideTest extends LinearOpMode {
         telemetry.update();
 
         // Wait for the game to start (driver presses PLAY)
+
+        double speed = 0.9;
         waitForStart();
-        for (int i=0; i<10; i++) {
-            robot.strafe(4, DriveClass.Direction.RIGHT, 1, 10, 0);
-            robot.straight(1, DriveClass.Direction.FORWARD, 1, 10, 0, false);
-            robot.strafe(4, DriveClass.Direction.LEFT, 1, 10, 0);
-            robot.straight(1, DriveClass.Direction.REVERSE, 1, 10, 0, false);
+        for (int i=0; i<2; i++) {
+            robot.strafe(3, DriveClass.Direction.RIGHT, speed, 10, 0);
+            sleep(500);
+            robot.straight(2, DriveClass.Direction.FORWARD, speed, 10, 0, false);
+            sleep(500);
+            robot.strafe(3, DriveClass.Direction.LEFT, speed, 10, 0);
+            sleep(500);
+            robot.straight(2, DriveClass.Direction.REVERSE, speed, 10, 0, false);
+            sleep(500);
         }
         robot.stop();
     }

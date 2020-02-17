@@ -5,7 +5,6 @@ import android.graphics.Color;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -15,14 +14,11 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 
-import org.firstinspires.ftc.robotcore.external.Func;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
-import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
 
 /**
@@ -116,30 +112,28 @@ public class DriveClass {
         bl_Drive.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
         br_Drive.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
-        fl_Drive.setTargetPositionTolerance(15);
-        fr_Drive.setTargetPositionTolerance(15);
-        bl_Drive.setTargetPositionTolerance(15);
-        br_Drive.setTargetPositionTolerance(15);
+        fl_Drive.setTargetPositionTolerance(40);
+        fr_Drive.setTargetPositionTolerance(40);
+        bl_Drive.setTargetPositionTolerance(40);
+        br_Drive.setTargetPositionTolerance(40);
 
         PIDFCoefficients pidf = fr_Drive.getPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER);
         RobotLog.d("Drive PID");
         RobotLog.d(pidf.toString());
-//        pidf.p=2;   // 1.170000;
-//        pidf.i=0.2; // 0.117000;
-//        pidf.d=0.05;// 0
-//        // pidf.f=11.700000;
-////        pidf.p = 5;
-////        pidf.i = 3;
-////        pidf.d = 0.1;
-////        pidf.f = 14;
-//        fr_Drive.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidf);
-////        fr_Drive.setPositionPIDFCoefficients(7);
-//        fl_Drive.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidf);
-////        fl_Drive.setPositionPIDFCoefficients(7);
-//        br_Drive.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidf);
-////        br_Drive.setPositionPIDFCoefficients(7);
-//        bl_Drive.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidf);
-////        bl_Drive.setPositionPIDFCoefficients(7);
+        // p=9.999847 i=2.999954 d=0.000000 f=0.000000
+
+        pidf.p=5;   // 10;
+        pidf.i=6;    // 3;
+        pidf.d=0;  // 0
+
+        fr_Drive.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidf);
+//        fr_Drive.setPositionPIDFCoefficients(7);
+        fl_Drive.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidf);
+//        fl_Drive.setPositionPIDFCoefficients(7);
+        br_Drive.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidf);
+//        br_Drive.setPositionPIDFCoefficients(7);
+        bl_Drive.setPIDFCoefficients(DcMotorEx.RunMode.RUN_USING_ENCODER, pidf);
+//        bl_Drive.setPositionPIDFCoefficients(7);
 
         if (useBrake) {
             fl_Drive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
@@ -190,13 +184,13 @@ public class DriveClass {
         parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-        parameters.loggingEnabled      = true;
-        parameters.loggingTag          = "IMU";
+        parameters.loggingEnabled      = false;
+        // parameters.loggingTag          = "IMU";
         // parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
         imu.initialize(parameters);
         // Start the logging of measured acceleration
-        // TODO: imu.startAccelerationIntegration(new Position(), new Velocity(), 10);
+        // imu.startAccelerationIntegration(new Position(), new Velocity(), 10);
 
 
         while (imu.isSystemCalibrated() && !opMode.isStopRequested()) {
@@ -216,6 +210,7 @@ public class DriveClass {
 
     public double readGyroHeading(double heading) {
         Orientation angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+
         double angle =  angles.firstAngle;
         double deltaAngle = heading - angle;
         if (deltaAngle < -180)
@@ -223,7 +218,7 @@ public class DriveClass {
         else if (deltaAngle > 180)
             deltaAngle -= 360;
 
-        double globalAngle = heading + deltaAngle;
+        double globalAngle = heading - deltaAngle;
 
         return globalAngle;
     }
@@ -287,9 +282,9 @@ public class DriveClass {
         br_Drive.setPower(br_power);
     }
 
-    public void straight(double target_meter, Direction direction, double speed, int timeout, double heading, boolean stopOnBumpers) {
-        ElapsedTime runTime = new ElapsedTime();
-        runTime.reset();
+    public void straight(double target_meter, Direction direction, double speed, double timeout, double heading, boolean stopOnBumpers) {
+        ElapsedTime timer = new ElapsedTime();
+        timer.reset();
 
         int dir = 1;
         if (direction == Direction.REVERSE)
@@ -313,31 +308,31 @@ public class DriveClass {
         br_Drive.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
 
         double power;
+        int accDist = 400;
 
-        while ((fl_Drive.isBusy() /*|| bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy()*/) &&
-                opMode.opModeIsActive() && runTime.seconds() < timeout) {
+        while ((fl_Drive.isBusy() && fr_Drive.isBusy()) && opMode.opModeIsActive() && timer.seconds() < timeout) {
 
             int distToTarget = Math.abs(fr_tar_pos - fr_Drive.getCurrentPosition());
 
             int distFromStart = Math.abs(ticks - distToTarget);
 
-            if (distFromStart < 300) {
-                power = speed * distFromStart / 300 * 0.8 + 0.2;
-            } else if (distToTarget < 300) {
-                power = speed/3;
+            if (distFromStart < accDist) {
+                power = (speed-0.2) * distFromStart / accDist * 0.8 + 0.2;
+            } else if (distToTarget < accDist) {
+                power = (speed-0.2) * distToTarget / accDist * 0.8 + 0.2;
             } else {
                 power = speed;
             }
 
-            double headingGyro = readGyroHeading(heading);
+            double headingGyro  = readGyroHeading(heading);
             double headingError = heading - headingGyro;
-            double headingCorrection = headingError * 0.01;
+            double headingCorrection =  headingError * 0.02 * power;
 
-            fl_Drive.setPower(power - headingCorrection);
+            fl_Drive.setPower(power + headingCorrection);
             fr_Drive.setPower(power + headingCorrection);
             bl_Drive.setPower(power - headingCorrection);
-            br_Drive.setPower(power + headingCorrection);
-            RobotLog.d("straight: heading: %f, corr: %f", headingGyro, headingCorrection );
+            br_Drive.setPower(power - headingCorrection);
+            RobotLog.d("%f2.4 ] straight: power: %f, heading: %f, corr: %f", timer.seconds(), power, headingGyro, headingCorrection );
 
             if (stopOnBumpers && direction == Direction.REVERSE) {
                 if (leftBumper.getState() == false) {
@@ -350,13 +345,13 @@ public class DriveClass {
                     br_Drive.setTargetPosition(br_Drive.getCurrentPosition());
                 }
             }
-            opMode.sleep(5);
+            opMode.sleep(1);
         }
     }
 
     public void strafe(double target_meter, Direction direction, double speed, int timeout, double heading) {
-        ElapsedTime runTime = new ElapsedTime();
-        runTime.reset();
+        ElapsedTime timer = new ElapsedTime();
+        timer.reset();
 
         int dir = 1;
         if (direction == Direction.LEFT)
@@ -379,34 +374,33 @@ public class DriveClass {
         br_Drive.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
 
         double power;
-        int accDist = 500;
+        int accDist = 400;
 
-        while ((fl_Drive.isBusy() /*|| bl_Drive.isBusy() ||  fr_Drive.isBusy() || br_Drive.isBusy()*/) &&
-                opMode.opModeIsActive() && runTime.seconds() < timeout) {
+        while ((fl_Drive.isBusy() && fr_Drive.isBusy()) && opMode.opModeIsActive() && timer.seconds() < timeout) {
 
             int distToTarget = Math.abs(fr_tar_pos - fr_Drive.getCurrentPosition());
 
             int distFromStart = Math.abs(ticks - distToTarget);
 
             if (distFromStart < accDist) {
-                power = speed * distFromStart / accDist * 0.7 + 0.3;
-            } else if (distToTarget < 500) {
-                power = 0.2;
+                power = (speed-0.2) * distFromStart / accDist * 0.8 + 0.2;
+            } else if (distToTarget < accDist) {
+                power = (speed-0.2) * distToTarget / accDist * 0.8 + 0.2;
             } else {
                 power = speed;
             }
 
             double headingGyro = readGyroHeading(heading);
             double headingError = heading - headingGyro;
-            double headingCorrection = headingError * 0.01;
-            RobotLog.d("strafe: heading: %f, corr: %f", headingGyro, headingCorrection );
+            double headingCorrection = dir * headingError * 0.05 * power;
+            RobotLog.d("%f2.4 ] strafe: power: %f, heading: %f, corr: %f", timer.seconds(), power, headingGyro, headingCorrection );
 
-            fl_Drive.setPower(power - headingCorrection);
-            fr_Drive.setPower(power - headingCorrection);
-            bl_Drive.setPower(power + headingCorrection);
-            br_Drive.setPower(power + headingCorrection);
+            fl_Drive.setPower(power + headingCorrection);
+            fr_Drive.setPower(power + headingCorrection);
+            bl_Drive.setPower(power - headingCorrection);
+            br_Drive.setPower(power - headingCorrection);
 
-            opMode.sleep(5);
+            opMode.sleep(1);
         }
     }
 
@@ -470,14 +464,14 @@ public class DriveClass {
 
     public void rotateTo(double targetAngle, double speed, double timeout, double tollerance) {
 
-        ElapsedTime runtime = new ElapsedTime();
-        runtime.reset();
+        ElapsedTime timer = new ElapsedTime();
+        timer.reset();
 
-        double currAngle = readGyroHeading(targetAngle);
+        double currAngle  = readGyroHeading(targetAngle);
         double deltaAngle = targetAngle - currAngle;
 
         /* 1 round is 5600 ticks
-         * to the right posotive
+         * to the right positive
          * to the left negative*/
         double rounds = deltaAngle / 360 ;
         rotate(rounds, Direction.RIGHT, speed, timeout );
@@ -489,21 +483,24 @@ public class DriveClass {
 
         double power = speed;
 
-        currAngle = readGyroHeading(targetAngle);
+        currAngle  = readGyroHeading(targetAngle);
         deltaAngle = targetAngle - currAngle;
-        while ( (Math.abs(deltaAngle) < tollerance) && opMode.opModeIsActive() && runtime.seconds() < timeout) {
+        RobotLog.d("%f2.4 ] rotateTo: power: %f, target: %f, gyro: %f, corr: %f", timer.seconds(), power, targetAngle, currAngle, deltaAngle );
+        while ( (Math.abs(deltaAngle) > tollerance) && opMode.opModeIsActive() && timer.seconds() < timeout) {
 
-            power = speed * deltaAngle * 0.1;
-            fl_Drive.setPower(-power);
-            fr_Drive.setPower(+power);
-            bl_Drive.setPower(-power);
-            br_Drive.setPower(+power);
+            power = Math.min(0.2, speed * deltaAngle * 0.01);
+            fl_Drive.setPower(+power);
+            fr_Drive.setPower(-power);
+            bl_Drive.setPower(+power);
+            br_Drive.setPower(-power);
 
             opMode.sleep(5);
 
             currAngle  = readGyroHeading(targetAngle);
             deltaAngle = targetAngle - currAngle;
+            RobotLog.d("%f2.4 ] rotateTo: power: %f, target: %f, gyro: %f, corr: %f", timer.seconds(), power, targetAngle, currAngle, deltaAngle );
         }
+        stop();
     }
 
     public void stop() {
@@ -762,13 +759,8 @@ public class DriveClass {
         else {
             strafe(0.7 * mul, Direction.RIGHT, 0.7, 3, 0);
             straight(1.3, Direction.REVERSE, 0.7, 4, 0, true);
-            driveToFoundation();
-            // sleep(200);
-            // Step 2: should be in front of the foundation, hooks down
-            drive(-0.2, 0 * mul, 0, 0, 0);
-            hooksDown();
-            opMode.sleep(500);
-            stop();
+            catchFoundation(0);
+            opMode.sleep(300);
             // Step 3: drag the foundation to the wall
             straight(1.8, Direction.FORWARD, 0.7, 3, 0, false);
 
@@ -895,7 +887,7 @@ public class DriveClass {
         }
         stop();
         double sec = total_timer.seconds();
-        double dist = Math.abs(fl_Drive.getCurrentPosition() - startPos) * 1400;
+        double dist = (double)Math.abs(fl_Drive.getCurrentPosition() - startPos) / 1400;
         RobotLog.d("Skystone found after %f sec, dist: %f",sec, dist);
         return dist;
     }
@@ -914,15 +906,22 @@ public class DriveClass {
         }
     }
 
-    private void driveToFoundation() {
-        drive(-0.6, 0, 0, 0, 0);
-        while( (leftBumper.getState() == false) && (rightBumper.getState() == false) && opMode.opModeIsActive() ) {
+    private void catchFoundation(double heading) {
+        ElapsedTime timer = new ElapsedTime();
+        timer.reset();
+        drive(-0.5, 0, 0, 0, 0);
+        while( (leftBumper.getState() == true) && (rightBumper.getState() == true) && (timer.seconds() < 3) && opMode.opModeIsActive() ) {
             opMode.sleep(2);
         }
-        drive(-0.2, 0, 0, 0, 0);
-        while( (leftBumper.getState() == true) && (rightBumper.getState() == true) && opMode.opModeIsActive() ) {
+        hooksDown();                                                         // catch the foundation
+        timer.reset();
+        drive(-0.1, 0, 0, 0, 0);
+        while( !((leftBumper.getState() == false) && (rightBumper.getState() == false)) && (timer.seconds() < 1) && opMode.opModeIsActive() ) {
             opMode.sleep(2);
         }
+        stop();
+        straight(0.1, Direction.REVERSE, 0.2, 0.5, 180, false ); // slow drive to hook the foundation.
+        opMode.sleep(200);
     }
 
     public void AUTO_skystone(Alliance team, ArmClass arm, boolean foundation) {
@@ -946,11 +945,12 @@ public class DriveClass {
 
             // find skystone
             approachStones(location);     // drive straight close to stones
-            double stoneDist = searchSkystone(location,mul); // drive LEFT : search for SkyStone
+            double skyDist = searchSkystone(location,mul); // drive LEFT : search for SkyStone
+            RobotLog.d("skyDist: %f", skyDist);
 
             // pickup STONE
-            arm.setArmDriveMode(false);
             arm.openClamps(false); // close clamps
+            arm.setArmDriveMode(false);
             arm.gootoo(55, 400,0.4);
             opMode.sleep(300); // wait for clamps to close
             arm.pleaseDo(ArmClass.Mode.SKY2_FOLD); // move arm back
@@ -959,16 +959,16 @@ public class DriveClass {
             straight(0.3, DriveClass.Direction.REVERSE, 1, 1, 0,false);
 
             // slide RIGHT to put stone
-            strafe((2.2 + stoneDist) * mul, DriveClass.Direction.RIGHT, 1, 8, 0);
+            strafe((2.3 + skyDist) * mul, DriveClass.Direction.RIGHT, 1, 8, 0);
             // robot.stop();
 
             // Dropdown stone.
             arm.pleaseDo(ArmClass.Mode.SKY4_DROP);
-            opMode.sleep(500);
+            opMode.sleep(600);
 
             // ============= Second Skystone ==============================================================================================================================
             RobotLog.d("Second Skystone");
-            strafe(3.3 * mul, DriveClass.Direction.LEFT, 1, 8, 0); // TODO: stoneDist
+            strafe((2.8 + skyDist)* mul, DriveClass.Direction.LEFT, 1, 8, 0); // Drive back to stones.
 
             arm.openClamps(true);
             arm.pleaseDo(ArmClass.Mode.SKY3_READY); // move arm forward ready to catch
@@ -978,10 +978,10 @@ public class DriveClass {
             searchSkystone(location,mul); // drive LEFT : search for SkyStone
 
             // pickup STONE
-            arm.setArmDriveMode(false);
             arm.openClamps(false);
+            arm.setArmDriveMode(false);
             arm.gootoo(55, 400,0.4);
-            opMode.sleep(300);
+            opMode.sleep(300); // wait for clamps to close
             arm.pleaseDo(ArmClass.Mode.SKY2_FOLD);
 
             // drive backwards
@@ -989,25 +989,23 @@ public class DriveClass {
 
             if(foundation == true) { // SOLO
 
-                strafe(5 * mul, Direction.LEFT, 1, 8, 0); // TODO: stoneDist // slide toward foundation line
+                strafe((4.8 + skyDist) * mul, Direction.RIGHT, 1, 8, 0); // slide toward foundation line
 
                 rotateTo(180 * mul,1,3, 1);      // rotate 180
-                straight(0.4, Direction.REVERSE,1,3, 180, true);    // drive to foundation
-                driveToFoundation();
-                hooksDown();                                                         // catch the foundation
-                straight(0.4, Direction.REVERSE, 0.2, 1, 180, false ); // slow drive to hook the foundation.
+                // straight(0.4, Direction.REVERSE,1,3, 180, true);    // drive to foundation
+                catchFoundation(180);
                 arm.pleaseDo(ArmClass.Mode.SKY5_DROP_BACK);                          // drop the stone backwards and HOME the arm.
 
-                double ang = 0.1 * mul * 360 ;
-                rotateTo(ang,1,3, 1);       // rotate just a little to gain angle.
-                double heading = readGyroHeading(180);
-                straight(0.8, Direction.FORWARD,1,3, heading, false);       // move forward half way toward wall.
-                rotateTo(90 * mul,1,3, 1);      // rotate foundation to building zone.
+                double ang = 180 + 10 * mul ;
+                rotateTo(ang,1,3, 0.5);       // rotate just a little to gain angle.
+                straight(0.8, Direction.FORWARD,1,3, ang, false);       // move forward half way toward wall.
+                ang =  - 90 * mul ;
+                rotateTo(ang,1,3, 1);      // rotate foundation to building zone.
                 hooksUp();                                                           // release foundation.
                 opMode.sleep(150);                                       // wait for hooks to open
 
                 // Parking - drive FORWARD towards bridge line to park - search the line and park.
-                straight(0.5, Direction.FORWARD,1,3, 90 * mul, false);       // move forward half way toward wall.
+                straight(0.5, Direction.FORWARD,1,3, ang, false);       // move forward half way toward wall.
                 timer.reset();
                 drive(1, 0, 0, 0, 0);
                 while (!isLine(team) && timer.seconds() < 3  && opMode.opModeIsActive()) {

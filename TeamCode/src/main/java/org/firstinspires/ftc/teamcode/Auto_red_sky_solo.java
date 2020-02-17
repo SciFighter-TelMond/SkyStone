@@ -42,7 +42,7 @@ public class Auto_red_sky_solo extends LinearOpMode {
 
     /* Declare OpMode members. */
     private DriveClass robot = new DriveClass(this);   // Use a Pushbot's hardware
-    private ArmClass arm = new ArmClass(this, robot);
+    private ArmClass     arm = new ArmClass(this, robot);
 
     private ElapsedTime runtime = new ElapsedTime();
     private ElapsedTime timer = new ElapsedTime();

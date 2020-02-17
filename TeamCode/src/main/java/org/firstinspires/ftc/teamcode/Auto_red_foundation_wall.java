@@ -59,7 +59,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class Auto_red_foundation_wall extends LinearOpMode {
 
     /* Declare OpMode members. */
-    private DriveClass         robot   = new DriveClass(this,false);   // Use a Pushbot's hardware
+    private DriveClass        robot = new DriveClass(this);   // Use a Pushbot's hardware
     private ElapsedTime     runtime = new ElapsedTime();
 
 
