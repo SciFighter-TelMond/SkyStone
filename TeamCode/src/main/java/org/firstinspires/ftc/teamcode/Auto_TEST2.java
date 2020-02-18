@@ -81,20 +81,42 @@ public class Auto_TEST2 extends LinearOpMode {
 
         ElapsedTime timer = new ElapsedTime();
 
+        DriveClass.Alliance team = DriveClass.Alliance.RED;
+        double mul = 1;
 
         runtime.reset();
-        /*starting point: building area, the bridge is on the right,
-         * the front of the robot is to the wall, the hooks directed to the middle of the field.
-         * please start close to the building site*/
-        // Step 1:  Drive forward (actually back) and a bit to the left (actually to the right)
-        // robot.approachStones(DriveClass.Location.RIGHT);
-        robot.rotateTo(180, 1,4, 3);
-        robot.catchFoundation(180);
 
+
+        robot.rotateTo(180 * mul,1,3, 3);      // rotate 180
+        // straight(0.4, Direction.REVERSE,1,3, 180, true);    // drive to foundation
+        robot.catchFoundation(180);
+        // arm.pleaseDo(ArmClass.Mode.SKY5_DROP_BACK);                          // drop the stone backwards and HOME the arm while moving the foundation.
+
+        // robot.straight(0.3, DriveClass.Direction.FORWARD,1,3, 180, false);
+
+        // Rotate the foundation to the building zone.
+        robot.rotate(0.05 * mul, DriveClass.Direction.RIGHT,1,0.5);       // rotate 15c - just a little to gain angle.
+
+        double angle = 180 + 20 * mul ;
+        robot.straight(1, DriveClass.Direction.FORWARD,1,3, angle, false);  // move forward half way - move foundation from the wal.
+
+        double bridgeDirection =  - 90 * mul ; // bridge direction
+        robot.rotateTo(bridgeDirection,1,3, 5);      // rotate foundation to building zone.
+        robot.hooksUp();                                                      // release foundation.
+        //sleep(150);                                  // wait for hooks to open
+        robot.strafe(0.3, DriveClass.Direction.RIGHT,1,1,bridgeDirection);
+
+        // Parking - drive FORWARD towards bridge line to park - search the line and park.
+        robot.straight(1.1, DriveClass.Direction.FORWARD,1,3, bridgeDirection, false);       // move forward toward bridge.
         timer.reset();
-        robot.drive(0.7,0,0.3,0,0);
-        while(timer.seconds() < 5) {
-            sleep(100);
+        robot.drive(0.5, 0, 0, 0, 0); // drive slowly until it sees the line.
+        while (!robot.isLine(team) && timer.seconds() < 1.5  && opModeIsActive()) {
+            sleep(1);
+        }
+        stop();
+        // waist time until the end to let the arm HOME finish.
+        while (opModeIsActive()) {
+            sleep(10);
         }
 
         robot.stop();

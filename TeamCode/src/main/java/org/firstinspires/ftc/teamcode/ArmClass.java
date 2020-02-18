@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 // import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
@@ -38,14 +39,14 @@ public class ArmClass extends Thread {
     volatile private int posArm0 = 0;
     volatile private int posArm1 = 0;
 
-    volatile private OpMode opMode = null;
+    volatile private LinearOpMode opMode = null;
     volatile private DriveClass driveClass = null;
 
     static final int STAY = 999999;
 
     volatile private int currFloor = 0;
 
-    public ArmClass(OpMode opMode, DriveClass drive) {
+    public ArmClass(LinearOpMode opMode, DriveClass drive) {
         this.setName("ArmClass");
         RobotLog.d("%s", this.getName());
 
@@ -181,8 +182,17 @@ public class ArmClass extends Thread {
 
         if (zeroArm0.getState() == false) {
             speed = Math.max(0, speed);
+        } else {
+            // prevent arm from dropping under high moment when rest.
+            if (Math.abs(speed) <= 0.01  && arm1.getCurrentPosition() > 500 ) {
+                if (arm0.getCurrentPosition() < 2600) {
+                    speed = 0.01; // give arm some minimal speed to hold up its position.
+                }
+                else if (arm0.getCurrentPosition() > 3800) {
+                    speed = -0.01; // give arm some minimal speed to hold up its position.
+                }
+            }
         }
-
         arm0.setPower(speed * speed_boost);
     }
 
@@ -195,7 +205,7 @@ public class ArmClass extends Thread {
         if (zeroArm1.getState() == false) {
             speed = Math.max(0, speed);
         }
-        if (speed > 0 && arm1.getCurrentPosition() > 950 - speed * 20) { // TODO:
+        if (speed > 0 && arm1.getCurrentPosition() > 970 - speed * 50) { // TODO:
             speed = 0;
         }
         arm1.setPower(speed * speed_boost / 2);
@@ -241,7 +251,7 @@ public class ArmClass extends Thread {
         arm1.setTargetPosition(pos1);
 
         //RobotLog.d("Arm goto start to: Arm0:(%d)->(%d), Arm1(%d)->(%d)  ", arm0.getCurrentPosition(), arm0.getTargetPosition(), arm1.getCurrentPosition(), arm1.getTargetPosition());
-        while (arm0.isBusy() || arm1.isBusy()) {
+        while ( (arm0.isBusy() || arm1.isBusy()) && opMode.opModeIsActive()) {
             sleep(50);
             //RobotLog.d("Arm goto run at: Arm0:(%d), Arm1(%d)", arm0.getCurrentPosition(), arm1.getCurrentPosition());
             checkups();
@@ -260,7 +270,7 @@ public class ArmClass extends Thread {
         arm1.setTargetPosition(pos1);
 
         //RobotLog.d("Arm goto start to: Arm0:(%d)->(%d), Arm1(%d)->(%d)  ", arm0.getCurrentPosition(), arm0.getTargetPosition(), arm1.getCurrentPosition(), arm1.getTargetPosition());
-        while ((arm0.isBusy() || arm1.isBusy()) && runTime.seconds() < timeout) {
+        while ((arm0.isBusy() || arm1.isBusy()) && runTime.seconds() < timeout && opMode.opModeIsActive()) {
             sleep(50);
             //RobotLog.d("Arm goto run at: Arm0:(%d), Arm1(%d)", arm0.getCurrentPosition(), arm1.getCurrentPosition());
             checkups();
@@ -303,7 +313,7 @@ public class ArmClass extends Thread {
                     openClamps(false);
                     driveClass.rollers(true);
                     sleep(500);
-                    gootoo(-500, -500);
+                    gootoo(-5000, -500);
                     reset();
                     driveClass.rollers(false);
                     RobotLog.d("Arm do: HOME/");
@@ -392,6 +402,7 @@ public class ArmClass extends Thread {
                     gootoo(900, 0);
                     rotateClamps(true);
                     openClamps(true);
+                    gootoo(STAY, 450);
                     gootoo(515, 380);
                     break;
 
@@ -418,6 +429,7 @@ public class ArmClass extends Thread {
                     RobotLog.d("Arm do: SKY5_DROP_BACK");
                     rotateClamps(false);
                     gootoo(5200, 20);
+                    sleep(200);
                     openClamps(true);
                     sleep(500);
                     linearDo(Mode.HOME);
@@ -444,8 +456,8 @@ public class ArmClass extends Thread {
         interrupt();
         arm0.setPower(0);
         arm1.setPower(0);
-        arm0.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        arm1.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+//        arm0.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+//        arm1.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         mode = Mode.IDLE;
     }
 
