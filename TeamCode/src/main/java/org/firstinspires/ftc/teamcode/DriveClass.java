@@ -318,7 +318,7 @@ public class DriveClass {
         br_Drive.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
 
         double power;
-        int accDist = 600;
+        int accDist = 500;
 
         while ((fl_Drive.isBusy() && fr_Drive.isBusy()) && opMode.opModeIsActive() && timer.seconds() < timeout) {
 
@@ -334,9 +334,12 @@ public class DriveClass {
                 power = speed;
             }
 
+            // Gyro Heading Correction
             double headingGyro  = readGyroHeading(heading);
             double headingError = heading - headingGyro;
             double headingCorrection = headingError * 0.06 * power * dir * Math.signum(target_meter);;
+            if (distToTarget < 300)
+                headingCorrection = 0;
 
             fl_Drive.setPower(power + headingCorrection);
             fr_Drive.setPower(power - headingCorrection);
@@ -390,7 +393,7 @@ public class DriveClass {
         br_Drive.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
 
         double power;
-        int accDist = 600;
+        int accDist = 500;
 
         while ((fl_Drive.isBusy() && fr_Drive.isBusy()) && opMode.opModeIsActive() && timer.seconds() < timeout) {
 
@@ -406,9 +409,12 @@ public class DriveClass {
                 power = speed;
             }
 
+            // Gyro Heading Correction
             double headingGyro = readGyroHeading(heading);
             double headingError = heading - headingGyro;
             double headingCorrection = dir * headingError * 0.06 * power * Math.signum(target_meter);
+            if (distToTarget < 300)
+                headingCorrection = 0;
             RobotLog.d("%f2.4 ] strafe: power: %f, heading: %f, corr: %f", timer.seconds(), power, headingGyro, headingCorrection );
 
             fl_Drive.setPower(power + headingCorrection);
