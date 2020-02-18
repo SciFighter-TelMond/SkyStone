@@ -148,11 +148,11 @@ public class LinearDrive extends LinearOpMode {
 
             clamps.update(gamepad2.left_bumper);
             if (clamps.isChanged())
-                arm.openClamps(clamps.getState());
+                arm.toggleClamps();
 
             clamps_rotate.update(gamepad2.right_bumper);
             if (clamps_rotate.isChanged())
-                arm.rotateClamps(clamps_rotate.getState());
+                arm.toggleRotateClamps();
 
             arm.setBoost(gamepad2.right_trigger + gamepad2.left_trigger);
 
