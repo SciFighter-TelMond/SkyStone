@@ -408,7 +408,7 @@ public class ArmClass extends Thread {
                     gootoo(ArmClass.STAY,800, 0.5);
                     sleep(50);
                     openClamps(true);
-                    sleep(300);
+                    sleep(400);
                     openClamps(false);
                     gootoo(ArmClass.STAY,0);
                     RobotLog.d("SKY4_DROP time: %f", timer.seconds());

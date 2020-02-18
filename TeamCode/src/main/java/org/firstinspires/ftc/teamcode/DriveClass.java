@@ -933,7 +933,7 @@ public class DriveClass {
     public void catchFoundation(double heading) {
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
-        drive(-0.5, 0, 0, 0, 0);
+        drive(-0.8, 0, 0, 0, 0);
         while( (leftBumper.getState() == true) && (rightBumper.getState() == true) && (timer.seconds() < 3) && opMode.opModeIsActive() ) {
             opMode.sleep(2);
         }
@@ -975,7 +975,7 @@ public class DriveClass {
             // pickup STONE
             arm.openClamps(false); // close clamps
             arm.setArmDriveMode(false);
-            arm.gootoo(55, 400,0.4);
+            arm.gootoo(60, 400,0.4);
             opMode.sleep(300); // wait for clamps to close
             arm.pleaseDo(ArmClass.Mode.SKY2_FOLD); // move arm back
 
@@ -988,7 +988,7 @@ public class DriveClass {
 
             // Dropdown stone.
             arm.pleaseDo(ArmClass.Mode.SKY4_DROP);
-            opMode.sleep(600);
+            opMode.sleep(800);
 
             // ============= Second Skystone ==============================================================================================================================
             RobotLog.d("Second Skystone");
@@ -1004,7 +1004,7 @@ public class DriveClass {
             // pickup STONE
             arm.openClamps(false);
             arm.setArmDriveMode(false);
-            arm.gootoo(55, 400,0.4);
+            arm.gootoo(60, 400,0.4);
             opMode.sleep(300); // wait for clamps to close
             arm.pleaseDo(ArmClass.Mode.SKY2_FOLD);
 
@@ -1015,25 +1015,33 @@ public class DriveClass {
 
                 strafe((4.8 + skyDist) * mul, Direction.RIGHT, 1, 8, 0); // slide toward foundation line
 
-                rotateTo(180 * mul,1,3, 5);      // rotate 180
+                rotateTo(180 * mul,1,3, 3);      // rotate 180
                 // straight(0.4, Direction.REVERSE,1,3, 180, true);    // drive to foundation
                 catchFoundation(180);
-                arm.pleaseDo(ArmClass.Mode.SKY5_DROP_BACK);                          // drop the stone backwards and HOME the arm.
+                arm.pleaseDo(ArmClass.Mode.SKY5_DROP_BACK);                          // drop the stone backwards and HOME the arm while moving the foundation.
 
-                double ang = 180 + 10 * mul ;
-                // rotateTo(ang,1,3, 0.5);       // rotate just a little to gain angle.
-                straight(0.8, Direction.FORWARD,1,3, ang, false);       // move forward half way toward wall.
-                ang =  - 90 * mul ;
-                rotateTo(ang,1,3, 5);      // rotate foundation to building zone.
-                hooksUp();                                                           // release foundation.
-                opMode.sleep(150);                                       // wait for hooks to open
+                // Rotate the foundation to the building zone.
+                rotate(0.05 * mul, Direction.RIGHT,1,0.5);       // rotate 15c - just a little to gain angle.
+
+                double angle = 180 + 20 * mul ;
+                straight(0.6, Direction.FORWARD,1,3, angle, false);  // move forward half way - move foundation from the wal.
+
+                double bridgeDirection =  - 90 * mul ; // bridge direction
+                rotateTo(bridgeDirection,1,3, 5);      // rotate foundation to building zone.
+                hooksUp();                                                      // release foundation.
+                opMode.sleep(150);                                  // wait for hooks to open
 
                 // Parking - drive FORWARD towards bridge line to park - search the line and park.
-                straight(0.5, Direction.FORWARD,1,3, ang, false);       // move forward half way toward wall.
+                straight(0.7, Direction.FORWARD,1,3, bridgeDirection, false);       // move forward toward bridge.
                 timer.reset();
-                drive(1, 0, 0, 0, 0);
+                drive(0.5, 0, 0, 0, 0); // drive slowly until it sees the line.
                 while (!isLine(team) && timer.seconds() < 3  && opMode.opModeIsActive()) {
                     opMode.sleep(1);
+                }
+                stop();
+                // waist time until the end to let the arm HOME finish.
+                while (opMode.opModeIsActive()) {
+                    opMode.sleep(10);
                 }
             }
             else { // BRIDGE
