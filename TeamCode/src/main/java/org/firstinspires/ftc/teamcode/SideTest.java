@@ -62,7 +62,7 @@ public class SideTest extends LinearOpMode {
     private DriveClass        robot = new DriveClass(this);   // Use a Pushbot's hardware
     private ElapsedTime     runtime = new ElapsedTime();
 
-
+    private ArmClass arm = new ArmClass(this, robot);
 
     @Override
     public void runOpMode() {
@@ -72,28 +72,34 @@ public class SideTest extends LinearOpMode {
          * The init() method of the hardware class does all the work here
          */
         robot.init(hardwareMap);
+        arm.init(hardwareMap);
 
         // Send telemetry message to signify robot waiting;
         telemetry.addData("Status", "Ready to run");    //
         telemetry.update();
 
         robot.init_GyroIMU();
-        telemetry.addData("Status", "Gyro IMU Ready");    //
-        telemetry.update();
 
         // Wait for the game to start (driver presses PLAY)
 
-        double speed = 0.9;
+        double speed = 1;
         waitForStart();
+
+        arm.begin();
+        arm.setArmDriveMode(false);
+
         for (int i=0; i<2; i++) {
-            robot.strafe(3, DriveClass.Direction.RIGHT, speed, 10, 0);
-            sleep(500);
-            robot.straight(2, DriveClass.Direction.FORWARD, speed, 10, 0, false);
-            sleep(500);
-            robot.strafe(3, DriveClass.Direction.LEFT, speed, 10, 0);
-            sleep(500);
-            robot.straight(2, DriveClass.Direction.REVERSE, speed, 10, 0, false);
-            sleep(500);
+            robot.strafe(-4, DriveClass.Direction.RIGHT, speed, 10, 0);
+            //sleep(500);
+            arm.pleaseDo(ArmClass.Mode.SKY2_FOLD);
+            robot.straight(-4, DriveClass.Direction.FORWARD, speed, 10, 0, false);
+            //sleep(500);
+            arm.pleaseDo(ArmClass.Mode.SKY3_READY);
+            robot.strafe(-4, DriveClass.Direction.LEFT, speed, 10, 0);
+            //sleep(500);
+            arm.pleaseDo(ArmClass.Mode.SKY4_DROP);
+            robot.straight(-4, DriveClass.Direction.REVERSE, speed, 10, 0, false);
+            //sleep(500);
         }
         robot.stop();
     }

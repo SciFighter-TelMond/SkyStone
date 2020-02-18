@@ -184,8 +184,8 @@ public class DriveClass {
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.calibrationDataFile = "AdafruitIMUCalibration.json"; // "BNO055IMUCalibration.json"; // see the calibration sample opmode
-        parameters.loggingEnabled      = false;
+        // parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+        // parameters.loggingEnabled      = false;
         // parameters.loggingTag          = "IMU";
         // parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
@@ -193,14 +193,15 @@ public class DriveClass {
         // Start the logging of measured acceleration
         // imu.startAccelerationIntegration(new Position(), new Velocity(), 10);
 
-        opMode.telemetry.addLine()
-                .addData("IMU:", new Func<String>()     { @Override public String value() { return imu.getSystemStatus().toShortString(); }})
-                .addData("Cal:", new Func<String>()     { @Override public String value() { return imu.getCalibrationStatus().toString(); }})
-                .addData("Heading:", new Func<String>() { @Override public String value() { return Float.toString(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle); }});
-
+//        opMode.telemetry.addLine()
+//                .addData("IMU:", new Func<String>()     { @Override public String value() { return imu.getSystemStatus().toShortString(); }})
+//                .addData("Cal:", new Func<String>()     { @Override public String value() { return imu.getCalibrationStatus().toString(); }})
+//                .addData("Heading:", new Func<String>() { @Override public String value() { return Float.toString(imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle); }});
+//
 
         while (imu.isGyroCalibrated() && !opMode.isStopRequested()) {
             opMode.sleep(100);
+            opMode.telemetry.update();
         }
         if (imu.isGyroCalibrated())
             opMode.telemetry.addData("Status", "Gyro IMU Ready");
@@ -317,7 +318,7 @@ public class DriveClass {
         br_Drive.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
 
         double power;
-        int accDist = 400;
+        int accDist = 600;
 
         while ((fl_Drive.isBusy() && fr_Drive.isBusy()) && opMode.opModeIsActive() && timer.seconds() < timeout) {
 
@@ -335,12 +336,18 @@ public class DriveClass {
 
             double headingGyro  = readGyroHeading(heading);
             double headingError = heading - headingGyro;
-            double headingCorrection =  headingError * 0.02 * power;
+            double headingCorrection = headingError * 0.06 * power * dir * Math.signum(target_meter);;
 
             fl_Drive.setPower(power + headingCorrection);
-            fr_Drive.setPower(power + headingCorrection);
-            bl_Drive.setPower(power - headingCorrection);
+            fr_Drive.setPower(power - headingCorrection);
+            bl_Drive.setPower(power + headingCorrection);
             br_Drive.setPower(power - headingCorrection);
+
+//            fl_Drive.setPower(power + headingCorrection);
+//            fr_Drive.setPower(power + headingCorrection);
+//            bl_Drive.setPower(power - headingCorrection);
+//            br_Drive.setPower(power - headingCorrection);
+
             RobotLog.d("%f2.4 ] straight: power: %f, heading: %f, corr: %f", timer.seconds(), power, headingGyro, headingCorrection );
 
             if (stopOnBumpers && direction == Direction.REVERSE) {
@@ -383,7 +390,7 @@ public class DriveClass {
         br_Drive.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
 
         double power;
-        int accDist = 400;
+        int accDist = 600;
 
         while ((fl_Drive.isBusy() && fr_Drive.isBusy()) && opMode.opModeIsActive() && timer.seconds() < timeout) {
 
@@ -401,7 +408,7 @@ public class DriveClass {
 
             double headingGyro = readGyroHeading(heading);
             double headingError = heading - headingGyro;
-            double headingCorrection = dir * headingError * 0.05 * power;
+            double headingCorrection = dir * headingError * 0.06 * power * Math.signum(target_meter);
             RobotLog.d("%f2.4 ] strafe: power: %f, heading: %f, corr: %f", timer.seconds(), power, headingGyro, headingCorrection );
 
             fl_Drive.setPower(power + headingCorrection);
@@ -616,7 +623,7 @@ public class DriveClass {
     }
 
     public double getSensorDistanceRight() {
-        return sensorDistanceRight.getDistance(DistanceUnit.CM);
+        return sensorDistanceRight.getDistance(DistanceUnit.CM) - 4;
     }
 
     public double getSensorDistanceLeft() {
@@ -631,7 +638,7 @@ public class DriveClass {
         } else {
             dist = getSensorDistanceRight(); // TODO: the sensor is missed calibrate
             RobotLog.d("DriveClass: Right SensorDistance: %f", dist);
-            dist -= 4;
+//            dist -= 4;
         }
         return dist;
     }
@@ -834,7 +841,7 @@ public class DriveClass {
     public double approachStones(Location location) {
         // drive straight close to stones
         ElapsedTime timer = new ElapsedTime();
-        double speed = 1;
+        double speed = 0.5;
         drive(speed, 0, 0, 0, 0);
         timer.reset();
         double dist = getSensorDistance(location);
@@ -843,7 +850,7 @@ public class DriveClass {
                 speed = (dist - 2)/2 * 0.5;
                 drive(speed, 0, 0, 0, 0);
             }
-            opMode.sleep(1);
+            opMode.sleep(5);
             dist = getSensorDistance(location);
         }
         stop();
@@ -917,7 +924,7 @@ public class DriveClass {
         }
     }
 
-    private void catchFoundation(double heading) {
+    public void catchFoundation(double heading) {
         ElapsedTime timer = new ElapsedTime();
         timer.reset();
         drive(-0.5, 0, 0, 0, 0);
@@ -1002,16 +1009,16 @@ public class DriveClass {
 
                 strafe((4.8 + skyDist) * mul, Direction.RIGHT, 1, 8, 0); // slide toward foundation line
 
-                rotateTo(180 * mul,1,3, 1);      // rotate 180
+                rotateTo(180 * mul,1,3, 5);      // rotate 180
                 // straight(0.4, Direction.REVERSE,1,3, 180, true);    // drive to foundation
                 catchFoundation(180);
                 arm.pleaseDo(ArmClass.Mode.SKY5_DROP_BACK);                          // drop the stone backwards and HOME the arm.
 
                 double ang = 180 + 10 * mul ;
-                rotateTo(ang,1,3, 0.5);       // rotate just a little to gain angle.
+                // rotateTo(ang,1,3, 0.5);       // rotate just a little to gain angle.
                 straight(0.8, Direction.FORWARD,1,3, ang, false);       // move forward half way toward wall.
                 ang =  - 90 * mul ;
-                rotateTo(ang,1,3, 1);      // rotate foundation to building zone.
+                rotateTo(ang,1,3, 5);      // rotate foundation to building zone.
                 hooksUp();                                                           // release foundation.
                 opMode.sleep(150);                                       // wait for hooks to open
 
