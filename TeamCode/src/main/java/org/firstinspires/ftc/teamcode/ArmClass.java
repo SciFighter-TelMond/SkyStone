@@ -348,50 +348,52 @@ public class ArmClass extends Thread {
                         gootoo(300, 0);
 
                     switch (currFloor) {
-                        case 0:
-                        case 1:
-                            RobotLog.d("Arm do: BUILD - floor 1");
-                            gootoo(830, STAY);
-                            gootoo(830, 560);
-                            gootoo(225, 555);
-                            break;
-                        case 2:
-                            RobotLog.d("Arm do: BUILD - floor 2");
-                            gootoo(930, STAY);
-                            gootoo(930, 600);
-                            gootoo(700, 730);
-                            break;
-                        case 3:
-                            RobotLog.d("Arm do: BUILD - floor 3");
-                            gootoo(1260, 80);
-                            gootoo(1030, 760);
-                            break;
-                        case 4:
-                            RobotLog.d("Arm do: BUILD - floor 4");
-                            gootoo(1630, 180);
-                            gootoo(1280, 870);
-                            break;
-                        case 5:
-                            RobotLog.d("Arm do: BUILD - floor 5");
-                            gootoo(1870, 540);
-                            gootoo(1485, 900);
-                            break;
-                        case 6:
-                            RobotLog.d("Arm do: BUILD - floor 6");
-                            gootoo(3000, 510);
-                            gootoo(3700, 540);
-                            break;
-                        case 7:
-                            RobotLog.d("Arm do: BUILD - floor 7");
-                            gootoo(3000, 800);
-                            gootoo(3615, 820);
-                            break;
-                        case 8:
-                            RobotLog.d("Arm do: BUILD - floor 8");
-                            gootoo(3000, 900);
-                            break;
+//                        case 1:
+//                            RobotLog.d("Arm do: BUILD - floor 1");
+//                            gootoo(830, STAY);
+//                            gootoo(830, 560);
+//                            gootoo(225, 555);
+//                            break;
+//                        case 2:
+//                            RobotLog.d("Arm do: BUILD - floor 2");
+//                            gootoo(930, STAY);
+//                            gootoo(930, 600);
+//                            gootoo(700, 730);
+//                            break;
+//                        case 3:
+//                            RobotLog.d("Arm do: BUILD - floor 3");
+//                            gootoo(1260, 80);
+//                            gootoo(1030, 760);
+//                            break;
+//                        case 4:
+//                            RobotLog.d("Arm do: BUILD - floor 4");
+//                            gootoo(1630, 180);
+//                            gootoo(1280, 870);
+//                            break;
+//                        case 5:
+//                            RobotLog.d("Arm do: BUILD - floor 5");
+//                            gootoo(1870, 540);
+//                            gootoo(1485, 900);
+//                            break;
+//                        case 6:
+//                            RobotLog.d("Arm do: BUILD - floor 6");
+//                            gootoo(3000, 510);
+//                            gootoo(3700, 540);
+//                            break;
+//                        case 7:
+//                            RobotLog.d("Arm do: BUILD - floor 7");
+//                            gootoo(3000, 800);
+//                            gootoo(3615, 820);
+//                            break;
+//                        case 8:
+//                            RobotLog.d("Arm do: BUILD - floor 8");
+//                            gootoo(3000, 900);
+//                            break;
                         default:
-                            RobotLog.d("Arm do: BUILD - NO floor");
+                            RobotLog.d("Arm do: BUILD - floor 7");
+                            gootoo(3040, 890);
+                            sleep(100);
+                            gootoo(3470,770);
                             break;
                     }
 
