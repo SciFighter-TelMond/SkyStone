@@ -23,6 +23,10 @@ public class ArmClass extends Thread {
     volatile private Servo clamps = null;
     volatile private Servo clampsRotate = null;
 
+    volatile private Toggle clampsState = new Toggle();
+    volatile private Toggle clampsRotateState = new Toggle();
+
+
     volatile private double power = 1;
     volatile private double speed_boost = 0.5;
 
@@ -59,6 +63,9 @@ public class ArmClass extends Thread {
         clamps = hardwareMap.get(Servo.class, "clamps");
         clampsRotate = hardwareMap.get(Servo.class, "clamps_rotate");
 
+        openClamps(false);
+        rotateClamps(false);
+
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
         arm0.setDirection(DcMotorEx.Direction.FORWARD);
@@ -70,7 +77,6 @@ public class ArmClass extends Thread {
 
         arm0.setTargetPositionTolerance(15);
         arm1.setTargetPositionTolerance(15);
-
 
         //==============================
         // PIDF control
@@ -119,6 +125,7 @@ public class ArmClass extends Thread {
     }
 
     public void openClamps(boolean open) {
+        clampsState.set(open);
         if (open) {
             clamps.setPosition(0);
         } else {
@@ -126,12 +133,23 @@ public class ArmClass extends Thread {
         }
     }
 
+    public void toggleClamps() {
+        boolean state = clampsState.toggle();
+        openClamps(state);
+    }
+
     public void rotateClamps(boolean rot) {
+        clampsRotateState.set(rot);
         if (rot) {
             clampsRotate.setPosition(1);
         } else {
             clampsRotate.setPosition(0);
         }
+    }
+
+    public void toggleRotateClamps() {
+        boolean state = clampsRotateState.toggle();
+        rotateClamps(state);
     }
 
     public void setArmDriveMode(boolean drive) {
@@ -392,7 +410,7 @@ public class ArmClass extends Thread {
                     gootoo(ArmClass.STAY,800, 0.5);
                     sleep(50);
                     openClamps(true);
-                    sleep(300);
+                    sleep(400);
                     openClamps(false);
                     gootoo(ArmClass.STAY,0);
                     RobotLog.d("SKY4_DROP time: %f", timer.seconds());
