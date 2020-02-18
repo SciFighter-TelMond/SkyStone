@@ -73,7 +73,8 @@ public class IMU_Test extends LinearOpMode
     // Main logic
     //----------------------------------------------------------------------------------------------
 
-    @Override public void runOpMode() {
+    @Override
+    public void runOpMode() {
 
         // Set up the parameters with which we will use our IMU. Note that integration
         // algorithm here just reports accelerations to the logcat log; it doesn't actually

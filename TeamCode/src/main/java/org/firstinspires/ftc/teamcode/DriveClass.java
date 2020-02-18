@@ -66,7 +66,7 @@ public class DriveClass {
     volatile private HardwareMap hwMap = null;
 
     // The Gyro IMU sensor object
-    BNO055IMU imu;
+    private BNO055IMU imu;
 
     public enum Direction { LEFT, RIGHT, FORWARD, REVERSE }
 
