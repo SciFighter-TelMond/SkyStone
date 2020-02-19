@@ -86,7 +86,7 @@ public class LinearDrive extends LinearOpMode {
             //==========================================
             //CapStone
             //==========================================
-            capStone.update(gamepad1.x);
+            capStone.update(gamepad1.x || (gamepad2.x && gamepad2.dpad_right));
             if (capStone.isClicked()) {
                 drive.setCapstone(capStone.getState());
             }
@@ -120,7 +120,7 @@ public class LinearDrive extends LinearOpMode {
 
             armDoHome.update(gamepad2.x && gamepad2.dpad_down);
             armDoPick.update(gamepad2.y && gamepad2.dpad_left);
-            armDoBuild.update(gamepad2.y && gamepad2.dpad_right);
+            // armDoBuild.update(gamepad2.y && gamepad2.dpad_right);
             armFloorUp.update(gamepad2.y && gamepad2.dpad_up);
             armFloorDown.update(gamepad2.y && gamepad2.dpad_down);
 

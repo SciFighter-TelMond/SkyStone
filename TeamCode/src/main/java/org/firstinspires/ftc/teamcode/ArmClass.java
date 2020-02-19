@@ -76,8 +76,8 @@ public class ArmClass extends Thread {
         arm0.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         arm1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
-        arm0.setTargetPositionTolerance(15);
-        arm1.setTargetPositionTolerance(15);
+        arm0.setTargetPositionTolerance(20);
+        arm1.setTargetPositionTolerance(20);
 
         //==============================
         // PIDF control
@@ -303,7 +303,7 @@ public class ArmClass extends Thread {
     public void run() {
         ElapsedTime timer = new ElapsedTime();
         try {
-            power = 0.95;
+            power = 1;
             setArmDriveMode(false);
             switch (mode) {
                 case HOME:
@@ -401,11 +401,17 @@ public class ArmClass extends Thread {
                     break;
 
                 case SKY1_STRETCH: // stretch arm to start position
-                    gootoo(900, 0);
+                    RobotLog.d("Arm do: STRACH");
+
+                    gootoo(700, 0);
                     rotateClamps(true);
                     openClamps(true);
-                    gootoo(STAY, 450);
-                    gootoo(515, 380);
+                    arm1.setPower(1);
+                    sleep(200);
+                    gootoo(STAY, 400);
+                    arm0.setPower(0.8);
+                    gootoo(480, 380);
+                    RobotLog.d("Arm do: STRACH/");
                     break;
 
                 case SKY2_FOLD: // after catch move arm back
@@ -413,7 +419,8 @@ public class ArmClass extends Thread {
                     break;
 
                 case SKY3_READY: // get ready to catch
-                    gootoo(515, 380);
+                    gootoo(630,430);
+                    gootoo(480, 380);
                     break;
 
                 case SKY4_DROP:
@@ -431,7 +438,7 @@ public class ArmClass extends Thread {
                     RobotLog.d("Arm do: SKY5_DROP_BACK");
                     rotateClamps(false);
                     gootoo(5200, 20);
-                    sleep(200);
+                    sleep(1000);
                     openClamps(true);
                     sleep(500);
                     linearDo(Mode.HOME);
