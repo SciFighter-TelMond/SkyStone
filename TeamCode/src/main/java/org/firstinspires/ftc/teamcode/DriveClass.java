@@ -959,13 +959,16 @@ public class DriveClass {
         int mul;
         Location location;
         double backDist;
+        double strafeToBridge;
         if (team == Alliance.BLUE) {
             mul = -1;
             backDist = 0.15;
+            strafeToBridge = 0.15;
             location = Location.RIGHT;
         } else { // Alliance.RED
             mul = 1;
             backDist = 0.3;
+            strafeToBridge = 0.3;
             location = Location.LEFT;
         }
 
@@ -980,9 +983,10 @@ public class DriveClass {
             double skyDist = searchSkystone(location,mul); // drive LEFT : search for SkyStone
             RobotLog.d("skyDist: %f", skyDist);
 
-            if (skyDist<0.4)
-                RobotLog.d("Skystone sleep 1500");
-                opMode.sleep(1500);
+            while(arm.isBusy() && opMode.opModeIsActive()) { // wait for arm to finish its SKY1_STRETCH maneuver
+                RobotLog.d("Arm busy before stone pickup");
+                opMode.sleep(10);
+            }
 
             // pickup STONE
             arm.openClamps(false); // close clamps
@@ -1000,7 +1004,7 @@ public class DriveClass {
 
             // Dropdown stone.
             arm.pleaseDo(ArmClass.Mode.SKY4_DROP);
-            opMode.sleep(1000);
+            opMode.sleep(800);
 
             // ============= Second Skystone ==============================================================================================================================
             RobotLog.d("Second Skystone");
@@ -1045,7 +1049,7 @@ public class DriveClass {
                 double bridgeDirection =  - 90 * mul ; // bridge direction
                 rotateTo(bridgeDirection,1,3, 5);      // rotate foundation to building zone.
                 hooksUp();                                                      // release foundation.
-                strafe(0.2 * mul, DriveClass.Direction.RIGHT,1,1,bridgeDirection);
+                strafe(strafeToBridge * mul, DriveClass.Direction.RIGHT,1,1,bridgeDirection);
 
                 // Parking - drive FORWARD towards bridge line to park - search the line and park.
                 straight(0.7, DriveClass.Direction.FORWARD,0.7,3, bridgeDirection, false);       // move forward toward bridge.

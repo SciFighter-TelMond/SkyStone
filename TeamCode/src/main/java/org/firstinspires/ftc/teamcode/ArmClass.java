@@ -299,6 +299,10 @@ public class ArmClass extends Thread {
         }
     }
 
+    public boolean isBusy() {
+        return (mode != Mode.MANUAL && mode != Mode.IDLE);
+    }
+
     @Override
     public void run() {
         ElapsedTime timer = new ElapsedTime();
@@ -407,20 +411,22 @@ public class ArmClass extends Thread {
                     rotateClamps(true);
                     openClamps(true);
                     arm1.setPower(1);
-                    sleep(200);
+                    sleep(200); // wait until swings end to prevent collide on clamps.
                     gootoo(STAY, 400);
-                    arm0.setPower(0.8);
-                    gootoo(480, 380);
+                    arm0.setPower(0.6); // slow arm down to prevent swings and collide on clamps.
+                    gootoo(495, 380);
                     RobotLog.d("Arm do: STRACH/");
                     break;
 
                 case SKY2_FOLD: // after catch move arm back
+                    arm1.setPower(1); // increase speed to prevent collide with bridge
                     gootoo(550, 100);
                     break;
 
                 case SKY3_READY: // get ready to catch
                     gootoo(630,430);
-                    gootoo(480, 380);
+                    arm0.setPower(0.6);
+                    gootoo(495, 380);
                     break;
 
                 case SKY4_DROP:
@@ -441,7 +447,15 @@ public class ArmClass extends Thread {
                     sleep(1000);
                     openClamps(true);
                     sleep(500);
-                    linearDo(Mode.HOME);
+
+                    // HOME
+                    // linearDo(Mode.HOME);
+                    driveClass.rollers(true);
+                    rotateClamps(false);
+                    openClamps(false);
+                    gootoo(-200, -200);
+                    driveClass.rollers(false);
+
                     RobotLog.d("Arm do: SKY5_DROP_BACK/");
                     break;
 
