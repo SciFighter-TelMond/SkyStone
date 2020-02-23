@@ -779,9 +779,9 @@ public class DriveClass {
         }
 
         if (foundationType == FoundationType.PARK_ONLY) {
-            while (timer.seconds() < 20 && opMode.opModeIsActive()) {
-                opMode.sleep(100);
-            }
+//            while (timer.seconds() < 20 && opMode.opModeIsActive()) {
+//                opMode.sleep(100);
+//            }
             //strafe(1.5 * mul, Direction.LEFT, 0.7, 3, 0);
             driveToLine(team, false, 10);
         }
@@ -875,7 +875,7 @@ public class DriveClass {
         return speed;
     }
 
-    private double searchSkystone(Location location,int mul) {
+    private double searchSkystone(Location location,int mul, boolean last) {
         // drive side way : search for SkyStone and return the time to find it.
         ElapsedTime total_timer = new ElapsedTime();
         total_timer.reset();
@@ -905,15 +905,17 @@ public class DriveClass {
 //        }
 //        RobotLog.d("Skystone 2 at %f sec",total_timer.seconds());
 
-        // continue driving a little more to middle of the stone
-        int skyPos = fl_Drive.getCurrentPosition();
-        int ticks = (int) (1400 * 0.24);
-        // int target = startPos - ticks * mul;
-        timer.reset();
-        while (Math.abs(fl_Drive.getCurrentPosition() - skyPos) < Math.abs(ticks) && timer.seconds() < 0.6  && opMode.opModeIsActive()) {
-            speed = speedup(total_timer.seconds(), 0.2, maxSpeed, accTime);
-            drive(0, -speed * mul, 0, 0, 0);
-            opMode.sleep(2);
+        if (!last) {
+            // continue driving a little more to middle of the stone
+            int skyPos = fl_Drive.getCurrentPosition();
+            int ticks = (int) (1400 * 0.24);
+            // int target = startPos - ticks * mul;
+            timer.reset();
+            while (Math.abs(fl_Drive.getCurrentPosition() - skyPos) < Math.abs(ticks) && timer.seconds() < 0.6 && opMode.opModeIsActive()) {
+                speed = speedup(total_timer.seconds(), 0.2, maxSpeed, accTime);
+                drive(0, -speed * mul, 0, 0, 0);
+                opMode.sleep(2);
+            }
         }
         stop();
         double sec = total_timer.seconds();
@@ -945,13 +947,13 @@ public class DriveClass {
         }
         hooksDown();                                                         // catch the foundation
         timer.reset();
-        drive(-0.2, 0, 0, 0, 0);
+        drive(-0.5, 0, 0, 0, 0);
         while( !((leftBumper.getState() == false) && (rightBumper.getState() == false)) && (timer.seconds() < 1) && opMode.opModeIsActive() ) {
             opMode.sleep(2);
         }
         stop();
-        straight(0.1, Direction.REVERSE, 0.2, 0.5, 180, false ); // slow drive to hook the foundation.
-        opMode.sleep(200);
+        straight(0.15, Direction.REVERSE, 0.3, 0.5, 180, false ); // slow drive to hook the foundation.
+        opMode.sleep(250);
     }
 
     public void AUTO_skystone(Alliance team, ArmClass arm, boolean foundation) {
@@ -967,7 +969,7 @@ public class DriveClass {
             location = Location.RIGHT;
         } else { // Alliance.RED
             mul = 1;
-            backDist = 0.3;
+            backDist = 0.28;
             strafeToBridge = 0.3;
             location = Location.LEFT;
         }
@@ -980,7 +982,7 @@ public class DriveClass {
 
             // find skystone
             approachStones(location);     // drive straight close to stones
-            double skyDist = searchSkystone(location,mul); // drive LEFT : search for SkyStone
+            double skyDist = searchSkystone(location,mul, false); // drive LEFT : search for SkyStone
             RobotLog.d("skyDist: %f", skyDist);
 
             while(arm.isBusy() && opMode.opModeIsActive()) { // wait for arm to finish its SKY1_STRETCH maneuver
@@ -1015,15 +1017,20 @@ public class DriveClass {
 
             // find skystone
             approachStones(location);     // drive straight close to stones
-            searchSkystone(location,mul); // drive LEFT : search for SkyStone
+            boolean last = skyDist > 0.9;
+            searchSkystone(location, mul, last); // drive LEFT : search for SkyStone
 
-            // pickup STONE
-            arm.openClamps(false);
-            arm.setArmDriveMode(false);
-            arm.gootoo(60, 400,0.4);
-            opMode.sleep(300); // wait for clamps to close
-            arm.pleaseDo(ArmClass.Mode.SKY2_FOLD);
-
+            if (!last) {
+                // pickup STONE
+                arm.openClamps(false);
+                arm.setArmDriveMode(false);
+                arm.gootoo(60, 400, 0.4);
+                opMode.sleep(300); // wait for clamps to close
+                arm.pleaseDo(ArmClass.Mode.SKY2_FOLD);
+            } else {
+                arm.openClamps(false);
+                arm.pleaseDo(ArmClass.Mode.SKY2_FOLD);
+            }
             // drive backwards
             straight(backDist, DriveClass.Direction.REVERSE, 0.8, 1, 0,false);
 
@@ -1052,7 +1059,7 @@ public class DriveClass {
                 strafe(strafeToBridge * mul, DriveClass.Direction.RIGHT,1,1,bridgeDirection);
 
                 // Parking - drive FORWARD towards bridge line to park - search the line and park.
-                straight(0.7, DriveClass.Direction.FORWARD,0.7,3, bridgeDirection, false);       // move forward toward bridge.
+                straight(0.9, DriveClass.Direction.FORWARD,0.9,3, bridgeDirection, false);       // move forward toward bridge.
                 timer.reset();
                 drive(0.6, 0, 0, 0, 0); // drive slowly until it sees the line.
                 while (!isLine(team) && timer.seconds() < 3  && opMode.opModeIsActive()) {

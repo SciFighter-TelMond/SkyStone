@@ -414,7 +414,7 @@ public class ArmClass extends Thread {
                     sleep(200); // wait until swings end to prevent collide on clamps.
                     gootoo(STAY, 400);
                     arm0.setPower(0.6); // slow arm down to prevent swings and collide on clamps.
-                    gootoo(495, 380);
+                    gootoo(515, 350);
                     RobotLog.d("Arm do: STRACH/");
                     break;
 
@@ -426,7 +426,7 @@ public class ArmClass extends Thread {
                 case SKY3_READY: // get ready to catch
                     gootoo(630,430);
                     arm0.setPower(0.6);
-                    gootoo(495, 380);
+                    gootoo(515, 350);
                     break;
 
                 case SKY4_DROP:
@@ -444,7 +444,7 @@ public class ArmClass extends Thread {
                     RobotLog.d("Arm do: SKY5_DROP_BACK");
                     rotateClamps(false);
                     gootoo(5200, 20);
-                    sleep(1000);
+                    sleep(200);
                     openClamps(true);
                     sleep(500);
 
